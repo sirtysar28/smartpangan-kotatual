@@ -1,0 +1,206 @@
+@extends('layouts.admin')
+@section('title', 'Perizinan Pangan - Admin Pangan Cerdas (Panca) Maryadat Kota Tual')
+@section('content')
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4 animate-fade-up">
+    <div>
+        <h4 class="fw-bold mb-1" style="font-size:1.4rem"><i class="bi bi-file-earmark-text me-2" style="color:var(--primary)"></i>Perizinan Pangan</h4>
+        <p class="text-muted mb-0 small">Kelola data perizinan pangan, PDUK, BPOM, Halal, SP-IRT di Kota Tual</p>
+    </div>
+    <a href="{{ route('admin.permits.create') }}" class="btn btn-primary-modern"><i class="bi bi-plus-lg me-2"></i>Tambah Perizinan</a>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-4 animate-fade-up">
+    <div class="col-6 col-md-3">
+        <div class="stat-card" style="border-left:4px solid #6366f1">
+            <div class="stat-icon" style="background:rgba(99,102,241,0.1);color:#6366f1"><i class="bi bi-file-earmark-text"></i></div>
+            <div>
+                <div class="fw-bold" style="font-size:1.4rem">{{ $stats['total'] }}</div>
+                <small class="text-muted">Total</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card" style="border-left:4px solid #f59e0b">
+            <div class="stat-icon" style="background:rgba(245,158,11,0.1);color:#f59e0b"><i class="bi bi-hourglass-split"></i></div>
+            <div>
+                <div class="fw-bold" style="font-size:1.4rem;color:#f59e0b">{{ $stats['pending'] }}</div>
+                <small class="text-muted">Menunggu</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card" style="border-left:4px solid #10b981">
+            <div class="stat-icon" style="background:rgba(16,185,129,0.1);color:#10b981"><i class="bi bi-patch-check-fill"></i></div>
+            <div>
+                <div class="fw-bold" style="font-size:1.4rem;color:#10b981">{{ $stats['approved'] }}</div>
+                <small class="text-muted">Disetujui</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card" style="border-left:4px solid #ef4444">
+            <div class="stat-icon" style="background:rgba(239,68,68,0.1);color:#ef4444"><i class="bi bi-x-circle-fill"></i></div>
+            <div>
+                <div class="fw-bold" style="font-size:1.4rem;color:#ef4444">{{ $stats['rejected'] }}</div>
+                <small class="text-muted">Ditolak</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card border-0 mb-4 animate-fade-up" style="border-radius:var(--radius);box-shadow:var(--shadow)">
+    <div class="p-3">
+        <form method="GET" action="{{ route('admin.permits.index') }}" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small fw-semibold text-muted">Cari</label>
+                <input type="text" name="search" class="form-control form-control-sm" placeholder="Nama usaha / pemohon / nomor..." value="{{ request('search') }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold text-muted">Jenis Perizinan</label>
+                <select name="type" class="form-select form-select-sm">
+                    <option value="">Semua</option>
+                    <option value="pduk" {{ request('type') == 'pduk' ? 'selected' : '' }}>PDUK</option>
+                    <option value="bpom" {{ request('type') == 'bpom' ? 'selected' : '' }}>BPOM</option>
+                    <option value="halal" {{ request('type') == 'halal' ? 'selected' : '' }}>Halal</option>
+                    <option value="sp_irt" {{ request('type') == 'sp_irt' ? 'selected' : '' }}>SP-IRT</option>
+                    <option value="lainnya" {{ request('type') == 'lainnya' ? 'selected' : '' }}>Lainnya</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold text-muted">Status</label>
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">Semua</option>
+                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Menunggu</option>
+                    <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Disetujui</option>
+                    <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Ditolak</option>
+                    <option value="expired" {{ request('status') == 'expired' ? 'selected' : '' }}>Kadaluarsa</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <div class="d-flex gap-1">
+                    <button type="submit" class="btn btn-sm btn-primary-modern" style="flex:1"><i class="bi bi-search"></i></button>
+                    <a href="{{ route('admin.permits.index') }}" class="btn btn-sm" style="background:rgba(99,102,241,0.08);color:var(--primary);border-radius:8px"><i class="bi bi-x-lg"></i></a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="card border-0 animate-fade-up" style="border-radius:var(--radius);box-shadow:var(--shadow)">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-modern mb-0" style="font-size:0.8rem">
+                <thead>
+                    <tr>
+                        <th style="width:40px">#</th>
+                        <th>Nomor Perizinan</th>
+                        <th>Nama Usaha</th>
+                        <th>Pemohon</th>
+                        <th>Jenis</th>
+                        <th>Status</th>
+                        <th>Tgl Terbit</th>
+                        <th>Tgl Kadaluarsa</th>
+                        <th style="width:120px">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($permits as $i => $p)
+                    @php
+                        $pClr = $p->permit_status_color;
+                        $pIcon = $p->permit_status_icon;
+                        $pLabel = $p->permit_status_label;
+                    @endphp
+                    <tr>
+                        <td class="text-muted">{{ $permits->firstItem() + $i }}</td>
+                        <td>
+                            <div class="fw-semibold" style="font-size:0.78rem">{{ $p->permit_number }}</div>
+                            @if($p->document_file_url)
+                                <a href="{{ $p->document_file_url }}" target="_blank" class="small" style="color:var(--primary);text-decoration:none"><i class="bi bi-paperclip me-1"></i>Dokumen</a>
+                            @endif
+                        </td>
+                        <td class="fw-semibold">{{ $p->business_name }}</td>
+                        <td>
+                            <small>{{ $p->applicant_name }}</small>
+                            @if($p->applicant_phone)
+                                <br><small class="text-muted">{{ $p->applicant_phone }}</small>
+                            @endif
+                        </td>
+                        <td><span class="badge" style="background:rgba(99,102,241,0.08);color:var(--primary);font-size:0.65rem">{{ $p->permit_type_label }}</span></td>
+                        <td>
+                            <span class="badge" style="background:{{ $pClr }}18;color:{{ $pClr }};font-size:0.68rem;border-radius:8px;font-weight:600">
+                                <i class="bi bi-{{ $pIcon }} me-1"></i>{{ $pLabel }}
+                            </span>
+                            @if($p->rejection_reason)
+                                <br><small class="text-danger" style="font-size:0.62rem" title="{{ $p->rejection_reason }}">{{ Str::limit($p->rejection_reason, 30) }}</small>
+                            @endif
+                        </td>
+                        <td><small>{{ $p->issue_date ? $p->issue_date->format('d/m/Y') : '-' }}</small></td>
+                        <td><small>{{ $p->expiry_date ? $p->expiry_date->format('d/m/Y') : '-' }}</small></td>
+                        <td>
+                            <div class="d-flex gap-1 flex-wrap">
+                                @if($p->permit_status === 'pending')
+                                    <form action="{{ route('admin.permits.approve', $p) }}" method="POST" onsubmit="return confirm('Setujui perizinan ini?')">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm" style="background:rgba(16,185,129,0.1);color:#10b981;border-radius:6px;font-size:0.7rem" title="Setujui"><i class="bi bi-check-lg"></i></button>
+                                    </form>
+                                    <button type="button" class="btn btn-sm" style="background:rgba(239,68,68,0.1);color:#ef4444;border-radius:6px;font-size:0.7rem" title="Tolak" data-bs-toggle="modal" data-bs-target="#rejectModal{{ $p->id }}"><i class="bi bi-x-lg"></i></button>
+                                @endif
+                                <a href="{{ route('admin.permits.edit', $p) }}" class="btn btn-sm" style="background:rgba(99,102,241,0.1);color:var(--primary);border-radius:6px;font-size:0.7rem" title="Edit"><i class="bi bi-pencil"></i></a>
+                                <form action="{{ route('admin.permits.destroy', $p) }}" method="POST" onsubmit="return confirm('Hapus perizinan ini?')">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="btn btn-sm" style="background:rgba(239,68,68,0.08);color:#ef4444;border-radius:6px;font-size:0.7rem" title="Hapus"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+
+                    {{-- Reject Modal --}}
+                    @if($p->permit_status === 'pending')
+                    <div class="modal fade" id="rejectModal{{ $p->id }}" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content" style="border-radius:16px;border:none">
+                                <div class="modal-header border-0 pb-0">
+                                    <h6 class="fw-bold mb-0"><i class="bi bi-x-circle-fill me-2" style="color:#ef4444"></i>Tolak Perizinan</h6>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p class="text-muted small mb-3">Perizinan <strong>{{ $p->permit_number }}</strong> — {{ $p->business_name }}</p>
+                                    <form action="{{ route('admin.permits.reject', $p) }}" method="POST">
+                                        @csrf
+                                        <label class="form-label small fw-semibold">Alasan Penolakan *</label>
+                                        <textarea name="rejection_reason" class="form-control" rows="3" required placeholder="Tulis alasan penolakan..."></textarea>
+                                        <div class="d-flex gap-2 mt-3">
+                                            <button type="submit" class="btn btn-sm" style="background:#ef4444;color:#fff;border-radius:8px;font-weight:600"><i class="bi bi-x-lg me-1"></i>Tolak</button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:8px">Batal</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    @empty
+                    <tr>
+                        <td colspan="9" class="text-center py-5">
+                            <div style="font-size:2rem;opacity:0.3;margin-bottom:0.5rem"><i class="bi bi-file-earmark-text"></i></div>
+                            <p class="text-muted mb-0">Belum ada data perizinan.</p>
+                            <a href="{{ route('admin.permits.create') }}" class="btn btn-sm btn-primary-modern mt-2"><i class="bi bi-plus-lg me-1"></i>Tambah Perizinan</a>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @if($permits->hasPages())
+    <div class="card-footer p-3" style="background:var(--bg-card)">
+        {{ $permits->withQueryString()->links() }}
+    </div>
+    @endif
+</div>
+@endsection
