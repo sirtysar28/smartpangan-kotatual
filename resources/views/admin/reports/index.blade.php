@@ -64,5 +64,31 @@
             </div>
         </div>
     </div>
+
+    <div class="col-md-6 animate-fade-up delay-4">
+        <div class="card border-0 h-100" style="border-radius:var(--radius);box-shadow:var(--shadow);border-top:3px solid #a855f7">
+            <div class="p-3">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="stat-icon" style="background:rgba(168,85,247,0.1)"><i class="bi bi-shield-check" style="color:#a855f7"></i></div>
+                    <div><h6 class="fw-bold mb-0">Laporan Keamanan Pangan</h6><small class="text-muted">Hasil Uji Rapid Test &amp; Uji Laboratorium</small></div>
+                </div>
+                <form action="{{ route('admin.reports.food-safety') }}" method="POST">@csrf
+                    <div class="row g-2 mb-2">
+                        <div class="col-6"><label class="form-label small">Dari (opsional)</label><input type="date" name="start_date" class="form-control form-control-sm"></div>
+                        <div class="col-6"><label class="form-label small">Sampai (opsional)</label><input type="date" name="end_date" class="form-control form-control-sm"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small">Jenis Laporan</label>
+                        <select name="report_type" class="form-select form-select-sm">
+                            <option value="all">Semua (Rapid Test + Uji Lab)</option>
+                            <option value="rapid">Hanya Uji Rapid Test</option>
+                            <option value="lab">Hanya Uji Laboratorium</option>
+                        </select>
+                    </div>
+                    <button class="btn w-100" style="background:rgba(168,85,247,0.1);color:#a855f7;border:none;border-radius:10px;font-weight:600"><i class="bi bi-file-earmark-pdf me-2"></i>Download Laporan PDF</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection

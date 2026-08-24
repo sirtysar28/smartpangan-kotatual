@@ -14,6 +14,8 @@ use App\Models\CommodityStock;
 use App\Models\FoodVulnerability;
 use App\Models\FoodSafety;
 use App\Models\FoodSafetyActivity;
+use App\Models\RapidTest;
+use App\Models\LabTest;
 use App\Models\SitePage;
 use Illuminate\Http\Request;
 
@@ -370,27 +372,22 @@ class HomeController extends Controller
     // ==================== KEAMANAN PANGAN ====================
     public function foodSafety()
     {
-        $checks = FoodSafety::with(['commodity', 'creator'])
-            ->latest('check_date')
-            ->paginate(15);
+        $rapidTests = RapidTest::latest('test_date')
+            ->paginate(10, ['*'], 'rapid_page');
 
-        $activities = FoodSafetyActivity::with('creator')
-            ->latest('activity_date')
-            ->paginate(10);
+        $labTests = LabTest::with('parameters')
+            ->latest('test_date')
+            ->paginate(10, ['*'], 'lab_page');
 
         $stats = [
-            'total_checks' => FoodSafety::count(),
-            'total_activities' => FoodSafetyActivity::count(),
-            'layak' => FoodSafety::whereIn('inspection_result', ['layak', 'Layak'])->count(),
-            'tidak_layak' => FoodSafety::whereIn('inspection_result', ['tidak_layak', 'Tidak Layak'])->count(),
-            'perlu_tindak_lanjut' => FoodSafety::whereIn('inspection_result', ['perlu_tindak_lanjut', 'Perlu Tindak Lanjut'])->count(),
+            'total_rapid' => RapidTest::count(),
+            'rapid_negatif' => RapidTest::where('result', 'negatif')->count(),
+            'rapid_positif' => RapidTest::where('result', 'positif')->count(),
+            'total_lab' => LabTest::count(),
         ];
 
-        $sourceTypes = FoodSafety::select('food_source_type')
-            ->distinct()->pluck('food_source_type');
-
         return view('frontend.food-safety', compact(
-            'checks', 'activities', 'stats', 'sourceTypes'
+            'rapidTests', 'labTests', 'stats'
         ));
     }
 

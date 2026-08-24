@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class ActivityLogService
 {
-    public static function log(string $action, string $module, string $description = null, array $properties = [])
+    public static function log(string $action, string $module, ?string $description = null, array $properties = [])
     {
         ActivityLog::create([
             'user_id' => Auth::id(),

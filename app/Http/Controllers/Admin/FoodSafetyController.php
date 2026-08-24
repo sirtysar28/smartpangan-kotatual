@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\FoodSafety;
 use App\Models\FoodSafetyActivity;
+use App\Models\RapidTest;
+use App\Models\LabTest;
 use App\Models\Commodity;
 use App\Services\ActivityLogService;
 use Illuminate\Http\Request;
@@ -15,28 +17,29 @@ class FoodSafetyController extends Controller
 
     public function index(Request $request)
     {
-        $safeties = FoodSafety::with('commodity', 'creator')
-            ->when($request->search, fn($q, $s) => $q->where('food_name', 'like', "%{$s}%")
-                ->orWhere('distributor_name', 'like', "%{$s}%")
-                ->orWhere('retailer_name', 'like', "%{$s}%"))
-            ->when($request->food_source_type, fn($q, $t) => $q->where('food_source_type', $t))
-            ->when($request->inspection_result, fn($q, $r) => $q->where('inspection_result', $r))
-            ->latest('check_date')
-            ->paginate(15);
+        $rapidTests = RapidTest::with('creator')
+            ->when($request->rapid_search, fn($q, $s) => $q->where('commodity_name', 'like', "%{$s}%")
+                ->orWhere('sample_location', 'like', "%{$s}%"))
+            ->when($request->rapid_type, fn($q, $t) => $q->where('rapid_test_type', $t))
+            ->latest('test_date')
+            ->paginate(10, ['*'], 'rapid_page');
 
-        $activities = FoodSafetyActivity::with('creator')
-            ->latest('activity_date')
-            ->paginate(10, ['*'], 'activity_page');
+        $labTests = LabTest::with('parameters')->withCount('parameters')
+            ->when($request->lab_search, fn($q, $s) => $q->where('commodity_name', 'like', "%{$s}%")
+                ->orWhere('lab_name', 'like', "%{$s}%")
+                ->orWhere('sample_location', 'like', "%{$s}%"))
+            ->latest('test_date')
+            ->paginate(10, ['*'], 'lab_page');
 
         $summary = [
-            'total_checks' => FoodSafety::count(),
-            'layak' => FoodSafety::where('inspection_result', 'layak')->count(),
-            'tidak_layak' => FoodSafety::where('inspection_result', 'tidak_layak')->count(),
-            'tindak_lanjut' => FoodSafety::where('inspection_result', 'perlu_tindak_lanjut')->count(),
-            'total_activities' => FoodSafetyActivity::count(),
+            'total_rapid' => RapidTest::count(),
+            'rapid_positif' => RapidTest::where('result', 'positif')->count(),
+            'rapid_negatif' => RapidTest::where('result', 'negatif')->count(),
+            'total_lab' => LabTest::count(),
+            'lab_tms' => LabTest::whereHas('parameters', fn($q) => $q->where('status', 'TMS'))->count(),
         ];
 
-        return view('admin.food-safety.index', compact('safeties', 'activities', 'summary'));
+        return view('admin.food-safety.index', compact('rapidTests', 'labTests', 'summary'));
     }
 
     public function createCheck()

@@ -84,6 +84,8 @@ Buka browser: **http://localhost:8000**
 - ✅ Manajemen kategori produk
 - ✅ Monitoring pesanan
 - ✅ Harga komoditas & bahan pangan
+- ✅ Uji Rapid Test (boraks, formalin, rhodamin B, dll) — input & tampil di frontend
+- ✅ Uji Laboratorium (mikotoksin, logam berat, mikrobiologi, residu pestisida) dengan nilai, satuan, standar, LOD/LOQ, status MS/TMS, sertifikat CoA PDF
 - ✅ AI Dashboard (trending, stock alert, prediksi inflasi)
 - ✅ Laporan PDF (penjualan, UMKM, komoditas, produk terlaris)
 
@@ -172,8 +174,9 @@ tualmart-ai/
 1. **Dashboard** → Statistik overview
 2. **Verifikasi UMKM** → Approve/reject
 3. **Monitor** harga komoditas pangan
-4. **AI Dashboard** → Insights & prediksi
-5. **Generate laporan** → PDF export
+4. **Keamanan Pangan** → Input pemeriksaan, uji rapid test, uji laboratorium (hasil tampil di frontend menu Keamanan Pangan)
+5. **AI Dashboard** → Insights & prediksi
+6. **Generate laporan** → PDF export
 
 ---
 

@@ -109,6 +109,20 @@ Route::middleware(['auth','admin'])->prefix('admin')->name('admin.')->group(func
     Route::put('/food-safety/activity/{activity}', [App\Http\Controllers\Admin\FoodSafetyController::class, 'updateActivity'])->name('food-safety.activity.update');
     Route::delete('/food-safety/activity/{activity}', [App\Http\Controllers\Admin\FoodSafetyController::class, 'destroyActivity'])->name('food-safety.activity.destroy');
 
+    // === UJI RAPID TEST (KEAMANAN PANGAN) ===
+    Route::get('/food-safety/rapid-test/create', [App\Http\Controllers\Admin\RapidTestController::class, 'create'])->name('food-safety.rapid.create');
+    Route::post('/food-safety/rapid-test', [App\Http\Controllers\Admin\RapidTestController::class, 'store'])->name('food-safety.rapid.store');
+    Route::get('/food-safety/rapid-test/{rapidTest}/edit', [App\Http\Controllers\Admin\RapidTestController::class, 'edit'])->name('food-safety.rapid.edit');
+    Route::put('/food-safety/rapid-test/{rapidTest}', [App\Http\Controllers\Admin\RapidTestController::class, 'update'])->name('food-safety.rapid.update');
+    Route::delete('/food-safety/rapid-test/{rapidTest}', [App\Http\Controllers\Admin\RapidTestController::class, 'destroy'])->name('food-safety.rapid.destroy');
+
+    // === UJI LABORATORIUM (KEAMANAN PANGAN) ===
+    Route::get('/food-safety/lab-test/create', [App\Http\Controllers\Admin\LabTestController::class, 'create'])->name('food-safety.lab.create');
+    Route::post('/food-safety/lab-test', [App\Http\Controllers\Admin\LabTestController::class, 'store'])->name('food-safety.lab.store');
+    Route::get('/food-safety/lab-test/{labTest}/edit', [App\Http\Controllers\Admin\LabTestController::class, 'edit'])->name('food-safety.lab.edit');
+    Route::put('/food-safety/lab-test/{labTest}', [App\Http\Controllers\Admin\LabTestController::class, 'update'])->name('food-safety.lab.update');
+    Route::delete('/food-safety/lab-test/{labTest}', [App\Http\Controllers\Admin\LabTestController::class, 'destroy'])->name('food-safety.lab.destroy');
+
     // === PERIZINAN PANGAN ===
     Route::get('/permits', [App\Http\Controllers\Admin\PermitController::class, 'index'])->name('permits.index');
 
@@ -153,6 +167,7 @@ Route::middleware(['auth','admin'])->prefix('admin')->name('admin.')->group(func
     Route::post('/reports/umkm', [App\Http\Controllers\Admin\ReportController::class, 'umkmReport'])->name('reports.umkm');
     Route::post('/reports/commodity', [App\Http\Controllers\Admin\ReportController::class, 'commodityReport'])->name('reports.commodity');
     Route::post('/reports/top-products', [App\Http\Controllers\Admin\ReportController::class, 'topProductsReport'])->name('reports.top-products');
+    Route::post('/reports/food-safety', [App\Http\Controllers\Admin\ReportController::class, 'foodSafetyReport'])->name('reports.food-safety');
 
     // Site Pages (Kelola Halaman Profil)
     Route::get('/site-pages', [App\Http\Controllers\Admin\SitePageController::class, 'index'])->name('site-pages.index');

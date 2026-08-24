@@ -25,6 +25,7 @@
         position: relative; overflow: hidden;
         max-height: 90vh; overflow-y: auto;
     }
+    .detail-popup-modal.wide { max-width: 900px; }
     .detail-popup-close {
         position: absolute; top: 12px; right: 12px; z-index: 10;
         width: 36px; height: 36px; border-radius: 50%;
@@ -102,11 +103,11 @@
                     </ol>
                 </nav>
                 <h4 class="fw-bold text-white mb-1"><i class="bi bi-shield-check me-2"></i>Keamanan Pangan</h4>
-                <small class="text-white-50">Pemeriksaan dan kegiatan keamanan mutu pangan di Kota Tual</small>
+                <small class="text-white-50">Hasil Uji Rapid Test & Uji Laboratorium pangan di Kota Tual</small>
             </div>
             <div class="d-flex gap-2">
-                <span class="badge-modern" style="background:rgba(14,165,233,0.15);color:#0ea5e9"><i class="bi bi-circle-fill me-1" style="font-size:0.4rem"></i>{{ $stats['total_checks'] }} Pemeriksaan</span>
-                <span class="badge-modern" style="background:rgba(16,185,129,0.15);color:#10b981"><i class="bi bi-circle-fill me-1" style="font-size:0.4rem"></i>{{ $stats['total_activities'] }} Kegiatan</span>
+                <span class="badge-modern" style="background:rgba(168,85,247,0.15);color:#c084fc"><i class="bi bi-circle-fill me-1" style="font-size:0.4rem"></i>{{ $stats['total_rapid'] }} Uji Rapid Test</span>
+                <span class="badge-modern" style="background:rgba(239,68,68,0.15);color:#f87171"><i class="bi bi-circle-fill me-1" style="font-size:0.4rem"></i>{{ $stats['total_lab'] }} Uji Lab</span>
             </div>
         </div>
     </div>
@@ -117,11 +118,20 @@
     <div class="container">
         <div class="row g-3">
             <div class="col-6 col-md-3">
+                <div class="stat-card" style="border-left:4px solid #a855f7">
+                    <div class="stat-icon" style="background:rgba(168,85,247,0.1);color:#a855f7"><i class="bi bi-lightning-charge-fill"></i></div>
+                    <div>
+                        <div class="fw-bold" style="font-size:1.5rem;color:#a855f7">{{ $stats['total_rapid'] }}</div>
+                        <small class="text-muted">Total Uji Rapid Test</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
                 <div class="stat-card" style="border-left:4px solid #10b981">
                     <div class="stat-icon" style="background:rgba(16,185,129,0.1);color:#10b981"><i class="bi bi-check-circle-fill"></i></div>
                     <div>
-                        <div class="fw-bold" style="font-size:1.5rem;color:#10b981">{{ $stats['layak'] }}</div>
-                        <small class="text-muted">Layak Konsumsi</small>
+                        <div class="fw-bold" style="font-size:1.5rem;color:#10b981">{{ $stats['rapid_negatif'] }}</div>
+                        <small class="text-muted">Rapid Test Negatif (Aman)</small>
                     </div>
                 </div>
             </div>
@@ -129,26 +139,17 @@
                 <div class="stat-card" style="border-left:4px solid #ef4444">
                     <div class="stat-icon" style="background:rgba(239,68,68,0.1);color:#ef4444"><i class="bi bi-x-circle-fill"></i></div>
                     <div>
-                        <div class="fw-bold" style="font-size:1.5rem;color:#ef4444">{{ $stats['tidak_layak'] }}</div>
-                        <small class="text-muted">Tidak Layak</small>
+                        <div class="fw-bold" style="font-size:1.5rem;color:#ef4444">{{ $stats['rapid_positif'] }}</div>
+                        <small class="text-muted">Rapid Test Positif</small>
                     </div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="stat-card" style="border-left:4px solid #f59e0b">
-                    <div class="stat-icon" style="background:rgba(245,158,11,0.1);color:#f59e0b"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                <div class="stat-card" style="border-left:4px solid #0ea5e9">
+                    <div class="stat-icon" style="background:rgba(14,165,233,0.1);color:#0ea5e9"><i class="bi bi-eyedropper"></i></div>
                     <div>
-                        <div class="fw-bold" style="font-size:1.5rem;color:#f59e0b">{{ $stats['perlu_tindak_lanjut'] }}</div>
-                        <small class="text-muted">Perlu Tindak Lanjut</small>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="stat-card" style="border-left:4px solid #6366f1">
-                    <div class="stat-icon" style="background:rgba(99,102,241,0.1);color:#6366f1"><i class="bi bi-clipboard-data"></i></div>
-                    <div>
-                        <div class="fw-bold" style="font-size:1.5rem;color:var(--primary)">{{ $stats['total_checks'] }}</div>
-                        <small class="text-muted">Total Pemeriksaan</small>
+                        <div class="fw-bold" style="font-size:1.5rem;color:#0ea5e9">{{ $stats['total_lab'] }}</div>
+                        <small class="text-muted">Total Uji Laboratorium</small>
                     </div>
                 </div>
             </div>
@@ -161,22 +162,22 @@
     <div class="container">
         <ul class="nav nav-tabs mb-3" role="tablist" style="border-bottom:2px solid #e2e8f0">
             <li class="nav-item">
-                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#checkPanel" type="button" role="tab" style="font-size:0.85rem;font-weight:600;border-radius:8px 8px 0 0">
-                    <i class="bi bi-clipboard2-check me-1"></i>Pemeriksaan
-                    <span class="badge ms-1" style="background:rgba(14,165,233,0.1);color:#0ea5e9;font-size:0.65rem">{{ $stats['total_checks'] }}</span>
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#rapidPanel" type="button" role="tab" style="font-size:0.85rem;font-weight:600;border-radius:8px 8px 0 0">
+                    <i class="bi bi-lightning-charge me-1"></i>Uji Rapid Test
+                    <span class="badge ms-1" style="background:rgba(168,85,247,0.1);color:#a855f7;font-size:0.65rem">{{ $stats['total_rapid'] }}</span>
                 </button>
             </li>
             <li class="nav-item">
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#activityPanel" type="button" role="tab" style="font-size:0.85rem;font-weight:600;border-radius:8px 8px 0 0">
-                    <i class="bi bi-calendar-event me-1"></i>Kegiatan
-                    <span class="badge ms-1" style="background:rgba(16,185,129,0.1);color:#10b981;font-size:0.65rem">{{ $stats['total_activities'] }}</span>
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#labPanel" type="button" role="tab" style="font-size:0.85rem;font-weight:600;border-radius:8px 8px 0 0">
+                    <i class="bi bi-eyedropper me-1"></i>Uji Laboratorium
+                    <span class="badge ms-1" style="background:rgba(239,68,68,0.1);color:#ef4444;font-size:0.65rem">{{ $stats['total_lab'] }}</span>
                 </button>
             </li>
         </ul>
 
         <div class="tab-content">
-            <!-- Pemeriksaan Tab -->
-            <div class="tab-pane fade show active" id="checkPanel" role="tabpanel">
+            <!-- Uji Rapid Test Tab -->
+            <div class="tab-pane fade show active" id="rapidPanel" role="tabpanel">
                 <div class="card border-0" style="border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden">
                     <div class="card-body p-0">
                         <div class="table-responsive">
@@ -185,75 +186,35 @@
                                     <tr>
                                         <th style="width:40px">#</th>
                                         <th>Tanggal</th>
-                                        <th>Nama Pangan</th>
-                                        <th>Asal</th>
-                                        <th>Pelaku Usaha</th>
-                                        <th>Sertifikasi</th>
-                                        <th>Hasil</th>
+                                        <th>Komoditas</th>
+                                        <th>Jenis Komoditas</th>
+                                        <th>Lokasi Sampel</th>
+                                        <th>Jenis Rapid Test</th>
+                                        <th>Hasil Uji</th>
                                         <th style="width:30px"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($checks as $i => $check)
-                                    @php
-                                        $rawResult = $check->inspection_result ?? '-';
-                                        $fcResult = $check->inspection_result_label ?? $rawResult;
-                                        // Color based on raw DB value
-                                        $rl = strtolower($rawResult);
-                                        if ($rl === '-' || $rawResult === '-') {
-                                            $fcClr = '#64748b';
-                                        } elseif (strpos($rl, 'tidak') !== false) {
-                                            $fcClr = '#ef4444';
-                                        } elseif (strpos($rl, 'layak') !== false) {
-                                            $fcClr = '#10b981';
-                                        } else {
-                                            $fcClr = '#f59e0b';
-                                        }
-                                        // Icon
-                                        if ($rl === '-' || $rawResult === '-') {
-                                            $fcIcon = 'dash-circle';
-                                        } elseif (strpos($rl, 'tidak') !== false) {
-                                            $fcIcon = 'x-circle-fill';
-                                        } elseif (strpos($rl, 'layak') !== false) {
-                                            $fcIcon = 'check-circle-fill';
-                                        } elseif (strpos($rl, 'tindak') !== false) {
-                                            $fcIcon = 'exclamation-triangle-fill';
-                                        } else {
-                                            $fcIcon = 'dash-circle';
-                                        }
-                                    @endphp
-                                    <tr class="check-row safety-check-row" data-check-id="{{ $check->id }}">
-                                        <td class="text-muted">{{ $checks->firstItem() + $i }}</td>
-                                        <td>{{ $check->check_date?->format('d/m/Y') }}</td>
-                                        <td class="fw-semibold">{{ $check->food_name }}</td>
-                                        <td><span class="badge" style="background:rgba(99,102,241,0.08);color:var(--primary);font-size:0.65rem">{{ $check->source_type_label ?? $check->food_source_type ?? '-' }}</span></td>
+                                    @forelse($rapidTests as $i => $rapid)
+                                    <tr class="check-row rapid-test-row" data-rapid-id="{{ $rapid->id }}" style="border-left:3px solid {{ $rapid->result_color }}">
+                                        <td class="text-muted">{{ $rapidTests->firstItem() + $i }}</td>
+                                        <td>{{ $rapid->test_date?->format('d/m/Y') }}</td>
+                                        <td class="fw-semibold">{{ $rapid->commodity_name }}</td>
+                                        <td>{{ $rapid->commodity_type ?? '-' }}</td>
+                                        <td>{{ $rapid->sample_location }}</td>
+                                        <td><span class="badge" style="background:rgba(168,85,247,0.08);color:#a855f7;font-size:0.65rem"><i class="bi bi-lightning-charge me-1"></i>{{ $rapid->type_label }}</span></td>
                                         <td>
-                                            <small class="fw-medium">{{ $check->distributor_name ?? '-' }}</small>
-                                            @if($check->retailer_name)
-                                                <br><small class="text-muted">{{ $check->retailer_name }}</small>
-                                            @endif
+                                            <span class="badge" style="background:{{ $rapid->result_color }}22;color:{{ $rapid->result_color }};font-size:0.7rem">
+                                                <i class="bi bi-{{ $rapid->result === 'positif' ? 'x-circle-fill' : 'check-circle-fill' }} me-1"></i>{{ $rapid->result_label }}
+                                            </span>
                                         </td>
-                                        <td>
-                                            <div class="d-flex gap-2 flex-wrap">
-                                                <span title="{{ $check->bpom_number ? 'BPOM: '.$check->bpom_number : 'Belum ada BPOM' }}">
-                                                    <i class="bi bi-{{ $check->bpom_number ? 'check-circle-fill' : 'dash-circle' }}" style="color:{{ $check->bpom_number ? '#10b981' : '#94a3b8' }};font-size:0.8rem"></i>
-                                                </span>
-                                                <span title="{{ $check->is_halal ? 'Halal'.($check->halal_number ? ': '.$check->halal_number : '') : 'Belum Halal' }}">
-                                                    <i class="bi bi-{{ $check->is_halal ? 'check-circle-fill' : 'dash-circle' }}" style="color:{{ $check->is_halal ? '#10b981' : '#94a3b8' }};font-size:0.8rem"></i>
-                                                </span>
-                                                <span title="{{ $check->is_pduk ? 'PDUK'.($check->pduk_number ? ': '.$check->pduk_number : '') : 'Belum PDUK' }}">
-                                                    <i class="bi bi-{{ $check->is_pduk ? 'check-circle-fill' : 'dash-circle' }}" style="color:{{ $check->is_pduk ? '#10b981' : '#94a3b8' }};font-size:0.8rem"></i>
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td><span class="badge" style="background:{{ $fcClr }}22;color:{{ $fcClr }};font-size:0.7rem"><i class="bi bi-{{ $fcIcon }} me-1"></i>{{ $fcResult }}</span></td>
                                         <td><i class="bi bi-eye" style="color:var(--primary);opacity:0.4;font-size:0.8rem"></i></td>
                                     </tr>
                                     @empty
                                     <tr>
                                         <td colspan="8" class="text-center py-5">
-                                            <div style="font-size:2rem;opacity:0.3;margin-bottom:0.5rem"><i class="bi bi-clipboard2-check"></i></div>
-                                            <p class="text-muted mb-0">Belum ada data pemeriksaan keamanan pangan.</p>
+                                            <div style="font-size:2rem;opacity:0.3;margin-bottom:0.5rem"><i class="bi bi-lightning-charge"></i></div>
+                                            <p class="text-muted mb-0">Belum ada data uji rapid test.</p>
                                         </td>
                                     </tr>
                                     @endforelse
@@ -261,64 +222,78 @@
                             </table>
                         </div>
                     </div>
-                    @if($checks->hasPages())
-                    <div class="card-footer p-3" style="background:var(--bg-card)">{{ $checks->links() }}</div>
+                    @if($rapidTests->hasPages())
+                    <div class="card-footer p-3" style="background:var(--bg-card)">{{ $rapidTests->links() }}</div>
                     @endif
                 </div>
                 <div class="text-center mt-2">
-                    <small class="text-muted"><i class="bi bi-cursor me-1"></i>Klik baris untuk melihat detail lengkap</small>
+                    <small class="text-muted"><i class="bi bi-cursor me-1"></i>Klik baris untuk melihat detail hasil uji rapid test</small>
                 </div>
             </div>
 
-            <!-- Kegiatan Tab -->
-            <div class="tab-pane fade" id="activityPanel" role="tabpanel">
-                <div class="row g-3">
-                    @forelse($activities as $activity)
-                    <div class="col-md-6 col-lg-4">
-                        <div class="card border-0 h-100 activity-card" data-activity-id="{{ $activity->id }}" style="border-radius:var(--radius);box-shadow:var(--shadow-sm)">
-                            @if($activity->evidence_photo)
-                                <div style="overflow:hidden;border-radius:var(--radius) var(--radius) 0 0;height:180px">
-                                    <img src="{{ Storage::url($activity->evidence_photo) }}" alt="{{ $activity->title }}" style="width:100%;height:100%;object-fit:cover" loading="lazy">
-                                </div>
-                            @else
-                            <div style="height:80px;background:linear-gradient(135deg,rgba(14,165,233,0.08),rgba(16,185,129,0.06));display:flex;align-items:center;justify-content:center;border-radius:var(--radius) var(--radius) 0 0">
-                                <i class="bi bi-calendar-event" style="font-size:2rem;color:#0ea5e9;opacity:0.3"></i>
-                            </div>
-                            @endif
-                            <div class="card-body p-3">
-                                <div class="d-flex align-items-center gap-2 mb-2">
-                                    <span class="badge" style="background:rgba(14,165,233,0.08);color:#0ea5e9;font-size:0.65rem">
-                                        <i class="bi bi-{{ $activity->activity_type_icon ?? 'activity' }} me-1"></i>{{ $activity->activity_type_label ?? '-' }}
-                                    </span>
-                                    <span class="badge" style="background:rgba(99,102,241,0.08);color:var(--primary);font-size:0.65rem">
-                                        <i class="bi bi-calendar3 me-1"></i>{{ $activity->activity_date?->format('d/m/Y') }}
-                                    </span>
-                                </div>
-                                <h6 class="fw-bold mb-2" style="font-size:0.88rem">{{ $activity->title }}</h6>
-                                <p class="text-muted small mb-2">{{ Str::limit($activity->description, 100) }}</p>
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <small class="text-muted"><i class="bi bi-geo-alt me-1"></i>{{ $activity->location ?? '-' }}</small>
-                                    @if($activity->participants_count)
-                                        <small class="text-muted"><i class="bi bi-people me-1"></i>{{ $activity->participants_count }} peserta</small>
-                                    @endif
-                                </div>
-                            </div>
+            <!-- Uji Laboratorium Tab -->
+            <div class="tab-pane fade" id="labPanel" role="tabpanel">
+                <div class="card border-0" style="border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-modern mb-0" style="font-size:0.82rem">
+                                <thead>
+                                    <tr>
+                                        <th style="width:40px">#</th>
+                                        <th>Tanggal</th>
+                                        <th>Komoditas</th>
+                                        <th>Jenis PSAT</th>
+                                        <th>Lab Uji</th>
+                                        <th>Lokasi Sampel</th>
+                                        <th>Status</th>
+                                        <th>CoA</th>
+                                        <th style="width:30px"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($labTests as $i => $lab)
+                                    <tr class="check-row lab-test-row" data-lab-id="{{ $lab->id }}" style="border-left:3px solid {{ $lab->overall_status_color }}">
+                                        <td class="text-muted">{{ $labTests->firstItem() + $i }}</td>
+                                        <td>{{ $lab->test_date?->format('d/m/Y') }}</td>
+                                        <td class="fw-semibold">{{ $lab->commodity_name }}</td>
+                                        <td><span class="badge" style="background:rgba(14,165,233,0.08);color:#0ea5e9;font-size:0.65rem">{{ $lab->psat_type_label }}</span></td>
+                                        <td>{{ $lab->lab_name }}</td>
+                                        <td>{{ $lab->sample_location }}</td>
+                                        <td>
+                                            <span class="badge" style="background:{{ $lab->overall_status_color }}22;color:{{ $lab->overall_status_color }};font-size:0.7rem">
+                                                <i class="bi bi-{{ $lab->overall_status === 'TMS' ? 'x-circle-fill' : 'check-circle-fill' }} me-1"></i>{{ $lab->overall_status_label }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @if($lab->certificate_file)
+                                                <a href="{{ $lab->certificate_file_url }}" target="_blank" class="badge" style="background:rgba(239,68,68,0.1);color:#ef4444;font-size:0.65rem;text-decoration:none" onclick="event.stopPropagation()"><i class="bi bi-file-earmark-pdf me-1"></i>PDF</a>
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
+                                        </td>
+                                        <td><i class="bi bi-eye" style="color:var(--primary);opacity:0.4;font-size:0.8rem"></i></td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="9" class="text-center py-5">
+                                            <div style="font-size:2rem;opacity:0.3;margin-bottom:0.5rem"><i class="bi bi-eyedropper"></i></div>
+                                            <p class="text-muted mb-0">Belum ada data hasil uji laboratorium.</p>
+                                        </td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                    @empty
-                    <div class="col-12 text-center py-5">
-                        <div style="font-size:2rem;opacity:0.3;margin-bottom:0.5rem"><i class="bi bi-calendar-event"></i></div>
-                        <p class="text-muted mb-0">Belum ada data kegiatan keamanan pangan.</p>
-                    </div>
-                    @endforelse
+                    @if($labTests->hasPages())
+                    <div class="card-footer p-3" style="background:var(--bg-card)">{{ $labTests->links() }}</div>
+                    @endif
                 </div>
-                @if($activities->hasPages())
-                <div class="mt-3">{{ $activities->links() }}</div>
-                @endif
                 <div class="text-center mt-2">
-                    <small class="text-muted"><i class="bi bi-cursor me-1"></i>Klik kartu untuk melihat detail lengkap</small>
+                    <small class="text-muted"><i class="bi bi-cursor me-1"></i>Klik baris untuk melihat hasil uji laboratorium lengkap (gaya sertifikat lab)</small>
                 </div>
             </div>
+
         </div>
     </div>
 </section>
@@ -326,24 +301,30 @@
 <!-- Legend -->
 <section class="py-4" style="background:var(--bg-card)">
     <div class="container">
-        <h6 class="fw-bold mb-3" style="font-size:0.95rem"><i class="bi bi-info-circle me-2" style="color:var(--primary)"></i>Penjelasan Sertifikasi</h6>
+        <h6 class="fw-bold mb-3" style="font-size:0.95rem"><i class="bi bi-info-circle me-2" style="color:var(--primary)"></i>Penjelasan Istilah Hasil Uji</h6>
         <div class="row g-3">
-            <div class="col-md-4">
-                <div class="p-3 d-flex align-items-start gap-2" style="border-radius:var(--radius-sm);background:rgba(16,185,129,0.04);border:1px solid rgba(16,185,129,0.1)">
-                    <i class="bi bi-check-circle-fill" style="color:#10b981;font-size:1.2rem;margin-top:2px"></i>
-                    <div><h6 class="fw-bold mb-0" style="font-size:0.82rem">BPOM</h6><small class="text-muted">Badan Pengawas Obat dan Makanan</small></div>
+            <div class="col-md-3 col-6">
+                <div class="p-3 h-100" style="border-radius:var(--radius-sm);background:rgba(168,85,247,0.04);border:1px solid rgba(168,85,247,0.1)">
+                    <h6 class="fw-bold mb-1" style="font-size:0.8rem"><i class="bi bi-lightning-charge-fill me-1" style="color:#a855f7"></i>Rapid Test</h6>
+                    <small class="text-muted">Uji cepat pemeriksaan bahan berbahaya (boraks, formalin, pewarna, dll) langsung di lokasi sampel</small>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="p-3 d-flex align-items-start gap-2" style="border-radius:var(--radius-sm);background:rgba(16,185,129,0.04);border:1px solid rgba(16,185,129,0.1)">
-                    <i class="bi bi-check-circle-fill" style="color:#10b981;font-size:1.2rem;margin-top:2px"></i>
-                    <div><h6 class="fw-bold mb-0" style="font-size:0.82rem">Halal</h6><small class="text-muted">Sertifikasi halal BPJPH</small></div>
+            <div class="col-md-3 col-6">
+                <div class="p-3 h-100" style="border-radius:var(--radius-sm);background:rgba(16,185,129,0.04);border:1px solid rgba(16,185,129,0.1)">
+                    <h6 class="fw-bold mb-1" style="font-size:0.8rem"><i class="bi bi-check-circle-fill me-1" style="color:#10b981"></i>Negatif / MS</h6>
+                    <small class="text-muted">Negatif = tidak terdeteksi bahan berbahaya. MS = Memenuhi Syarat sesuai baku mutu</small>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="p-3 d-flex align-items-start gap-2" style="border-radius:var(--radius-sm);background:rgba(16,185,129,0.04);border:1px solid rgba(16,185,129,0.1)">
-                    <i class="bi bi-check-circle-fill" style="color:#10b981;font-size:1.2rem;margin-top:2px"></i>
-                    <div><h6 class="fw-bold mb-0" style="font-size:0.82rem">PDUK</h6><small class="text-muted">Perizinan Usaha Pangan</small></div>
+            <div class="col-md-3 col-6">
+                <div class="p-3 h-100" style="border-radius:var(--radius-sm);background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.1)">
+                    <h6 class="fw-bold mb-1" style="font-size:0.8rem"><i class="bi bi-x-circle-fill me-1" style="color:#ef4444"></i>Positif / TMS</h6>
+                    <small class="text-muted">Positif = terdeteksi bahan berbahaya. TMS = Tidak Memenuhi Syarat sesuai baku mutu</small>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="p-3 h-100" style="border-radius:var(--radius-sm);background:rgba(14,165,233,0.04);border:1px solid rgba(14,165,233,0.1)">
+                    <h6 class="fw-bold mb-1" style="font-size:0.8rem"><i class="bi bi-file-earmark-pdf me-1" style="color:#0ea5e9"></i>LOD / LOQ / CoA</h6>
+                    <small class="text-muted">LOD/LOQ = batas deteksi & batas kuantifikasi alat uji. CoA = Certificate of Analysis dari laboratorium</small>
                 </div>
             </div>
         </div>
@@ -381,11 +362,13 @@
 
     function esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-    function openPopup(html, hdrColor, hdrTitle, hdrSub) {
+    function openPopup(html, hdrColor, hdrTitle, hdrSub, wide) {
         header.style.background = hdrColor || 'linear-gradient(135deg,#0c4a6e,#0ea5e9)';
         titleEl.textContent = hdrTitle || 'Detail';
         subtitleEl.textContent = hdrSub || '';
         bodyEl.innerHTML = html;
+        var modal = overlay.querySelector('.detail-popup-modal');
+        if (modal) modal.classList.toggle('wide', !!wide);
         overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
     }
@@ -397,114 +380,148 @@
     function infoItem(label, value, full) {
         return '<div class="detail-info-item'+(full?' full':'')+'"><div class="info-label">'+label+'</div><div class="info-value">'+value+'</div></div>';
     }
-    function certRow(name, hasCert, number) {
-        var cls = hasCert ? 'cert-yes' : 'cert-no';
-        var icon = hasCert ? '<i class="bi bi-check-circle-fill cert-icon" style="color:#10b981"></i>' : '<i class="bi bi-dash-circle cert-icon" style="color:#94a3b8"></i>';
-        var numHtml = '';
-        if (hasCert && number && number !== '-' && number !== '') {
-            numHtml = '<span class="cert-number">(' + esc(number) + ')</span>';
-        }
-        return '<div class="detail-cert-row '+cls+'">' + icon + ' <span class="cert-name">' + name + '</span>' + numHtml + '</div>';
-    }
 
     // ===== EMBED DATA =====
-    
-    // Konversi data ke JSON di sisi server (PHP)
-    var checksData = {!! json_encode($checks->mapWithKeys(function($check) {
-        return [$check->id => [
-            'date' => $check->check_date ? $check->check_date->format('d/m/Y') : '-',
-            'foodName' => $check->food_name ?? '',
-            'sourceType' => $check->source_type_label ?? $check->food_source_type ?? '-',
-            'foodCondition' => $check->food_condition_label ?? $check->food_condition ?? '-',
-            'packagingType' => $check->packaging_type ?? '-',
-            'packagingNetto' => $check->packaging_netto ?? '-',
-            'expiryDate' => $check->expiry_date ? $check->expiry_date->format('d/m/Y') : '-',
-            'distributorName' => $check->distributor_name ?? '-',
-            'retailerName' => $check->retailer_name ?? '-',
-            'retailerAddress' => $check->retailer_address ?? '-',
-            'bpomNumber' => $check->bpom_number ?? '',
-            'isHalal' => (bool) $check->is_halal,
-            'halalNumber' => $check->halal_number ?? '',
-            'isPduk' => (bool) $check->is_pduk,
-            'pdukNumber' => $check->pduk_number ?? '',
-            'result' => $check->inspection_result_label ?? $check->inspection_result ?? '-',
-            'resultColor' => $check->inspection_result_color ?? '#64748b',
-            'recommendation' => $check->recommendation,
-            'recommendationPhoto' => $check->recommendation_photo_url,
-            'inspectionType' => $check->inspection_type ?? '-',
-            'inspectorName' => $check->inspector_name ?? '-',
-            'notes' => $check->notes,
-            'creatorName' => $check->creator?->name ?? '-',
+
+    var rapidTestsData = {!! json_encode($rapidTests->mapWithKeys(function($r) {
+        return [$r->id => [
+            'date' => $r->test_date ? $r->test_date->format('d/m/Y') : '-',
+            'location' => $r->sample_location ?? '-',
+            'commodityName' => $r->commodity_name ?? '',
+            'commodityType' => $r->commodity_type ?? '-',
+            'type' => $r->type_label ?? '-',
+            'result' => $r->result_label ?? '-',
+            'resultColor' => $r->result_color ?? '#64748b',
+            'notes' => $r->notes,
         ]];
     })) !!};
 
-    var activitiesData = {!! json_encode($activities->mapWithKeys(function($activity) {
-        return [$activity->id => [
-            'date' => $activity->activity_date ? $activity->activity_date->format('d/m/Y') : '-',
-            'title' => $activity->title ?? '',
-            'type' => $activity->activity_type_label ?? '-',
-            'typeIcon' => $activity->activity_type_icon ?? 'activity',
-            'description' => $activity->description,
-            'location' => $activity->location ?? '-',
-            'participantsCount' => $activity->participants_count ?? 0,
-            'evidencePhoto' => $activity->evidence_photo ? \Storage::url($activity->evidence_photo) : null,
-            'evidencePhoto2' => $activity->evidence_photo_2 ? \Storage::url($activity->evidence_photo_2) : null,
-            'evidencePhoto3' => $activity->evidence_photo_3 ? \Storage::url($activity->evidence_photo_3) : null,
-            'outcome' => $activity->outcome,
-            'status' => $activity->status ?? '-',
-            'creatorName' => $activity->creator?->name ?? '-',
+    var labTestsData = {!! json_encode($labTests->mapWithKeys(function($lab) {
+        return [$lab->id => [
+            'date' => $lab->test_date ? $lab->test_date->format('d/m/Y') : '-',
+            'location' => $lab->sample_location ?? '-',
+            'labName' => $lab->lab_name ?? '-',
+            'commodityName' => $lab->commodity_name ?? '',
+            'psatType' => $lab->psat_type_label ?? '-',
+            'method' => $lab->method ?? '-',
+            'notes' => $lab->notes,
+            'certificate' => $lab->certificate_file_url,
+            'overallStatus' => $lab->overall_status_label ?? '-',
+            'overallColor' => $lab->overall_status_color ?? '#64748b',
+            'params' => $lab->parameters->map(function($p) {
+                return [
+                    'category' => $p->test_category,
+                    'categoryLabel' => $p->category_label,
+                    'categoryIcon' => $p->category_icon,
+                    'categoryColor' => $p->category_color,
+                    'parameter' => $p->parameter,
+                    'result' => $p->result_label,
+                    'resultColor' => $p->result_color,
+                    'value' => $p->value ?? '',
+                    'unit' => $p->unit ?? '',
+                    'standard' => $p->standard ?? '',
+                    'lod' => $p->lod ?? '',
+                    'loq' => $p->loq ?? '',
+                    'status' => $p->status_label ?? '-',
+                    'statusColor' => $p->status_color ?? '#64748b',
+                    'method' => $p->method ?? '-',
+                ];
+            }),
         ]];
     })) !!};
 
-    // Click check row
-    document.querySelectorAll('.safety-check-row').forEach(function(row) {
+    // Click rapid test row
+    document.querySelectorAll('.rapid-test-row').forEach(function(row) {
         row.addEventListener('click', function() {
-            var id = this.dataset.checkId;
-            var d = checksData[id];
-            if (!d) { console.warn('No data for check id:', id); return; }
+            var id = this.dataset.rapidId;
+            var d = rapidTestsData[id];
+            if (!d) return;
 
-            var r = d.result.toLowerCase();
-            var hdrColor = r.indexOf('layak') >= 0 && r.indexOf('tidak') < 0
-                ? 'linear-gradient(135deg,#064e3b,#10b981)'
-                : (r.indexOf('tidak') >= 0 ? 'linear-gradient(135deg,#7f1d1d,#ef4444)' : 'linear-gradient(135deg,#78350f,#f59e0b)');
+            var isPos = d.result.toLowerCase().indexOf('positif') >= 0;
+            var hdrColor = isPos ? 'linear-gradient(135deg,#7f1d1d,#ef4444)' : 'linear-gradient(135deg,#581c87,#a855f7)';
 
             var html = '<div class="detail-info-grid">';
-            html += infoItem('Tanggal Pemeriksaan', esc(d.date));
-            html += infoItem('Nama Pangan', '<strong>' + esc(d.foodName) + '</strong>');
-            html += infoItem('Asal Pangan', esc(d.sourceType));
-            html += infoItem('Kondisi Pangan', esc(d.foodCondition));
-            html += infoItem('Jenis Kemasan', esc(d.packagingType));
-            html += infoItem('Berat Bersih', esc(d.packagingNetto));
-            html += infoItem('Tanggal Kadaluarsa', esc(d.expiryDate));
-            html += infoItem('Jenis Pemeriksaan', esc(d.inspectionType));
-            html += infoItem('Nama Pemeriksa', esc(d.inspectorName));
-            html += infoItem('Dibuat Oleh', esc(d.creatorName));
+            html += infoItem('Tanggal Pengujian', esc(d.date));
+            html += infoItem('Komoditas', '<strong>' + esc(d.commodityName) + '</strong>');
+            html += infoItem('Jenis Komoditas', esc(d.commodityType));
+            html += infoItem('Lokasi Sampel', esc(d.location));
+            html += infoItem('Jenis Rapid Test', '<i class="bi bi-lightning-charge me-1"></i>' + esc(d.type));
+            html += infoItem('Hasil Uji', '<strong style="color:' + d.resultColor + '">' + esc(d.result) + '</strong>');
             html += '</div>';
 
-            html += '<h6 class="fw-bold mt-3 mb-2" style="font-size:0.85rem;color:var(--primary)"><i class="bi bi-person-badge me-1"></i>Pelaku Usaha</h6>';
-            html += '<div class="detail-info-grid">';
-            html += infoItem('Distributor', esc(d.distributorName));
-            html += infoItem('Pengecer', esc(d.retailerName));
-            html += infoItem('Alamat Pengecer', esc(d.retailerAddress), true);
-            html += '</div>';
-
-            html += '<h6 class="fw-bold mt-3 mb-2" style="font-size:0.85rem;color:var(--primary)"><i class="bi bi-patch-check me-1"></i>Sertifikasi</h6>';
-            html += certRow('BPOM', d.bpomNumber !== '' && d.bpomNumber !== '-', d.bpomNumber);
-            html += certRow('Halal', d.isHalal, d.halalNumber);
-            html += certRow('PDUK', d.isPduk, d.pdukNumber);
-
-            html += '<h6 class="fw-bold mt-3 mb-2" style="font-size:0.85rem;color:var(--primary)"><i class="bi bi-clipboard-check me-1"></i>Hasil Pemeriksaan</h6>';
-            html += '<div class="p-3" style="border-radius:12px;background:'+d.resultColor+'10;border:1px solid '+d.resultColor+'20;text-align:center">';
-            html += '<div class="fw-bold" style="font-size:1.1rem;color:'+d.resultColor+'">' + esc(d.result) + '</div>';
-            html += '</div>';
-
-            if (d.recommendation) {
-                html += '<div class="mt-2 p-3" style="border-radius:12px;background:rgba(99,102,241,0.04);border:1px solid rgba(99,102,241,0.08)">';
-                html += '<div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;font-weight:600;margin-bottom:4px">Rekomendasi</div>';
-                html += '<div style="font-size:0.85rem">' + esc(d.recommendation) + '</div></div>';
+            if (d.notes) {
+                html += '<div class="mt-2 p-3" style="border-radius:12px;background:rgba(148,163,184,0.04);border:1px solid rgba(148,163,184,0.08)">';
+                html += '<div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;font-weight:600;margin-bottom:4px">Catatan</div>';
+                html += '<div style="font-size:0.85rem">' + esc(d.notes) + '</div></div>';
             }
-            if (d.recommendationPhoto) {
-                html += '<div class="mt-2"><img src="'+esc(d.recommendationPhoto)+'" alt="Rekomendasi" style="max-width:100%;border-radius:12px;border:1px solid #e2e8f0"></div>';
+
+            openPopup(html, hdrColor, d.commodityName, 'Uji Rapid Test — ' + d.type + ' — ' + d.date);
+        });
+    });
+
+    // Click lab test row → popup gaya sertifikat lab (CoA)
+    document.querySelectorAll('.lab-test-row').forEach(function(row) {
+        row.addEventListener('click', function() {
+            var id = this.dataset.labId;
+            var d = labTestsData[id];
+            if (!d) return;
+
+            var isTms = d.overallStatus.indexOf('TMS') >= 0 || d.overallStatus.indexOf('Tidak') >= 0;
+            var hdrColor = isTms ? 'linear-gradient(135deg,#7f1d1d,#ef4444)' : 'linear-gradient(135deg,#0c4a6e,#0ea5e9)';
+
+            var html = '<div class="p-3 mb-2" style="border-radius:12px;background:' + d.overallColor + '10;border:1px solid ' + d.overallColor + '22;display:flex;align-items:center;justify-content:space-between;gap:0.75rem;flex-wrap:wrap">';
+            html += '<div><div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;font-weight:600">Kesimpulan Hasil Uji</div>';
+            html += '<div class="fw-bold" style="font-size:1.05rem;color:' + d.overallColor + '">' + esc(d.overallStatus) + '</div></div>';
+            html += '<small class="text-muted">' + d.params.length + ' parameter diuji</small>';
+            html += '</div>';
+
+            html += '<div class="detail-info-grid">';
+            html += infoItem('Tanggal Pengujian', esc(d.date));
+            html += infoItem('Nama Komoditas', '<strong>' + esc(d.commodityName) + '</strong>');
+            html += infoItem('Jenis PSAT', esc(d.psatType));
+            html += infoItem('Lab Uji', esc(d.labName));
+            html += infoItem('Lokasi Sampel', esc(d.location));
+            html += infoItem('Metode Uji (Umum)', esc(d.method));
+            html += '</div>';
+
+            // Tabel parameter per kelompok uji (gaya CoA)
+            var groups = {};
+            var order = [];
+            d.params.forEach(function(p) {
+                if (!groups[p.category]) { groups[p.category] = []; order.push(p); }
+                groups[p.category].push(p);
+            });
+
+            html += '<div class="mt-3">';
+            order.forEach(function(first) {
+                var list = groups[first.category];
+                html += '<div class="mb-3">';
+                html += '<div class="fw-bold mb-1" style="font-size:0.8rem;color:' + first.categoryColor + '"><i class="bi ' + first.categoryIcon + ' me-1"></i>' + esc(first.categoryLabel) + '</div>';
+                html += '<div style="overflow-x:auto;border-radius:12px;border:1px solid rgba(148,163,184,0.15)">';
+                html += '<table style="width:100%;border-collapse:collapse;font-size:0.7rem;min-width:640px">';
+                html += '<thead><tr style="background:' + first.categoryColor + '0d">';
+                ['Parameter','Hasil','Nilai','Satuan','Standar','LOD','LOQ','Status','Metode'].forEach(function(h){ html += '<th style="padding:0.45rem 0.6rem;text-align:left;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.3px;color:#64748b">' + h + '</th>'; });
+                html += '</tr></thead><tbody>';
+                list.forEach(function(p, idx) {
+                    var bg = idx % 2 ? 'background:rgba(148,163,184,0.03)' : '';
+                    html += '<tr style="' + bg + '">';
+                    html += '<td style="padding:0.45rem 0.6rem;font-weight:600;white-space:nowrap">' + esc(p.parameter) + '</td>';
+                    html += '<td style="padding:0.45rem 0.6rem;color:' + p.resultColor + ';font-weight:600;white-space:nowrap">' + esc(p.result) + '</td>';
+                    html += '<td style="padding:0.45rem 0.6rem">' + esc(p.value || '-') + '</td>';
+                    html += '<td style="padding:0.45rem 0.6rem">' + esc(p.unit || '-') + '</td>';
+                    html += '<td style="padding:0.45rem 0.6rem">' + esc(p.standard || '-') + '</td>';
+                    html += '<td style="padding:0.45rem 0.6rem">' + esc(p.lod || '-') + '</td>';
+                    html += '<td style="padding:0.45rem 0.6rem">' + esc(p.loq || '-') + '</td>';
+                    html += '<td style="padding:0.45rem 0.6rem;white-space:nowrap"><span style="color:' + p.statusColor + ';font-weight:600">' + esc(p.status) + '</span></td>';
+                    html += '<td style="padding:0.45rem 0.6rem">' + esc(p.method) + '</td>';
+                    html += '</tr>';
+                });
+                html += '</tbody></table></div></div>';
+            });
+            html += '</div>';
+
+            if (d.certificate) {
+                html += '<a href="' + esc(d.certificate) + '" target="_blank" class="btn btn-sm mt-1" style="background:rgba(239,68,68,0.1);color:#ef4444;border-radius:10px;font-weight:600;font-size:0.75rem"><i class="bi bi-file-earmark-pdf me-1"></i>Unduh Sertifikat CoA (PDF)</a>';
             }
             if (d.notes) {
                 html += '<div class="mt-2 p-3" style="border-radius:12px;background:rgba(148,163,184,0.04);border:1px solid rgba(148,163,184,0.08)">';
@@ -512,42 +529,7 @@
                 html += '<div style="font-size:0.85rem">' + esc(d.notes) + '</div></div>';
             }
 
-            openPopup(html, hdrColor, d.foodName, 'Pemeriksaan — ' + d.date);
-        });
-    });
-
-    // Click activity card
-    document.querySelectorAll('.activity-card').forEach(function(card) {
-        card.addEventListener('click', function() {
-            var id = this.dataset.activityId;
-            var d = activitiesData[id];
-            if (!d) { console.warn('No data for activity id:', id); return; }
-
-            var html = '<div class="detail-info-grid">';
-            html += infoItem('Tanggal', esc(d.date));
-            html += infoItem('Jenis Kegiatan', '<i class="bi bi-'+esc(d.typeIcon)+' me-1"></i>' + esc(d.type));
-            html += infoItem('Lokasi', esc(d.location));
-            html += infoItem('Peserta', d.participantsCount + ' orang');
-            html += infoItem('Status', esc(d.status));
-            html += infoItem('Dibuat Oleh', esc(d.creatorName));
-            html += '</div>';
-
-            if (d.description) {
-                html += '<h6 class="fw-bold mt-3 mb-2" style="font-size:0.85rem;color:var(--primary)"><i class="bi bi-text-paragraph me-1"></i>Deskripsi</h6>';
-                html += '<div class="p-3" style="border-radius:12px;background:rgba(99,102,241,0.04);border:1px solid rgba(99,102,241,0.08)"><div style="font-size:0.85rem;line-height:1.6">'+esc(d.description)+'</div></div>';
-            }
-            if (d.outcome) {
-                html += '<h6 class="fw-bold mt-3 mb-2" style="font-size:0.85rem;color:var(--primary)"><i class="bi bi-flag me-1"></i>Hasil / Outcome</h6>';
-                html += '<div class="p-3" style="border-radius:12px;background:rgba(16,185,129,0.04);border:1px solid rgba(16,185,129,0.08)"><div style="font-size:0.85rem;line-height:1.6">'+esc(d.outcome)+'</div></div>';
-            }
-            var photos = [d.evidencePhoto, d.evidencePhoto2, d.evidencePhoto3].filter(function(p){return p;});
-            if (photos.length > 0) {
-                html += '<h6 class="fw-bold mt-3 mb-2" style="font-size:0.85rem;color:var(--primary)"><i class="bi bi-images me-1"></i>Dokumentasi</h6>';
-                html += '<div class="detail-photo-grid">';
-                photos.forEach(function(p){ html += '<img src="'+esc(p)+'" alt="Dokumentasi" loading="lazy">'; });
-                html += '</div>';
-            }
-            openPopup(html, 'linear-gradient(135deg,#064e3b,#10b981)', d.title, d.type + ' — ' + d.date);
+            openPopup(html, hdrColor, d.commodityName, 'Hasil Uji Laboratorium — ' + d.labName + ' — ' + d.date, true);
         });
     });
 })();
