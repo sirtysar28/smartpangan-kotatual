@@ -345,93 +345,110 @@
     </div>
 </div>
 
-<!-- ===== KEAMANAN PANGAN ===== -->
+<!-- ===== INFORMASI KEAMANAN PANGAN ===== -->
 <div class="card border-0 mb-4 animate-fade-up" style="border-radius:var(--radius);box-shadow:var(--shadow)">
     <div class="p-3">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
             <div class="section-title">
                 <span class="icon-circle" style="background:rgba(14,165,233,0.1);color:#0ea5e9"><i class="bi bi-shield-check"></i></span>
-                Keamanan Pangan
+                Informasi Keamanan Pangan
             </div>
-            <a href="{{ route('admin.food-safety.index') }}" class="btn btn-sm fw-semibold" style="color:var(--primary);font-size:0.8rem">Kelola <i class="bi bi-arrow-right"></i></a>
+            <div class="d-flex gap-2">
+                <a href="{{ route('admin.food-safety.rapid.create') }}" class="btn btn-sm fw-semibold" style="color:#a855f7;font-size:0.78rem;background:rgba(168,85,247,0.08);border-radius:8px"><i class="bi bi-lightning-charge me-1"></i>+ Rapid Test</a>
+                <a href="{{ route('admin.food-safety.lab.create') }}" class="btn btn-sm fw-semibold" style="color:#ef4444;font-size:0.78rem;background:rgba(239,68,68,0.08);border-radius:8px"><i class="bi bi-eyedropper me-1"></i>+ Uji Lab</a>
+                <a href="{{ route('admin.food-safety.index') }}" class="btn btn-sm fw-semibold" style="color:var(--primary);font-size:0.78rem">Kelola <i class="bi bi-arrow-right"></i></a>
+            </div>
         </div>
 
-        <!-- Stats -->
+        <!-- Stats Row -->
         <div class="row g-2 mb-3">
-            <div class="col-6 col-md-3">
-                <div class="p-2 text-center" style="border-radius:10px;background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.12)">
-                    <div class="fw-bold" style="font-size:1.3rem;color:#6366f1">{{ $foodSafetyStats['total_checks'] }}</div>
-                    <small class="text-muted" style="font-size:0.7rem">Total Pemeriksaan</small>
+            <div class="col-6 col-md-2">
+                <div class="p-2 text-center" style="border-radius:10px;background:rgba(168,85,247,0.06);border:1px solid rgba(168,85,247,0.12)">
+                    <div class="fw-bold" style="font-size:1.2rem;color:#a855f7">{{ $rapidTotal }}</div>
+                    <small class="text-muted" style="font-size:0.65rem">Total Rapid Test</small>
                 </div>
             </div>
-            <div class="col-6 col-md-3">
-                <div class="p-2 text-center" style="border-radius:10px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.12)">
-                    <div class="fw-bold" style="font-size:1.3rem;color:#10b981">{{ $foodSafetyStats['layak'] }}</div>
-                    <small class="text-muted" style="font-size:0.7rem">Layak Konsumsi</small>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
+            <div class="col-6 col-md-2">
                 <div class="p-2 text-center" style="border-radius:10px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.12)">
-                    <div class="fw-bold" style="font-size:1.3rem;color:#ef4444">{{ $foodSafetyStats['tidak_layak'] }}</div>
-                    <small class="text-muted" style="font-size:0.7rem">Tidak Layak</small>
+                    <div class="fw-bold" style="font-size:1.2rem;color:#ef4444">{{ $rapidPositif }}</div>
+                    <small class="text-muted" style="font-size:0.65rem">Rapid Positif 🔴</small>
                 </div>
             </div>
-            <div class="col-6 col-md-3">
+            <div class="col-6 col-md-2">
+                <div class="p-2 text-center" style="border-radius:10px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.12)">
+                    <div class="fw-bold" style="font-size:1.2rem;color:#10b981">{{ $rapidNegatif }}</div>
+                    <small class="text-muted" style="font-size:0.65rem">Rapid Negatif ✅</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
                 <div class="p-2 text-center" style="border-radius:10px;background:rgba(14,165,233,0.06);border:1px solid rgba(14,165,233,0.12)">
-                    <div class="fw-bold" style="font-size:1.3rem;color:#0ea5e9">{{ $foodSafetyStats['total_activities'] }}</div>
-                    <small class="text-muted" style="font-size:0.7rem">Kegiatan</small>
+                    <div class="fw-bold" style="font-size:1.2rem;color:#0ea5e9">{{ $labTotal }}</div>
+                    <small class="text-muted" style="font-size:0.65rem">Total Uji Lab</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="p-2 text-center" style="border-radius:10px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.12)">
+                    <div class="fw-bold" style="font-size:1.2rem;color:#10b981">{{ $labMs }}</div>
+                    <small class="text-muted" style="font-size:0.65rem">Lab MS ✅</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="p-2 text-center" style="border-radius:10px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.12)">
+                    <div class="fw-bold" style="font-size:1.2rem;color:#ef4444">{{ $labTms }}</div>
+                    <small class="text-muted" style="font-size:0.65rem">Lab TMS ❌</small>
                 </div>
             </div>
         </div>
 
         <!-- Charts Row -->
         <div class="row g-3 mb-3">
-            <div class="col-lg-8">
-                <small class="fw-bold text-muted d-block mb-2" style="font-size:0.72rem">TREN PEMERIKSAAN (6 BULAN TERAKHIR)</small>
-                <div style="position:relative;height:220px">
-                    <canvas id="foodSafetyTrendChart"></canvas>
+            <div class="col-lg-4">
+                <small class="fw-bold text-muted d-block mb-2" style="font-size:0.72rem">TREN RAPID TEST (6 BULAN)</small>
+                <div style="position:relative;height:200px">
+                    <canvas id="rapidTrendChart"></canvas>
                 </div>
             </div>
             <div class="col-lg-4">
-                <small class="fw-bold text-muted d-block mb-2" style="font-size:0.72rem">DISTRIBUSI HASIL PEMERIKSAAN</small>
-                <div style="position:relative;height:170px">
-                    <canvas id="foodSafetyResultChart"></canvas>
+                <small class="fw-bold text-muted d-block mb-2" style="font-size:0.72rem">TREN UJI LAB (6 BULAN)</small>
+                <div style="position:relative;height:200px">
+                    <canvas id="labTrendChart"></canvas>
                 </div>
-                <div class="d-flex flex-wrap gap-2 mt-2 justify-content-center">
-                    <span class="badge-modern" style="background:rgba(16,185,129,0.1);color:#10b981;font-size:0.62rem"><i class="bi bi-flower1 me-1"></i>Tumbuhan: {{ $foodSafetyBySource['tumbuhan'] }}</span>
-                    <span class="badge-modern" style="background:rgba(14,165,233,0.1);color:#0ea5e9;font-size:0.62rem"><i class="bi bi-fish me-1"></i>Ikan: {{ $foodSafetyBySource['ikan'] }}</span>
-                    <span class="badge-modern" style="background:rgba(245,158,11,0.1);color:#f59e0b;font-size:0.62rem"><i class="bi bi-egg me-1"></i>Hewan: {{ $foodSafetyBySource['hewan'] }}</span>
+            </div>
+            <div class="col-lg-4">
+                <small class="fw-bold text-muted d-block mb-2" style="font-size:0.72rem">RINGKASAN HASIL</small>
+                <div style="position:relative;height:200px">
+                    <canvas id="safetySummaryChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- Recent Checks + Activities -->
+        <!-- Recent Data: Lab Tests + Rapid Tests -->
         <div class="row g-3">
             <div class="col-lg-7">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold mb-0" style="font-size:0.85rem"><i class="bi bi-clock-history me-2" style="color:#0ea5e9"></i>Pemeriksaan Terbaru</h6>
-                    <a href="{{ route('admin.food-safety.index') }}" class="small text-decoration-none fw-semibold" style="color:var(--primary)">Lihat Semua <i class="bi bi-arrow-right"></i></a>
+                    <h6 class="fw-bold mb-0" style="font-size:0.85rem"><i class="bi bi-eyedropper me-2" style="color:#0ea5e9"></i>Uji Lab Terbaru</h6>
+                    <a href="{{ route('admin.food-safety.index', ['tab' => 'lab']) }}" class="small text-decoration-none fw-semibold" style="color:var(--primary)">Lihat Semua <i class="bi bi-arrow-right"></i></a>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-modern mb-0" style="font-size:0.8rem">
+                    <table class="table table-modern mb-0" style="font-size:0.78rem">
                         <thead>
-                            <tr><th>Nama Pangan</th><th>Asal</th><th>Hasil</th><th>Tgl Cek</th></tr>
+                            <tr><th>Komoditas</th><th>Jenis PSAT</th><th>Parameter</th><th>Status</th><th>Tgl Uji</th></tr>
                         </thead>
                         <tbody>
-                            @forelse($recentFoodSafetyChecks as $fc)
-                            @php
-                                $fcClr = match($fc->inspection_result) { 'layak'=>'#10b981','tidak_layak'=>'#ef4444','perlu_tindak_lanjut'=>'#f59e0b', default=>'#64748b' };
-                                $fcIcon = match($fc->inspection_result) { 'layak'=>'check-circle-fill','tidak_layak'=>'x-circle-fill','perlu_tindak_lanjut'=>'exclamation-triangle-fill', default=>'dash-circle' };
-                                $fcLabel = $fc->inspection_result_label;
-                            @endphp
+                            @forelse($recentLabTests as $lt)
                             <tr>
-                                <td class="fw-semibold">{{ $fc->food_name }}</td>
-                                <td><small>{{ $fc->source_type_label }}</small></td>
-                                <td><span class="badge" style="background:{{ $fcClr }}22;color:{{ $fcClr }};font-size:0.62rem"><i class="bi bi-{{ $fcIcon }} me-1"></i>{{ $fcLabel }}</span></td>
-                                <td><small class="text-muted">{{ $fc->check_date?->format('d/m/Y') }}</small></td>
+                                <td class="fw-semibold">{{ $lt->commodity_name }}</td>
+                                <td><small>{{ $lt->psat_type_label }}</small></td>
+                                <td><small>{{ $lt->parameters_count }} parameter</small></td>
+                                <td>
+                                    <span class="badge" style="background:{{ $lt->overall_status_color }}22;color:{{ $lt->overall_status_color }};font-size:0.62rem;border-radius:6px;font-weight:600">
+                                        <i class="bi bi-{{ $lt->overall_status === 'MS' ? 'check-circle-fill' : 'x-circle-fill' }} me-1"></i>{{ $lt->overall_status }}
+                                    </span>
+                                </td>
+                                <td><small class="text-muted">{{ $lt->test_date?->format('d/m/Y') }}</small></td>
                             </tr>
                             @empty
-                            <tr><td colspan="4" class="text-center text-muted small py-3">Belum ada data pemeriksaan.</td></tr>
+                            <tr><td colspan="5" class="text-center text-muted small py-3">Belum ada data uji lab.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -439,24 +456,44 @@
             </div>
             <div class="col-lg-5">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold mb-0" style="font-size:0.85rem"><i class="bi bi-people me-2" style="color:#f59e0b"></i>Kegiatan Terbaru</h6>
-                    <a href="{{ route('admin.food-safety.index') }}#activityPanel" class="small text-decoration-none fw-semibold" style="color:var(--primary)">Lihat Semua <i class="bi bi-arrow-right"></i></a>
+                    <h6 class="fw-bold mb-0" style="font-size:0.85rem"><i class="bi bi-lightning-charge me-2" style="color:#a855f7"></i>Rapid Test Terbaru</h6>
+                    <a href="{{ route('admin.food-safety.index', ['tab' => 'rapid']) }}" class="small text-decoration-none fw-semibold" style="color:var(--primary)">Lihat Semua <i class="bi bi-arrow-right"></i></a>
                 </div>
                 <div class="d-flex flex-column gap-2">
-                    @forelse($recentFoodSafetyActivities as $fa)
-                    <div class="d-flex gap-2 p-2" style="border-radius:10px;background:rgba(0,0,0,0.02);border:1px solid #e2e8f0">
-                        <div style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(245,158,11,0.1)">
-                            <i class="bi bi-{{ $fa->activity_type_icon }}" style="color:#f59e0b;font-size:0.9rem"></i>
+                    @forelse($recentRapidTests as $rt)
+                    <div class="d-flex gap-2 p-2" style="border-radius:10px;background:{{ $rt->result === 'positif' ? 'rgba(239,68,68,0.04)' : 'rgba(16,185,129,0.04)' }};border:1px solid {{ $rt->result === 'positif' ? 'rgba(239,68,68,0.15)' : 'rgba(16,185,129,0.15)' }}">
+                        <div style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:{{ $rt->result === 'positif' ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)' }}">
+                            <i class="bi bi-{{ $rt->result === 'positif' ? 'x-circle-fill' : 'check-circle-fill' }}" style="color:{{ $rt->result === 'positif' ? '#ef4444' : '#10b981' }};font-size:0.9rem"></i>
                         </div>
                         <div class="flex-grow-1">
-                            <div class="fw-semibold" style="font-size:0.8rem">{{ Str::limit($fa->title, 45) }}</div>
-                            <small class="text-muted" style="font-size:0.68rem">{{ $fa->activity_type_label }} · {{ $fa->activity_date?->format('d M Y') }}</small>
+                            <div class="fw-semibold" style="font-size:0.8rem">{{ $rt->commodity_name }}</div>
+                            <small class="text-muted" style="font-size:0.68rem">{{ $rt->type_label }} · {{ $rt->test_date?->format('d M Y') }}</small>
                         </div>
+                        <span class="badge" style="background:{{ $rt->result_color }}22;color:{{ $rt->result_color }};font-size:0.6rem;border-radius:6px;font-weight:600">
+                            {{ $rt->result === 'positif' ? 'Positif' : 'Negatif' }}
+                        </span>
                     </div>
                     @empty
-                    <div class="text-center text-muted small py-3">Belum ada kegiatan.</div>
+                    <div class="text-center text-muted small py-3">Belum ada data rapid test.</div>
                     @endforelse
                 </div>
+
+                @if($recentFoodSafetyActivities->count() > 0)
+                <div class="d-flex justify-content-between align-items-center mt-3 mb-2">
+                    <h6 class="fw-bold mb-0" style="font-size:0.85rem"><i class="bi bi-people me-2" style="color:#f59e0b"></i>Kegiatan Terbaru</h6>
+                </div>
+                @foreach($recentFoodSafetyActivities->take(2) as $fa)
+                <div class="d-flex gap-2 p-2 mb-1" style="border-radius:10px;background:rgba(0,0,0,0.02);border:1px solid #e2e8f0">
+                    <div style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(245,158,11,0.1)">
+                        <i class="bi bi-{{ $fa->activity_type_icon }}" style="color:#f59e0b;font-size:0.8rem"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold" style="font-size:0.75rem">{{ Str::limit($fa->title, 40) }}</div>
+                        <small class="text-muted" style="font-size:0.65rem">{{ $fa->activity_date?->format('d M Y') }}</small>
+                    </div>
+                </div>
+                @endforeach
+                @endif
             </div>
         </div>
     </div>
@@ -630,7 +667,7 @@
 
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script>
 const RED = '#ef4444', GREEN = '#10b981', BLUE = '#0ea5e9', PURPLE = '#6366f1', ORANGE = '#f59e0b';
 
@@ -747,69 +784,77 @@ const RED = '#ef4444', GREEN = '#10b981', BLUE = '#0ea5e9', PURPLE = '#6366f1', 
     });
 })();
 
-// ===== FOOD SAFETY TREND (stacked bar, 6 bulan) =====
+// ===== RAPID TEST TREND (stacked bar) =====
 (function() {
-    const ctx = document.getElementById('foodSafetyTrendChart');
+    const ctx = document.getElementById('rapidTrendChart');
     if (!ctx) return;
-
-    const trend = @json($foodSafetyTrend);
+    const trend = @json($rapidTrend);
     new Chart(ctx, {
         type: 'bar',
         data: {
             labels: trend.map(function(t) { return t.label; }),
             datasets: [
-                { label: 'Layak', data: trend.map(function(t){return t.layak;}), backgroundColor: GREEN, borderRadius: 4, stack: 's', maxBarThickness: 40 },
-                { label: 'Tidak Layak', data: trend.map(function(t){return t.tidak_layak;}), backgroundColor: RED, borderRadius: 4, stack: 's', maxBarThickness: 40 },
-                { label: 'Perlu Tindak Lanjut', data: trend.map(function(t){return t.perlu_tindak_lanjut;}), backgroundColor: ORANGE, borderRadius: 4, stack: 's', maxBarThickness: 40 }
+                { label: 'Negatif (Aman)', data: trend.map(function(t){return t.negatif;}), backgroundColor: GREEN, borderRadius: 4, stack: 's', maxBarThickness: 32 },
+                { label: 'Positif (Terkontaminasi)', data: trend.map(function(t){return t.positif;}), backgroundColor: RED, borderRadius: 4, stack: 's', maxBarThickness: 32 }
             ]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', font: { size: 11 }, padding: 12 } },
-                tooltip: { backgroundColor: 'rgba(15,23,42,0.9)', padding: 10, cornerRadius: 8 }
-            },
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', font: { size: 10 }, padding: 8 } } },
             scales: {
-                x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11 } } },
-                y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1, precision: 0, font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } }
+                x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 } } },
+                y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1, precision: 0, font: { size: 9 } }, grid: { color: 'rgba(0,0,0,0.04)' } }
             }
         }
     });
 })();
 
-// ===== FOOD SAFETY RESULT (horizontal bar) =====
+// ===== LAB TEST TREND (stacked bar) =====
 (function() {
-    const ctx = document.getElementById('foodSafetyResultChart');
+    const ctx = document.getElementById('labTrendChart');
     if (!ctx) return;
-
+    const trend = @json($labTrend);
     new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Layak', 'Tidak Layak', 'Tindak Lanjut'],
+            labels: trend.map(function(t) { return t.label; }),
+            datasets: [
+                { label: 'MS (Memenuhi Syarat)', data: trend.map(function(t){return t.ms;}), backgroundColor: GREEN, borderRadius: 4, stack: 's', maxBarThickness: 32 },
+                { label: 'TMS (Tidak Memenuhi Syarat)', data: trend.map(function(t){return t.tms;}), backgroundColor: RED, borderRadius: 4, stack: 's', maxBarThickness: 32 }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', font: { size: 10 }, padding: 8 } } },
+            scales: {
+                x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 } } },
+                y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1, precision: 0, font: { size: 9 } }, grid: { color: 'rgba(0,0,0,0.04)' } }
+            }
+        }
+    });
+})();
+
+// ===== SAFETY SUMMARY (doughnut) =====
+(function() {
+    const ctx = document.getElementById('safetySummaryChart');
+    if (!ctx) return;
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Rapid Aman ✅', 'Rapid Positif 🔴', 'Lab MS ✅', 'Lab TMS ❌'],
             datasets: [{
-                label: 'Pemeriksaan',
-                data: [{{ $foodSafetyStats['layak'] }}, {{ $foodSafetyStats['tidak_layak'] }}, {{ $foodSafetyStats['perlu_tindak_lanjut'] }}],
-                backgroundColor: [GREEN, RED, ORANGE],
-                borderRadius: 6,
-                borderSkipped: false,
-                maxBarThickness: 28,
+                data: [{{ $rapidNegatif }}, {{ $rapidPositif }}, {{ $labMs }}, {{ $labTms }}],
+                backgroundColor: [GREEN, RED, BLUE, '#f97316'],
+                borderWidth: 0, spacing: 3, borderRadius: 5
             }]
         },
         options: {
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: false,
+            responsive: true, maintainAspectRatio: false, cutout: '58%',
             plugins: {
-                legend: { display: false },
-                tooltip: { backgroundColor: 'rgba(15,23,42,0.9)', padding: 10, cornerRadius: 8 }
-            },
-            scales: {
-                x: { beginAtZero: true, ticks: { stepSize: 1, precision: 0, font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } },
-                y: { grid: { display: false }, ticks: { font: { size: 11, weight: '600' } } }
+                legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', font: { size: 10 }, padding: 8 } }
             }
         }
     });
 })();
 </script>
-@endsection
+@endpush

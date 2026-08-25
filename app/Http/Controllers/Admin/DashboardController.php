@@ -7,7 +7,6 @@ use App\Models\Umkm;
 use App\Models\AiInsight;
 use App\Models\Commodity;
 use App\Models\CommodityPrice;
-use App\Models\FoodSafety;
 use App\Models\FoodSafetyActivity;
 use App\Services\FoodSecurityService;
 
@@ -80,40 +79,53 @@ class DashboardController extends Controller
         $recentUmkms = Umkm::with('user')->latest()->take(5)->get();
         $pendingPermits = Umkm::with('user')->where('status', 'pending')->latest()->take(5)->get();
 
-        // ===== KEAMANAN PANGAN =====
-        $foodSafetyStats = [
-            'total_checks'        => FoodSafety::count(),
-            'layak'               => FoodSafety::where('inspection_result', 'layak')->count(),
-            'tidak_layak'         => FoodSafety::where('inspection_result', 'tidak_layak')->count(),
-            'perlu_tindak_lanjut' => FoodSafety::where('inspection_result', 'perlu_tindak_lanjut')->count(),
-            'total_activities'    => FoodSafetyActivity::count(),
-        ];
-        $foodSafetyBySource = [
-            'tumbuhan' => FoodSafety::where('food_source_type', 'tumbuhan')->count(),
-            'ikan'     => FoodSafety::where('food_source_type', 'ikan')->count(),
-            'hewan'    => FoodSafety::where('food_source_type', 'hewan')->count(),
-        ];
-        // Tren pemeriksaan keamanan pangan per bulan (6 bulan terakhir)
-        $foodSafetyTrend = [];
+        // ===== KEAMANAN PANGAN (Rapid Test + Uji Lab) =====
+        // Rapid Test stats
+        $rapidTotal = \App\Models\RapidTest::count();
+        $rapidPositif = \App\Models\RapidTest::where('result', 'positif')->count();
+        $rapidNegatif = \App\Models\RapidTest::where('result', 'negatif')->count();
+        $recentRapidTests = \App\Models\RapidTest::with('creator')->latest('test_date')->take(5)->get();
+
+        // Lab Test stats
+        $labTotal = \App\Models\LabTest::withCount('parameters')->count();
+        $labMs = \App\Models\LabTest::whereDoesntHave('parameters', fn($q) => $q->where('status', 'TMS'))->count();
+        $labTms = \App\Models\LabTest::whereHas('parameters', fn($q) => $q->where('status', 'TMS'))->count();
+        $recentLabTests = \App\Models\LabTest::with('creator')->withCount('parameters')->latest('test_date')->take(5)->get();
+
+        // Kegiatan
+        $recentFoodSafetyActivities = FoodSafetyActivity::latest('activity_date')->take(4)->get();
+
+        // Tren uji lab per bulan (6 bulan terakhir)
+        $labTrend = [];
         for ($i = 5; $i >= 0; $i--) {
             $m = now()->subMonths($i);
-            $foodSafetyTrend[] = [
-                'label'               => $m->locale('id')->isoFormat('MMM'),
-                'layak'               => FoodSafety::where('inspection_result', 'layak')->whereMonth('check_date', $m->month)->whereYear('check_date', $m->year)->count(),
-                'tidak_layak'         => FoodSafety::where('inspection_result', 'tidak_layak')->whereMonth('check_date', $m->month)->whereYear('check_date', $m->year)->count(),
-                'perlu_tindak_lanjut' => FoodSafety::where('inspection_result', 'perlu_tindak_lanjut')->whereMonth('check_date', $m->month)->whereYear('check_date', $m->year)->count(),
+            $labTrend[] = [
+                'label' => $m->locale('id')->isoFormat('MMM'),
+                'ms'    => \App\Models\LabTest::whereDoesntHave('parameters', fn($q) => $q->where('status', 'TMS'))->whereMonth('test_date', $m->month)->whereYear('test_date', $m->year)->count(),
+                'tms'   => \App\Models\LabTest::whereHas('parameters', fn($q) => $q->where('status', 'TMS'))->whereMonth('test_date', $m->month)->whereYear('test_date', $m->year)->count(),
             ];
         }
-        $recentFoodSafetyChecks = FoodSafety::latest('check_date')->take(5)->get();
-        $recentFoodSafetyActivities = FoodSafetyActivity::latest('activity_date')->take(4)->get();
+
+        // Tren rapid test per bulan
+        $rapidTrend = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $m = now()->subMonths($i);
+            $rapidTrend[] = [
+                'label'   => $m->locale('id')->isoFormat('MMM'),
+                'positif' => \App\Models\RapidTest::where('result', 'positif')->whereMonth('test_date', $m->month)->whereYear('test_date', $m->year)->count(),
+                'negatif' => \App\Models\RapidTest::where('result', 'negatif')->whereMonth('test_date', $m->month)->whereYear('test_date', $m->year)->count(),
+            ];
+        }
 
         return view('admin.dashboard', compact(
             'aiInsights',
             'commodities', 'priceIncreases', 'totalCommodities',
             'avgChange', 'stableCount', 'upCount', 'downCount', 'commodityTrend',
             'foodSecurity', 'permitStats', 'recentUmkms', 'pendingPermits',
-            'foodSafetyStats', 'foodSafetyBySource', 'foodSafetyTrend',
-            'recentFoodSafetyChecks', 'recentFoodSafetyActivities'
+            'rapidTotal', 'rapidPositif', 'rapidNegatif', 'recentRapidTests',
+            'labTotal', 'labMs', 'labTms', 'recentLabTests',
+            'recentFoodSafetyActivities',
+            'labTrend', 'rapidTrend'
         ));
     }
 }

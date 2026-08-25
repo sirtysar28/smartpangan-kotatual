@@ -108,7 +108,12 @@
             <div class="modal-body p-3">
                 <label class="form-label small fw-semibold" id="valuePopupLabel">Nilai Hasil Uji</label>
                 <input type="text" class="form-control" id="valuePopupInput" placeholder="Contoh: 0.85">
-                <small class="text-muted d-block mt-2">Isi angka hasil pengukuran, contoh: <code>0.85</code>, <code>&lt; 3.0</code>, <code>1.2 x 10²</code></small>
+                <div class="d-flex flex-wrap gap-1 mt-2">
+                    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill quick-value-btn" data-value="Tidak Terdeteksi" style="font-size:0.7rem">Tidak Terdeteksi</button>
+                    <button type="button" class="btn btn-outline-warning btn-sm rounded-pill quick-value-btn" data-value="<LOD" style="font-size:0.7rem">&lt;LOD</button>
+                    <button type="button" class="btn btn-outline-info btn-sm rounded-pill quick-value-btn" data-value="<LOQ" style="font-size:0.7rem">&lt;LOQ</button>
+                </div>
+                <small class="text-muted d-block mt-2">Isi angka hasil pengukuran, contoh: <code>0.85</code>, <code>1.2 x 10²</code>, atau pilih tombol cepat di atas.</small>
             </div>
             <div class="modal-footer py-2 p-3">
                 <button type="button" class="btn btn-primary btn-sm rounded-pill px-4" id="valuePopupSave"><i class="bi bi-check-lg me-1"></i>Simpan Nilai</button>
@@ -117,8 +122,14 @@
     </div>
 </div>
 
+@push('scripts')
 <script>
 (function() {
+    if (typeof bootstrap === 'undefined') {
+        console.error('Bootstrap JS not loaded');
+        return;
+    }
+
     var rowIdx = 0;
     var presets = {!! json_encode(\App\Models\LabTestParameter::PRESETS) !!};
     var catInfo = {!! json_encode(\App\Models\LabTestParameter::CATEGORIES) !!};
@@ -192,6 +203,14 @@
         setTimeout(function(){ popupInput.focus(); }, 300);
     }
 
+    // ==== QUICK VALUE BUTTONS (Tidak Terdeteksi, <LOD, <LOQ) ====
+    document.querySelectorAll('.quick-value-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            popupInput.value = this.dataset.value;
+            popupInput.focus();
+        });
+    });
+
     document.getElementById('valuePopupSave').addEventListener('click', function() {
         if (activeValueInput) {
             activeValueInput.value = popupInput.value;
@@ -202,11 +221,12 @@
     popupInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('valuePopupSave').click(); } });
 
     // ==== PREFILL (edit mode / old input) ====
-    var prefill = {!! $oldParams ? json_encode($oldParams) : ($editMode ? json_encode($labTest->parameters->map(fn($p) => ['test_category' => $p->test_category, 'parameter' => $p->parameter, 'result' => $p->result, 'value' => $p->value, 'unit' => $p->unit, 'standard' => $p->standard, 'lod' => $p->lod, 'loq' => $p->loq, 'status' => $p->status, 'method' => $p->method])->values()->all()) : 'null') !!};
-    if (prefill) {
-        prefill.forEach(function(row) {
+    var prefillData = {!! $oldParams ? json_encode($oldParams) : ($editMode ? json_encode($labTest->parameters->map(fn($p) => ['test_category' => $p->test_category, 'parameter' => $p->parameter, 'result' => $p->result, 'value' => $p->value, 'unit' => $p->unit, 'standard' => $p->standard, 'lod' => $p->lod, 'loq' => $p->loq, 'status' => $p->status, 'method' => $p->method])->values()->all()) : 'null') !!};
+    if (prefillData) {
+        prefillData.forEach(function(row) {
             if (row && row.parameter) { addParamRow(row.test_category, row); }
         });
     }
 })();
 </script>
+@endpush

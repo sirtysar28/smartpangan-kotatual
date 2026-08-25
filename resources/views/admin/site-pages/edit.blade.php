@@ -110,7 +110,7 @@
 </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script>
 document.getElementById('colorPicker')?.addEventListener('input', function() {
     document.getElementById('colorText').value = this.value;
@@ -121,4 +121,4 @@ document.getElementById('colorText')?.addEventListener('input', function() {
     }
 });
 </script>
-@endsection
+@endpush

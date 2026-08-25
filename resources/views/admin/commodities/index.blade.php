@@ -230,7 +230,7 @@
 </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script>
 const RED='#ef4444',GREEN='#10b981',BLUE='#0ea5e9',PURPLE='#6366f1',ORANGE='#f59e0b';
 const PALETTE=['#6366f1','#0ea5e9','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#14b8a6'];
@@ -287,4 +287,4 @@ const PALETTE=['#6366f1','#0ea5e9','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4
     });
 })();
 </script>
-@endsection
+@endpush

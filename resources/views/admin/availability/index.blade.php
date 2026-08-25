@@ -169,7 +169,7 @@
 
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script>
 const RED='#ef4444',GREEN='#10b981',BLUE='#0ea5e9',PURPLE='#6366f1',ORANGE='#f59e0b';
 
@@ -214,4 +214,4 @@ const RED='#ef4444',GREEN='#10b981',BLUE='#0ea5e9',PURPLE='#6366f1',ORANGE='#f59
     });
 })();
 </script>
-@endsection
+@endpush

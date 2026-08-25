@@ -118,7 +118,7 @@
 
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script>
 function confirmDelete(id, name) {
     if(confirm('Yakin ingin menghapus user "' + name + '"?')) {
@@ -128,4 +128,4 @@ function confirmDelete(id, name) {
     }
 }
 </script>
-@endsection
+@endpush
