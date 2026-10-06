@@ -30,6 +30,9 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+        // Normalisasi input harga format Indonesia (60.983 → 60983)
+        \App\Support\IdNumber::merge($request, ['price', 'discount_price']);
+
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
@@ -58,6 +61,9 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         if ($product->umkm_id !== Auth::user()->umkm->id) abort(403);
+        // Normalisasi input harga format Indonesia (60.983 → 60983)
+        \App\Support\IdNumber::merge($request, ['price', 'discount_price']);
+
         $data = $request->validate([
             'name' => 'required','category_id' => 'required','description' => 'required',
             'price' => 'required|numeric','stock' => 'required|integer','weight' => 'required|integer',

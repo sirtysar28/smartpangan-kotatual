@@ -8,8 +8,8 @@
         <div class="col-md-8"><label class="form-label">Nama Produk *</label><input type="text" name="name" class="form-control" required></div>
         <div class="col-md-4"><label class="form-label">Kategori *</label><select name="category_id" class="form-select" required><option value="">Pilih</option>@foreach($categories as $c)<option value="{{ $c->id }}">{{ $c->name }}</option>@endforeach</select></div>
         <div class="col-12"><label class="form-label">Deskripsi *</label><textarea name="description" class="form-control" rows="4" required></textarea></div>
-        <div class="col-md-4"><label class="form-label">Harga (Rp) *</label><input type="number" name="price" class="form-control" required></div>
-        <div class="col-md-4"><label class="form-label">Harga Diskon</label><input type="number" name="discount_price" class="form-control"></div>
+        <div class="col-md-4"><label class="form-label">Harga (Rp) *</label><input type="text" name="price" class="form-control price-input" placeholder="cth. 25.000" inputmode="numeric" autocomplete="off" required></div>
+        <div class="col-md-4"><label class="form-label">Harga Diskon</label><input type="text" name="discount_price" class="form-control price-input" placeholder="Opsional, cth. 20.000" inputmode="numeric" autocomplete="off"></div>
         <div class="col-md-4"><label class="form-label">Stok *</label><input type="number" name="stock" class="form-control" required></div>
         <div class="col-md-4"><label class="form-label">Berat (gram) *</label><input type="number" name="weight" class="form-control" value="100" required></div>
         <div class="col-md-4"><label class="form-label">Satuan</label><input type="text" name="unit" class="form-control" value="pcs"></div>

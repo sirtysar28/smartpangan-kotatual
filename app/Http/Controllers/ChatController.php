@@ -29,8 +29,8 @@ class ChatController extends Controller
             ], 500);
         }
 
-        // Read model & params from settings
-        $model = Setting::get('groq_model', 'llama-3.3-70b-versatile');
+        // Read model & params from settings — default & otomatis dialihkan ke GPT-OSS 120B
+        $model = $this->normalizeGroqModel(Setting::get('groq_model', 'openai/gpt-oss-120b'));
         $maxTokens = (int) Setting::get('ai_max_tokens', 1000);
         $temperature = (float) Setting::get('ai_temperature', 0.7);
 
@@ -86,5 +86,35 @@ Jawab dalam Bahasa Indonesia dengan ramah dan profesional. Jika ditanya hal di l
                 'error' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Normalisasi nama model Groq:
+     * - otomatis dialihkan (alias) ke GPT-OSS 120B bila cocok,
+     * - melengkapi prefix "openai/" untuk varian gpt-oss,
+     * - memetakan model lama yang sudah deprecated.
+     */
+    private function normalizeGroqModel(?string $model): string
+    {
+        $m = strtolower(trim($model ?? ''));
+
+        $aliases = [
+            // GPT-OSS (otomatis dialihkan ke 120B)
+            'gpt-oss-120b' => 'openai/gpt-oss-120b',
+            'gpt-oss' => 'openai/gpt-oss-120b',
+            'gpt oss 120b' => 'openai/gpt-oss-120b',
+            'gptoss120b' => 'openai/gpt-oss-120b',
+            'openai/gpt-oss' => 'openai/gpt-oss-120b',
+            'openai/gpt-oss-120b' => 'openai/gpt-oss-120b',
+            'gpt-oss-20b' => 'openai/gpt-oss-20b',
+            'openai/gpt-oss-20b' => 'openai/gpt-oss-20b',
+            // Legacy
+            'llama-3.3-70b' => 'llama-3.3-70b-versatile',
+            'llama3.3-70b' => 'llama-3.3-70b-versatile',
+            'llama-3.1-8b' => 'llama-3.1-8b-instant',
+            'llama3.1-8b' => 'llama-3.1-8b-instant',
+        ];
+
+        return $aliases[$m] ?? ($m !== '' ? $m : 'openai/gpt-oss-120b');
     }
 }

@@ -35,6 +35,33 @@
         <x-input-error :messages="$errors->get('password')" class="mt-1 small text-danger" />
     </div>
 
+    {{-- ===== CAPTCHA 5 KARAKTER (di bawah password) ===== --}}
+    @php
+        $captchaCode = session('login_captcha_code', strtoupper(substr(str_shuffle('ABCDEFGHJKMNPQRSTUVWXYZ23456789'), 0, 5)));
+        $captchaChars = str_split($captchaCode);
+        $captchaStyles = [
+            ['r' => -8, 'y' => 2, 's' => 1.15], ['r' => 6, 'y' => -2, 's' => 0.95],
+            ['r' => -5, 'y' => 3, 's' => 1.1], ['r' => 9, 'y' => -1, 's' => 1.05],
+            ['r' => -7, 'y' => 1, 's' => 1.12],
+        ];
+    @endphp
+    <div class="mb-3">
+        <x-input-label for="captcha" :value="__('Verifikasi Keamanan')" class="small fw-semibold text-muted" />
+        <div class="d-flex align-items-stretch gap-2 mt-1">
+            <div class="d-flex align-items-center justify-content-center flex-shrink-0 user-select-none"
+                 id="captchaQuestion"
+                 style="background:repeating-linear-gradient(45deg,#eef2ff,#eef2ff 6px,#e0e7ff 6px,#e0e7ff 12px);border:1.5px dashed #c7d2fe;border-radius:10px;padding:0.45rem 0.9rem;letter-spacing:2px;font-size:1.05rem;font-weight:800;color:#4338ca;font-style:italic;overflow:hidden">
+                @foreach($captchaChars as $i => $ch)
+                    <span style="display:inline-block;transform:rotate({{ $captchaStyles[$i]['r'] }}deg) translateY({{ $captchaStyles[$i]['y'] }}px) scale({{ $captchaStyles[$i]['s'] }})">{{ $ch }}</span>
+                @endforeach
+            </div>
+            <input id="captcha" type="text" name="captcha" class="form-control flex-grow-1"
+                   value="{{ old('captcha') }}" required autocomplete="off"
+                   maxlength="5" placeholder="5 karakter" style="max-width:130px;text-transform:uppercase;font-weight:700;letter-spacing:3px" />
+        </div>
+        <x-input-error :messages="$errors->get('captcha')" class="mt-1 small text-danger" />
+    </div>
+
     <div class="d-flex justify-content-between align-items-center mb-3">
         <label class="form-check-label d-flex align-items-center gap-2 mb-0">
             <input type="checkbox" class="form-check-input" name="remember" id="remember">

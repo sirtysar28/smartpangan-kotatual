@@ -2,10 +2,15 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0f172a">
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('logo.png') }}">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PANCA Kota Tual">
     <title>@yield('title', 'Pangan Cerdas (Panca) Maryadat Kota Tual - Monitoring Harga Pangan & Marketplace Digital')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -111,6 +116,12 @@
 
         * { font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); overflow-x: hidden; color: var(--text-main); }
+
+        /* ===== ANTI-MELEBAR (overflow guard mobile) ===== */
+        .min-w-0 { min-width: 0 !important; }
+        img, video, canvas, svg { max-width: 100%; }
+        .main-content { min-width: 0; }
+        .table-responsive { max-width: 100%; -webkit-overflow-scrolling: touch; }
         /* FIX GLOBAL: Tailwind .collapse{visibility:collapse} konflik dgn Bootstrap accordion.
            Tanpa ini, teks di dalam akordion yang terbuka jadi invisible. */
         .accordion-collapse { visibility: visible !important; }
@@ -392,8 +403,23 @@
         @media (max-width: 767.98px) {
             .sidebar-admin { transform: translateX(-100%); width: var(--sidebar-width) !important; }
             .sidebar-admin.show { transform: translateX(0); box-shadow: 0 0 60px rgba(0,0,0,0.5); }
-            .main-content { margin-left: 0 !important; }
+            .main-content { margin-left: 0 !important; padding: 0.85rem 0.85rem 92px; min-width: 0; max-width: 100%; }
             .sidebar-toggle-btn { display: none; }
+
+            /* Semua anak konten wajib muat dalam layar */
+            .main-content > *,
+            .main-content .card,
+            .main-content .row,
+            .main-content .row > *,
+            .main-content .chart-container,
+            .main-content .chart-box { min-width: 0; max-width: 100%; }
+            body > * { min-width: 0; max-width: 100%; }
+            main, section, .container, .container-fluid { min-width: 0; max-width: 100%; }
+            .main-content h1, .main-content h2, .main-content h3,
+            .main-content h4, .main-content h5, .main-content h6,
+            .main-content p, .main-content small, .main-content div,
+            .main-content span, .main-content a, .main-content button { overflow-wrap: break-word; }
+            .d-flex > * { min-width: 0; }
         }
 
         /* ===== COUNTER ANIMATION ===== */
@@ -550,6 +576,17 @@
         .commodity-card .price-up { color: #ef4444; }
         .commodity-card .price-down { color: #10b981; }
         .commodity-card .price-stable { color: #64748b; }
+
+        /* ===== BOTTOM NAV MOBILE (5 ICON) — naikkan tombol float di atasnya ===== */
+        @media (max-width: 767.98px) {
+            .chat-btn { bottom: calc(86px + env(safe-area-inset-bottom, 0px)) !important; width: 50px; height: 50px; font-size: 1.3rem; }
+            .chat-widget { bottom: calc(150px + env(safe-area-inset-bottom, 0px)); right: 12px; left: 12px; width: auto; }
+        }
+
+        /* ===== PWA ===== */
+        @media (display-mode: standalone) {
+            .pwa-install-hint { display: none !important; }
+        }
     </style>
     @yield('styles')
 </head>
@@ -616,7 +653,9 @@
     @endif
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    {{-- Chart.js: lokal dulu (anti-gagal CDN), fallback ke CDN --}}
+    <script src="{{ asset('assets/chart.umd.min.js') }}"></script>
+    <script>window.Chart || document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js@4"><\/script>');</script>
     <script>
         // ===== DARK MODE =====
         function initDarkMode() {
@@ -783,6 +822,13 @@
         if(chatSendBtn) {
             chatSendBtn.addEventListener('click', sendChat);
             chatInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendChat(); });
+        }
+
+        // ===== PWA SERVICE WORKER =====
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('{{ asset('sw.js') }}').catch(() => {});
+            });
         }
     </script>
     @yield('scripts')

@@ -8,7 +8,7 @@
         <div class="col-md-8"><label class="form-label">Nama *</label><input type="text" name="name" class="form-control" value="{{ $product->name }}" required></div>
         <div class="col-md-4"><label class="form-label">Kategori *</label><select name="category_id" class="form-select" required>@foreach($categories as $c)<option value="{{ $c->id }}" {{ $product->category_id==$c->id?'selected':'' }}>{{ $c->name }}</option>@endforeach</select></div>
         <div class="col-12"><label class="form-label">Deskripsi *</label><textarea name="description" class="form-control" rows="4" required>{{ $product->description }}</textarea></div>
-        <div class="col-md-4"><label class="form-label">Harga (Rp) *</label><input type="number" name="price" class="form-control" value="{{ $product->price }}" required></div>
+        <div class="col-md-4"><label class="form-label">Harga (Rp) *</label><input type="text" name="price" class="form-control price-input" inputmode="numeric" autocomplete="off" value="{{ old('price', $product->price ? number_format($product->price, 0, '', '.') : '') }}" required></div>
         <div class="col-md-4"><label class="form-label">Stok *</label><input type="number" name="stock" class="form-control" value="{{ $product->stock }}" required></div>
         <div class="col-md-4"><label class="form-label">Berat (gram) *</label><input type="number" name="weight" class="form-control" value="{{ $product->weight }}" required></div>
         <div class="col-md-6"><label class="form-label">Ganti Foto</label><input type="file" name="image" class="form-control" accept="image/*"></div>

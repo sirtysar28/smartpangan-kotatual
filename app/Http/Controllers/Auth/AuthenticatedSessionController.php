@@ -16,6 +16,14 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
+        // ===== CAPTCHA 5 KARAKTER ALPHANUMERIC =====
+        if (!session()->has('login_captcha_code')) {
+            // Karakter tanpa ambigu (tanpa O/0/I/1/L)
+            $chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+            $code = substr(str_shuffle(str_repeat($chars, 5)), 0, 5);
+            session(['login_captcha_code' => $code]);
+        }
+
         return view('auth.login');
     }
 
@@ -27,6 +35,9 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+
+        // Hapus captcha setelah login sukses
+        session()->forget('login_captcha_code');
 
         $user = Auth::user();
 

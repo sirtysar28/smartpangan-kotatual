@@ -7,7 +7,7 @@
     body { font-family: sans-serif; font-size: 11px; color: #1e293b; margin: 40px 42px; }
 
     /* KOP */
-    .kop { text-align: center; border-bottom: 3px double #1a5276; padding-bottom: 12px; margin-bottom: 18px; }
+    .kop { margin-bottom: 18px; }
     .kop .pemda { font-size: 15px; font-weight: bold; letter-spacing: 1px; }
     .kop .app { font-size: 13px; font-weight: bold; color: #1a5276; margin-top: 2px; }
     .kop .tagline { font-size: 10px; color: #64748b; }
@@ -69,11 +69,21 @@
 </head>
 <body>
 
-<div class="kop">
-    <div class="pemda">PEMERINTAH KOTA TUAL</div>
-    <div class="app">PANCA &mdash; Pangan Cerdas Maryadat Kota Tual</div>
-    <div class="tagline">Sistem Monitoring Stabilisasi Harga, Pasokan, dan Keamanan Pangan Kota Tual, Provinsi Maluku</div>
-</div>
+@php
+    $fsLogoData = '';
+    $fsLogoPath = public_path('logo.png');
+    if (is_file($fsLogoPath)) { $fsLogoData = 'data:image/png;base64,' . base64_encode(file_get_contents($fsLogoPath)); }
+@endphp
+<table class="kop" width="100%" style="border-bottom:3px double #1a5276;margin-bottom:18px">
+    <tr>
+        @if($fsLogoData)<td width="62" valign="middle" style="text-align:center;padding-bottom:12px"><img src="{{ $fsLogoData }}" width="50" height="50" style="border-radius:8px"></td>@endif
+        <td valign="middle" style="padding-bottom:12px">
+            <div class="pemda">PEMERINTAH KOTA TUAL</div>
+            <div class="app">PANCA &mdash; Pangan Cerdas Maryadat Kota Tual</div>
+            <div class="tagline">Sistem Monitoring Stabilisasi Harga, Pasokan, dan Keamanan Pangan Kota Tual, Provinsi Maluku</div>
+        </td>
+    </tr>
+</table>
 
 <div class="judul-laporan">
     <h3>LAPORAN HASIL UJI KEAMANAN PANGAN</h3>
@@ -226,7 +236,8 @@
     </table>
 </div>
 
-<div class="footer-cetak">PANCA &mdash; Pangan Cerdas Maryadat Kota Tual &copy; {{ now()->year }} Pemerintah Kota Tual &bull; Dicetak dari sistem oleh {{ auth()->user()?->name ?? '-' }}</div>
+<div class="footer-cetak">Dicetak dari sistem oleh {{ auth()->user()?->name ?? '-' }} pada {{ now()->translatedFormat('d F Y H:i') }}</div>
+@include('admin.reports.partials.footer')
 
 </body>
 </html>

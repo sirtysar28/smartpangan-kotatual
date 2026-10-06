@@ -20,7 +20,7 @@
                 <label class="form-label"><i class="bi bi-tag me-1" style="color:#ef4444"></i>HET (Harga Eceran Tertinggi)</label>
                 <div class="input-icon-wrapper">
                     <span class="input-icon-left">Rp</span>
-                    <input type="number" name="het" class="form-control" placeholder="Opsional" step="100" value="{{ old('het') }}">
+                    <input type="text" name="het" class="form-control price-input" placeholder="Opsional, cth. 75.000" inputmode="numeric" autocomplete="off" value="{{ old('het') }}">
                 </div>
             </div>
         </div>
@@ -29,7 +29,7 @@
                 <label class="form-label"><i class="bi bi-tag me-1" style="color:#0ea5e9"></i>HAP (Harga Acuan Pemerintah)</label>
                 <div class="input-icon-wrapper">
                     <span class="input-icon-left">Rp</span>
-                    <input type="number" name="hap" class="form-control" placeholder="Opsional" step="100" value="{{ old('hap') }}">
+                    <input type="text" name="hap" class="form-control price-input" placeholder="Opsional, cth. 70.000" inputmode="numeric" autocomplete="off" value="{{ old('hap') }}">
                 </div>
             </div>
         </div>
@@ -38,7 +38,7 @@
                 <label class="form-label"><i class="bi bi-tag me-1" style="color:#f59e0b"></i>HPP (Harga Pokok Penjualan)</label>
                 <div class="input-icon-wrapper">
                     <span class="input-icon-left">Rp</span>
-                    <input type="number" name="hpp" class="form-control" placeholder="Opsional" step="100" value="{{ old('hpp') }}">
+                    <input type="text" name="hpp" class="form-control price-input" placeholder="Opsional, cth. 65.000" inputmode="numeric" autocomplete="off" value="{{ old('hpp') }}">
                 </div>
             </div>
         </div>
@@ -50,7 +50,7 @@
         <option value="perumahan" {{ old('category') == 'perumahan' ? 'selected' : '' }}>Perumahan</option>
         <option value="lainnya" {{ old('category') == 'lainnya' ? 'selected' : '' }}>Lainnya</option>
     </select></div>
-    <div class="mb-3"><label class="form-label">Harga Awal (Hari Ini) *</label><input type="number" name="price" class="form-control" step="100" required value="{{ old('price') }}"></div>
+    <div class="mb-3"><label class="form-label">Harga Awal (Hari Ini) *</label><input type="text" name="price" class="form-control price-input" placeholder="cth. 60.983" inputmode="numeric" autocomplete="off" required value="{{ old('price') }}"></div>
     <div class="mb-3"><label class="form-label">Deskripsi</label><textarea name="description" class="form-control" rows="2">{{ old('description') }}</textarea></div>
     <div class="mb-3"><label class="form-label">Gambar Komoditas</label><input type="file" name="image" class="form-control" accept="image/*"><small class="text-muted">JPG, PNG, WEBP (max 2MB)</small></div>
 

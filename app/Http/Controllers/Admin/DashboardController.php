@@ -55,7 +55,7 @@ class DashboardController extends Controller
                 'name'   => $c->name,
                 'unit'   => $c->unit,
                 'image'  => $c->image_url,
-                'prices' => $prices->pluck('price')->toArray(),
+                'prices' => $prices->pluck('price')->map(fn($p) => (float) $p)->values()->toArray(),
                 'dates'  => $prices->map(fn($p) => is_array($p) ? \Carbon\Carbon::parse($p['price_date'])->format('d/m') : $p->price_date->format('d/m'))->toArray(),
             ];
         }
@@ -90,7 +90,7 @@ class DashboardController extends Controller
         $labTotal = \App\Models\LabTest::withCount('parameters')->count();
         $labMs = \App\Models\LabTest::whereDoesntHave('parameters', fn($q) => $q->where('status', 'TMS'))->count();
         $labTms = \App\Models\LabTest::whereHas('parameters', fn($q) => $q->where('status', 'TMS'))->count();
-        $recentLabTests = \App\Models\LabTest::with('creator')->withCount('parameters')->latest('test_date')->take(5)->get();
+        $recentLabTests = \App\Models\LabTest::with('creator')->with(['parameters' => fn($q) => $q->select('id', 'lab_test_id', 'status')])->withCount('parameters')->latest('test_date')->take(5)->get();
 
         // Kegiatan
         $recentFoodSafetyActivities = FoodSafetyActivity::latest('activity_date')->take(4)->get();

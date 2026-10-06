@@ -45,8 +45,13 @@
         </div>
         <hr style="border-color:rgba(255,255,255,0.08);margin:2rem 0 1rem">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-            <p class="small mb-0" style="color:rgba(255,255,255,0.45) !important">&copy; {{ date('Y') }} Pangan Cerdas (Panca) Maryadat Kota Tual — CV Cipta Karya Digital Indonesia</p>
-            <p class="small mb-0" style="color:rgba(255,255,255,0.45) !important">Pemerintah Daerah Kota Tual</p>
+            <p class="small mb-0" style="color:rgba(255,255,255,0.45) !important">&copy; {{ date('Y') }} Pangan Cerdas (Panca) Maryadat Kota Tual — Pemerintah Kota Tual</p>
+            <p class="small mb-0" style="color:rgba(255,255,255,0.45) !important">
+                Developed by <a href="https://ciptakaryadigital.id/new" target="_blank" rel="noopener" class="text-decoration-none fw-semibold" style="color:rgba(255,255,255,0.75) !important">CV Cipta Karya Digital Indonesia</a>
+            </p>
         </div>
     </div>
+
+    {{-- ===== 5 ICON NAVIGASI KHUSUS MOBILE (bottom nav ala aplikasi) ===== --}}
+    @include('frontend.partials.mobile-nav')
 </footer>

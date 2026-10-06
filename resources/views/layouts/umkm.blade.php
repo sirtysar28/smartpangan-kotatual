@@ -2,10 +2,11 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0f172a">
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('favicon.png') }}">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
     <title>@yield('title', 'UMKM Panel - Pangan Cerdas (Panca) Maryadat Kota Tual')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -44,6 +45,12 @@
 
         * { font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); overflow-x: hidden; color: var(--text-main); margin: 0; padding: 0; }
+
+        /* ===== ANTI-MELEBAR (overflow guard mobile) ===== */
+        .min-w-0 { min-width: 0 !important; }
+        img, video, canvas, svg { max-width: 100%; }
+        .main-content { min-width: 0; }
+        .table-responsive { max-width: 100%; -webkit-overflow-scrolling: touch; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--gray-light); border-radius: 10px; }
@@ -313,11 +320,31 @@
             margin-left: var(--sidebar-collapsed-width);
         }
 
+        .sidebar-backdrop {
+            position: fixed; inset: 0; background: rgba(15,23,42,0.55); backdrop-filter: blur(3px);
+            z-index: 1035; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .sidebar-backdrop.show { opacity: 1; pointer-events: auto; }
+
         @media (max-width: 767.98px) {
-            .sidebar-admin { transform: translateX(-100%); width: var(--sidebar-width) !important; }
+            .sidebar-admin { transform: translateX(-100%); width: var(--sidebar-width) !important; transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
             .sidebar-admin.show { transform: translateX(0); box-shadow: 0 0 60px rgba(0,0,0,0.5); }
-            .main-content { margin-left: 0 !important; }
+            .main-content { margin-left: 0 !important; padding: 0.85rem 0.85rem 96px; min-width: 0; max-width: 100%; }
             .sidebar-toggle-btn { display: none; }
+            body.sidebar-open { overflow: hidden; }
+
+            /* Semua anak konten wajib muat dalam layar */
+            .main-content > *,
+            .main-content .card,
+            .main-content .row,
+            .main-content .row > *,
+            .main-content .chart-container,
+            .main-content .chart-box { min-width: 0; max-width: 100%; }
+            .main-content h1, .main-content h2, .main-content h3,
+            .main-content h4, .main-content h5, .main-content h6,
+            .main-content p, .main-content small, .main-content div,
+            .main-content span, .main-content a, .main-content button { overflow-wrap: break-word; }
+            .d-flex > * { min-width: 0; }
         }
 
         /* ===== COUNTER ANIMATION ===== */
@@ -369,14 +396,15 @@
             background: linear-gradient(135deg, #6366f1, #818cf8);
             border-color: rgba(99,102,241,0.5);
         }
-
-        @yield('styles')
     </style>
+    @yield('styles')
 </head>
 <body>
     <div class="d-flex">
+        <!-- Backdrop sidebar mobile -->
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
         <!-- Sidebar -->
-        <div class="sidebar-admin p-0 d-none d-md-block" id="umkmSidebar">
+        <div class="sidebar-admin p-0" id="umkmSidebar">
             <button class="sidebar-toggle-btn" id="sidebarCollapseBtn" title="Toggle sidebar">
                 <i class="bi bi-chevron-left"></i>
             </button>
@@ -405,7 +433,7 @@
                 <div style="padding:0.5rem 1.25rem;margin-top:0.5rem" class="sidebar-section-label">
                     <small style="color:rgba(255,255,255,0.2);font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;font-weight:700">Toko</small>
                 </div>
-                <a class="nav-link {{ request()->routeIs('umkm.profile.edit')?'active':'' }}" href="{{ route('umkm.profile.edit') }}">
+                <a class="nav-link {{ request()->routeIs('profile.edit')?'active':'' }}" href="{{ route('profile.edit') }}">
                     <i class="bi bi-shop"></i><span class="sidebar-text">Profil Toko</span>
                 </a>
                 <a class="nav-link" href="{{ route('home') }}" target="_blank">
@@ -438,13 +466,13 @@
         <div class="main-content flex-grow-1">
             <!-- Mobile header -->
             <div class="d-flex justify-content-between align-items-center mb-4 d-md-none animate-fade-down">
-                <div class="d-flex align-items-center gap-2">
-                    <button class="btn btn-sm" id="sidebarToggle" style="background:#000;color:#fff;border-radius:10px;border:1px solid rgba(255,255,255,0.1)"><i class="bi bi-list"></i></button>
-                    <span class="fw-bold" style="color:#1e293b"><img src="{{ asset('logo.png') }}" style="width:24px;height:24px;border-radius:6px"> Pangan Cerdas (Panca) Maryadat Kota Tual</span>
+                <div class="d-flex align-items-center gap-2 min-w-0">
+                    <button class="btn btn-sm flex-shrink-0" id="sidebarToggle" aria-label="Buka/tutup menu" style="background:#000;color:#fff;border-radius:10px;border:1px solid rgba(255,255,255,0.1);width:38px;height:38px;display:flex;align-items:center;justify-content:center"><i class="bi bi-list fs-5" id="sidebarToggleIcon"></i></button>
+                    <span class="fw-bold small text-truncate" style="color:#1e293b"><img src="{{ asset('logo.png') }}" style="width:22px;height:22px;border-radius:6px" class="me-1"><span class="d-none d-sm-inline">Pangan Cerdas (Panca)</span><span class="d-sm-none">PANCA</span></span>
                 </div>
-                <div class="d-flex align-items-center gap-2">
-                    <button class="dark-mode-toggle" onclick="toggleDarkMode(this)" style="width:44px;height:24px" title="Toggle Dark/Light Mode"></button>
-                    <a href="{{ route('home') }}" class="btn btn-sm" style="background:linear-gradient(135deg,#6366f1,#0ea5e9);color:#fff;border-radius:10px;border:none"><i class="bi bi-house"></i></a>
+                <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                    <button class="dark-mode-toggle" onclick="toggleDarkMode(this)" style="width:40px;height:22px" title="Toggle Dark/Light Mode"></button>
+                    <a href="{{ route('home') }}" class="btn btn-sm flex-shrink-0" style="background:linear-gradient(135deg,#6366f1,#0ea5e9);color:#fff;border-radius:8px;border:none;width:38px;height:38px;display:flex;align-items:center;justify-content:center"><i class="bi bi-house"></i></a>
                 </div>
             </div>
 
@@ -468,7 +496,9 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    {{-- Chart.js: lokal dulu (anti-gagal CDN), fallback ke CDN --}}
+    <script src="{{ asset('assets/chart.umd.min.js') }}"></script>
+    <script>window.Chart || document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js@4"><\/script>');</script>
     <script>
         // ===== DARK MODE =====
         function initDarkMode() {
@@ -540,14 +570,33 @@
             setTimeout(() => { if(a) a.style.display = 'none'; }, 5000);
         });
 
-        // Sidebar mobile toggle
+        // Sidebar mobile toggle (hamburger + backdrop)
         const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+        const sidebarToggleIcon = document.getElementById('sidebarToggleIcon');
         const sidebar = document.querySelector('.sidebar-admin');
+        function closeMobileSidebar() {
+            if (!sidebar) return;
+            sidebar.classList.remove('show');
+            sidebarBackdrop && sidebarBackdrop.classList.remove('show');
+            sidebarToggleIcon && sidebarToggleIcon.classList.replace('bi-x-lg', 'bi-list');
+            document.body.classList.remove('sidebar-open');
+        }
         if(sidebarToggle && sidebar) {
-            sidebarToggle.addEventListener('click', () => sidebar.classList.toggle('show'));
-            document.addEventListener('click', (e) => {
-                if(!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) sidebar.classList.remove('show');
+            sidebarToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = sidebar.classList.toggle('show');
+                sidebarBackdrop && sidebarBackdrop.classList.toggle('show', isOpen);
+                sidebarToggleIcon && sidebarToggleIcon.classList.toggle('bi-x-lg', isOpen);
+                sidebarToggleIcon && sidebarToggleIcon.classList.toggle('bi-list', !isOpen);
+                document.body.classList.toggle('sidebar-open', isOpen);
             });
+            sidebarBackdrop && sidebarBackdrop.addEventListener('click', closeMobileSidebar);
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth < 768 && !sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) closeMobileSidebar();
+            });
+            sidebar.querySelectorAll('a.nav-link').forEach(l => l.addEventListener('click', () => { if (window.innerWidth < 768) closeMobileSidebar(); }));
+            window.addEventListener('resize', () => { if (window.innerWidth >= 768) closeMobileSidebar(); });
         }
 
         // Sidebar collapse toggle (desktop)
@@ -562,7 +611,43 @@
                 localStorage.setItem('tualmart_sidebar_collapsed', sidebar.classList.contains('collapsed'));
             });
         }
+
+        // ===== INPUT HARGA (format ribuan id-ID — bebas ketik 60.983 / 60983) =====
+        document.addEventListener('input', function (e) {
+            const el = e.target;
+            if (!el.classList || !el.classList.contains('price-input')) return;
+            const digitsBefore = el.value.slice(0, el.selectionStart).replace(/\D/g, '').length;
+            let digits = el.value.replace(/\D/g, '').replace(/^0+(?=\d)/, '').slice(0, 15);
+            el.value = digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            let pos = 0, seen = 0;
+            for (let i = 0; i < el.value.length && seen < digitsBefore; i++) {
+                if (/\d/.test(el.value[i])) seen++;
+                pos = i + 1;
+            }
+            try { el.setSelectionRange(pos, pos); } catch (_) {}
+        });
+        // Sebelum submit: kirim angka polos tanpa titik (server juga menormalisasi)
+        document.addEventListener('submit', function (e) {
+            (e.target.querySelectorAll ? e.target.querySelectorAll('input.price-input') : []).forEach(function (el) {
+                el.value = el.value.replace(/\D/g, '');
+            });
+        }, true);
+        // Prefill: nilai angka polos → format titik ribuan
+        document.querySelectorAll('input.price-input').forEach(function (el) {
+            const d = el.value.replace(/\D/g, '');
+            if (d && el.value.indexOf('.') === -1) el.value = Number(d).toLocaleString('de-DE');
+        });
+
+        // ===== PWA SERVICE WORKER =====
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('{{ asset('sw.js') }}').catch(() => {});
+            });
+        }
     </script>
+
+    {{-- 5 icon bottom nav khusus mobile (umkm — link frontend publik) --}}
+    @include('frontend.partials.mobile-nav')
     @yield('scripts')
 </body>
 </html>

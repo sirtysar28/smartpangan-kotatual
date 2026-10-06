@@ -2,8 +2,49 @@
 @section('title', 'Dashboard Admin - Pangan Cerdas (Panca) Maryadat Kota Tual')
 @section('content')
 
+<style>
+    /* ===== CHART BOX — tinggi responsif ===== */
+    .chart-box { position: relative; width: 100%; }
+    .chart-box-lg { height: 340px; }
+    .chart-box-md { height: 250px; }
+    .chart-box-sm { height: 210px; }
+    @media (min-width: 768px) and (max-width: 1199.98px) {
+        .chart-box-lg { height: 300px; }
+    }
+    @media (max-width: 767.98px) {
+        .chart-box-lg { height: 270px; }
+        .chart-box-md { height: 230px; }
+        .chart-box-sm { height: 195px; }
+        .chart-container { padding: 0.9rem; }
+        /* Header dashboard mobile */
+        .dash-welcome h4 { font-size: 1.05rem !important; line-height: 1.35; }
+        .dash-welcome p { font-size: 0.72rem !important; }
+        .dash-welcome > div:last-child { width: 100%; }
+        /* Bar indeks ketahanan pangan mobile */
+        .food-security-head { flex-direction: column; align-items: flex-start !important; }
+        .food-security-head .index-wrap { width: 100%; justify-content: space-between; }
+        .food-security-head .index-bar-track { width: 100% !important; flex: 1; }
+        /* Tombol aksi keamanan pangan */
+        .safety-actions { width: 100%; }
+        .safety-actions .btn { flex: 1; font-size: 0.72rem !important; padding: 0.4rem 0.5rem; }
+        /* Kartu komoditas lebih ringkas */
+        .commodity-card { padding: 0.65rem; }
+        .commodity-card h6 { font-size: 0.75rem !important; }
+        .commodity-card .fw-bold { font-size: 0.85rem !important; }
+        /* Tabel prediksi: kolom rapat */
+        .table-modern { font-size: 0.72rem; }
+        .table-modern th, .table-modern td { padding: 0.45rem 0.5rem !important; white-space: nowrap; }
+    }
+    @media (max-width: 360px) {
+        .chart-box-lg { height: 240px; }
+        .chart-box-md { height: 210px; }
+        .chart-box-sm { height: 180px; }
+        .commodity-card { padding: 0.55rem; }
+    }
+</style>
+
 <!-- Welcome -->
-<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4 animate-fade-up">
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4 animate-fade-up dash-welcome">
     <div>
         <h4 class="fw-bold mb-1" style="font-size:1.35rem">📊 Monitoring Harga, Pasokan & Keamanan Pangan</h4>
         <p class="text-muted mb-0 small">PANCA — Layanan Pangan Cerdas: Sistem Monitoring Stabilisasi Harga, Pasokan, dan Keamanan Pangan Kota Tual</p>
@@ -22,7 +63,7 @@
             <div class="d-flex align-items-start justify-content-between">
                 <div>
                     <small class="text-muted fw-medium" style="font-size:0.75rem">Total Komoditas</small>
-                    <div class="stat-value mt-1" style="color:#6366f1">{{ $totalCommodities }}</div>
+                    <div class="stat-value mt-1" style="color:#6366f1" data-counter="{{ $totalCommodities }}">{{ $totalCommodities }}</div>
                 </div>
                 <div class="stat-icon" style="background:rgba(99,102,241,0.1)"><i class="bi bi-graph-up-arrow" style="color:#6366f1"></i></div>
             </div>
@@ -34,7 +75,7 @@
             <div class="d-flex align-items-start justify-content-between">
                 <div>
                     <small class="text-muted fw-medium" style="font-size:0.75rem">Harga Naik 🔴</small>
-                    <div class="stat-value mt-1" style="color:#ef4444">{{ $upCount }}</div>
+                    <div class="stat-value mt-1" style="color:#ef4444" data-counter="{{ $upCount }}">{{ $upCount }}</div>
                 </div>
                 <div class="stat-icon" style="background:rgba(239,68,68,0.1)"><i class="bi bi-arrow-up-circle" style="color:#ef4444"></i></div>
             </div>
@@ -46,7 +87,7 @@
             <div class="d-flex align-items-start justify-content-between">
                 <div>
                     <small class="text-muted fw-medium" style="font-size:0.75rem">Harga Turun 🟢</small>
-                    <div class="stat-value mt-1" style="color:#10b981">{{ $downCount }}</div>
+                    <div class="stat-value mt-1" style="color:#10b981" data-counter="{{ $downCount }}">{{ $downCount }}</div>
                 </div>
                 <div class="stat-icon" style="background:rgba(16,185,129,0.1)"><i class="bi bi-arrow-down-circle" style="color:#10b981"></i></div>
             </div>
@@ -58,7 +99,7 @@
             <div class="d-flex align-items-start justify-content-between">
                 <div>
                     <small class="text-muted fw-medium" style="font-size:0.75rem">Harga Stabil 🔵</small>
-                    <div class="stat-value mt-1" style="color:#0ea5e9">{{ $stableCount }}</div>
+                    <div class="stat-value mt-1" style="color:#0ea5e9" data-counter="{{ $stableCount }}">{{ $stableCount }}</div>
                 </div>
                 <div class="stat-icon" style="background:rgba(14,165,233,0.1)"><i class="bi bi-dash-circle" style="color:#0ea5e9"></i></div>
             </div>
@@ -76,7 +117,7 @@
                     <small class="text-muted">14 hari terakhir — @if($commodityTrend) {{ count($commodityTrend) }} komoditas utama @endif</small>
                 </div>
             </div>
-            <div style="position:relative;height:320px">
+            <div class="chart-box chart-box-lg">
                 <canvas id="priceTrendChart"></canvas>
             </div>
         </div>
@@ -89,7 +130,7 @@
                     <small class="text-muted">Distribusi naik/turun/stabil</small>
                 </div>
             </div>
-            <div style="position:relative;height:240px">
+            <div class="chart-box chart-box-md">
                 <canvas id="priceStatusChart"></canvas>
             </div>
             @if($avgChange != 0)
@@ -131,15 +172,15 @@
 <!-- ===== KETAHANAN PANGAN (BAPANAS) ===== -->
 <div class="card border-0 mb-4 animate-fade-up" style="border-radius:var(--radius);box-shadow:var(--shadow)">
     <div class="p-3">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 food-security-head">
             <div class="section-title">
                 <span class="icon-circle" style="background:rgba(16,185,129,0.1);color:#10b981"><i class="bi bi-shield-check"></i></span>
                 Status Ketahanan Pangan
             </div>
-            <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center gap-3 index-wrap">
                 <small class="text-muted">Indeks Keseluruhan</small>
                 <div class="d-flex align-items-center gap-2">
-                    <div style="width:140px;height:10px;border-radius:10px;background:#e2e8f0;overflow:hidden">
+                    <div class="index-bar-track" style="width:140px;height:10px;border-radius:10px;background:#e2e8f0;overflow:hidden">
                         <div style="width:{{ $foodSecurity['overall_index'] }}%;height:100%;border-radius:10px;background:{{ $foodSecurity['overall_index'] >= 70 ? 'linear-gradient(90deg,#10b981,#34d399)' : ($foodSecurity['overall_index'] >= 50 ? 'linear-gradient(90deg,#f59e0b,#fbbf24)' : 'linear-gradient(90deg,#ef4444,#f87171)') }};transition:width 1.5s ease"></div>
                     </div>
                     <span class="fw-bold fs-5" style="color:{{ $foodSecurity['overall_index'] >= 70 ? '#10b981' : ($foodSecurity['overall_index'] >= 50 ? '#f59e0b' : '#ef4444') }}">{{ $foodSecurity['overall_index'] }}</span>
@@ -353,7 +394,7 @@
                 <span class="icon-circle" style="background:rgba(14,165,233,0.1);color:#0ea5e9"><i class="bi bi-shield-check"></i></span>
                 Informasi Keamanan Pangan
             </div>
-            <div class="d-flex gap-2">
+            <div class="d-flex gap-2 flex-wrap safety-actions">
                 <a href="{{ route('admin.food-safety.rapid.create') }}" class="btn btn-sm fw-semibold" style="color:#a855f7;font-size:0.78rem;background:rgba(168,85,247,0.08);border-radius:8px"><i class="bi bi-lightning-charge me-1"></i>+ Rapid Test</a>
                 <a href="{{ route('admin.food-safety.lab.create') }}" class="btn btn-sm fw-semibold" style="color:#ef4444;font-size:0.78rem;background:rgba(239,68,68,0.08);border-radius:8px"><i class="bi bi-eyedropper me-1"></i>+ Uji Lab</a>
                 <a href="{{ route('admin.food-safety.index') }}" class="btn btn-sm fw-semibold" style="color:var(--primary);font-size:0.78rem">Kelola <i class="bi bi-arrow-right"></i></a>
@@ -404,19 +445,19 @@
         <div class="row g-3 mb-3">
             <div class="col-lg-4">
                 <small class="fw-bold text-muted d-block mb-2" style="font-size:0.72rem">TREN RAPID TEST (6 BULAN)</small>
-                <div style="position:relative;height:200px">
+                <div class="chart-box chart-box-sm">
                     <canvas id="rapidTrendChart"></canvas>
                 </div>
             </div>
             <div class="col-lg-4">
                 <small class="fw-bold text-muted d-block mb-2" style="font-size:0.72rem">TREN UJI LAB (6 BULAN)</small>
-                <div style="position:relative;height:200px">
+                <div class="chart-box chart-box-sm">
                     <canvas id="labTrendChart"></canvas>
                 </div>
             </div>
             <div class="col-lg-4">
                 <small class="fw-bold text-muted d-block mb-2" style="font-size:0.72rem">RINGKASAN HASIL</small>
-                <div style="position:relative;height:200px">
+                <div class="chart-box chart-box-sm">
                     <canvas id="safetySummaryChart"></canvas>
                 </div>
             </div>
@@ -669,192 +710,239 @@
 
 @push('scripts')
 <script>
+// ============================================================
+//  DASHBOARD CHARTS — bulletproof: try/catch per chart, data
+//  dinormalisasi ke number, init setelah DOM siap, animasi
+//  smooth bertahap (progressive draw / stagger / rotate)
+// ============================================================
 const RED = '#ef4444', GREEN = '#10b981', BLUE = '#0ea5e9', PURPLE = '#6366f1', ORANGE = '#f59e0b';
+const IS_MOBILE_CHART = window.matchMedia('(max-width: 767.98px)').matches;
 
-// ===== PRICE TREND CHART =====
-(function() {
-    const ctx = document.getElementById('priceTrendChart');
-    if (!ctx) return;
+function initDashboardCharts() {
+    if (typeof Chart === 'undefined') {
+        console.warn('[PANCA] Chart.js belum termuat — chart dilewati.');
+        return;
+    }
 
-    const trendData = @json($commodityTrend);
-    if (!trendData || trendData.length === 0) return;
+    // ===== GLOBAL DEFAULTS (smooth & clean) =====
+    try {
+        Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+        Chart.defaults.animation.duration = 1300;
+        Chart.defaults.animation.easing = 'easeOutQuart';
+        Chart.defaults.plugins.legend.labels.usePointStyle = true;
+        Chart.defaults.plugins.legend.labels.pointStyle = 'circle';
+        Chart.defaults.plugins.legend.labels.boxWidth = 8;
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15,23,42,0.92)';
+        Chart.defaults.plugins.tooltip.padding = 12;
+        Chart.defaults.plugins.tooltip.cornerRadius = 10;
+        Chart.defaults.plugins.tooltip.titleFont = { size: 12 };
+        Chart.defaults.plugins.tooltip.bodyFont = { size: 11 };
+    } catch (e) { console.warn('[PANCA] Chart defaults:', e); }
 
-    const colors = [PURPLE, RED, GREEN, BLUE, ORANGE, '#ec4899', '#8b5cf6', '#14b8a6'];
-    const datasets = trendData.map(function(item, i) {
-        return {
-            label: item.name,
-            data: item.prices,
-            borderColor: colors[i % colors.length],
-            backgroundColor: colors[i % colors.length] + '18',
-            borderWidth: 2.5,
-            tension: 0.35,
-            pointRadius: 3,
-            pointHoverRadius: 7,
-            pointBackgroundColor: '#fff',
-            pointBorderColor: colors[i % colors.length],
-            pointBorderWidth: 2,
-            fill: true,
-        };
-    });
+    // Normalisasi nilai ke number (data string dari DB decimal)
+    const toNum = v => (v === null || v === undefined || v === '' ? null : Number(v));
+    const fmtRp = v => 'Rp ' + Number(v).toLocaleString('id-ID');
 
-    const allDates = trendData[0].dates || [];
-    new Chart(ctx, {
-        type: 'line',
-        data: { labels: allDates, datasets: datasets },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 15,
-                        usePointStyle: true,
-                        pointStyle: 'circle',
-                        font: { size: 11, family: "'Inter', sans-serif" }
-                    }
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(15,23,42,0.9)',
-                    titleFont: { size: 12 },
-                    bodyFont: { size: 11 },
-                    padding: 12,
-                    cornerRadius: 8,
-                    callbacks: {
-                        label: function(ctx) {
-                            return ctx.dataset.label + ': Rp ' + ctx.parsed.y.toLocaleString('id-ID');
+    // ===== 1. TREN HARGA KOMODITAS (line, progressive draw) =====
+    try {
+        const el = document.getElementById('priceTrendChart');
+        const trendData = @json($commodityTrend) || [];
+        if (el && trendData.length) {
+            const palette = [PURPLE, RED, GREEN, BLUE, ORANGE, '#ec4899', '#8b5cf6', '#14b8a6'];
+            const datasets = trendData.map(function (item, i) {
+                const c = palette[i % palette.length];
+                return {
+                    label: item.name,
+                    data: (item.prices || []).map(toNum),
+                    borderColor: c,
+                    backgroundColor: c + '1A',
+                    borderWidth: IS_MOBILE_CHART ? 2 : 2.5,
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: IS_MOBILE_CHART ? 2 : 3,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: c,
+                    pointBorderWidth: 2,
+                };
+            });
+            new Chart(el, {
+                type: 'line',
+                data: { labels: trendData[0].dates || [], datasets: datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 1600,
+                        easing: 'easeOutQuart',
+                        delay: function (ctx) { return ctx.datasetIndex * 200; }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: IS_MOBILE_CHART ? 10 : 14, font: { size: IS_MOBILE_CHART ? 10 : 11 } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (ctx) { return ctx.dataset.label + ': ' + fmtRp(ctx.parsed.y); }
+                            }
                         }
-                    }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: { color: 'rgba(100,116,139,0.08)' },
+                            ticks: {
+                                callback: function (v) { return 'Rp' + Math.round(v / 1000) + 'K'; },
+                                font: { size: IS_MOBILE_CHART ? 9 : 10 },
+                                maxTicksLimit: IS_MOBILE_CHART ? 5 : 8
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: IS_MOBILE_CHART ? 9 : 10 }, maxRotation: 0, autoSkip: true, maxTicksLimit: IS_MOBILE_CHART ? 5 : 10 }
+                        }
+                    },
+                    interaction: { intersect: false, mode: 'index' }
                 }
-            },
-            scales: {
-                y: {
-                    beginAtZero: false,
-                    grid: { color: 'rgba(0,0,0,0.05)' },
-                    ticks: {
-                        callback: function(v) { return 'Rp ' + (v/1000) + 'K'; },
-                        font: { size: 10 }
-                    }
+            });
+        }
+    } catch (e) { console.error('[PANCA] priceTrendChart:', e); }
+
+    // ===== 2. STATUS HARGA (bar, stagger dari kiri) =====
+    try {
+        const el = document.getElementById('priceStatusChart');
+        if (el) {
+            new Chart(el, {
+                type: 'bar',
+                data: {
+                    labels: ['Naik 🔴', 'Turun 🟢', 'Stabil 🔵'],
+                    datasets: [{
+                        label: 'Jumlah Komoditas',
+                        data: [{{ (int) $upCount }}, {{ (int) $downCount }}, {{ (int) $stableCount }}],
+                        backgroundColor: [RED, GREEN, BLUE],
+                        borderRadius: { topLeft: 10, topRight: 10, bottomLeft: 0, bottomRight: 0 },
+                        borderSkipped: false,
+                        maxBarThickness: 72,
+                    }]
                 },
-                x: {
-                    grid: { display: false },
-                    ticks: { font: { size: 10 }, maxRotation: 0 }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 1100,
+                        easing: 'easeOutElastic',
+                        delay: function (ctx) { return ctx.dataIndex * 160; }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: function (ctx) { return ctx.parsed.y + ' komoditas'; } } }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0, font: { size: IS_MOBILE_CHART ? 9 : 11 } }, grid: { color: 'rgba(100,116,139,0.08)' } },
+                        x: { grid: { display: false }, ticks: { font: { size: IS_MOBILE_CHART ? 10 : 12, weight: '600' } } }
+                    }
                 }
-            },
-            interaction: { intersect: false, mode: 'index' },
+            });
         }
-    });
-})();
+    } catch (e) { console.error('[PANCA] priceStatusChart:', e); }
 
-// ===== PRICE STATUS BAR =====
-(function() {
-    const ctx = document.getElementById('priceStatusChart');
-    if (!ctx) return;
-
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Naik 🔴', 'Turun 🟢', 'Stabil 🔵'],
-            datasets: [{
-                label: 'Jumlah Komoditas',
-                data: [{{ $upCount }}, {{ $downCount }}, {{ $stableCount }}],
-                backgroundColor: [RED, GREEN, BLUE],
-                borderRadius: 8,
-                borderSkipped: false,
-                maxBarThickness: 72,
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: 'rgba(15,23,42,0.9)',
-                    padding: 10,
-                    cornerRadius: 8,
-                    callbacks: { label: function(ctx) { return ctx.parsed.y + ' komoditas'; } }
+    // ===== 3. TREN RAPID TEST (stacked bar, stagger) =====
+    try {
+        const el = document.getElementById('rapidTrendChart');
+        const trend = @json($rapidTrend) || [];
+        if (el) {
+            new Chart(el, {
+                type: 'bar',
+                data: {
+                    labels: trend.map(function (t) { return t.label; }),
+                    datasets: [
+                        { label: 'Negatif (Aman)', data: trend.map(function (t) { return t.negatif || 0; }), backgroundColor: GREEN, borderRadius: 5, stack: 's', maxBarThickness: 30 },
+                        { label: 'Positif (Terkontaminasi)', data: trend.map(function (t) { return t.positif || 0; }), backgroundColor: RED, borderRadius: 5, stack: 's', maxBarThickness: 30 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    animation: { duration: 1000, easing: 'easeOutQuart', delay: function (ctx) { return ctx.dataIndex * 90; } },
+                    plugins: { legend: { position: 'bottom', labels: { font: { size: IS_MOBILE_CHART ? 9 : 10 }, padding: 8 } } },
+                    scales: {
+                        x: { stacked: true, grid: { display: false }, ticks: { font: { size: IS_MOBILE_CHART ? 8 : 10 }, maxRotation: 0, autoSkip: false } },
+                        y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1, precision: 0, font: { size: 9 } }, grid: { color: 'rgba(100,116,139,0.06)' } }
+                    }
                 }
-            },
-            scales: {
-                y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0, font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.05)' } },
-                x: { grid: { display: false }, ticks: { font: { size: 12, weight: '600' } } }
-            }
+            });
         }
-    });
-})();
+    } catch (e) { console.error('[PANCA] rapidTrendChart:', e); }
 
-// ===== RAPID TEST TREND (stacked bar) =====
-(function() {
-    const ctx = document.getElementById('rapidTrendChart');
-    if (!ctx) return;
-    const trend = @json($rapidTrend);
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: trend.map(function(t) { return t.label; }),
-            datasets: [
-                { label: 'Negatif (Aman)', data: trend.map(function(t){return t.negatif;}), backgroundColor: GREEN, borderRadius: 4, stack: 's', maxBarThickness: 32 },
-                { label: 'Positif (Terkontaminasi)', data: trend.map(function(t){return t.positif;}), backgroundColor: RED, borderRadius: 4, stack: 's', maxBarThickness: 32 }
-            ]
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', font: { size: 10 }, padding: 8 } } },
-            scales: {
-                x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 } } },
-                y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1, precision: 0, font: { size: 9 } }, grid: { color: 'rgba(0,0,0,0.04)' } }
-            }
+    // ===== 4. TREN UJI LAB (stacked bar, stagger) =====
+    try {
+        const el = document.getElementById('labTrendChart');
+        const trend = @json($labTrend) || [];
+        if (el) {
+            new Chart(el, {
+                type: 'bar',
+                data: {
+                    labels: trend.map(function (t) { return t.label; }),
+                    datasets: [
+                        { label: 'MS (Memenuhi Syarat)', data: trend.map(function (t) { return t.ms || 0; }), backgroundColor: GREEN, borderRadius: 5, stack: 's', maxBarThickness: 30 },
+                        { label: 'TMS (Tidak MS)', data: trend.map(function (t) { return t.tms || 0; }), backgroundColor: RED, borderRadius: 5, stack: 's', maxBarThickness: 30 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    animation: { duration: 1000, easing: 'easeOutQuart', delay: function (ctx) { return ctx.dataIndex * 90; } },
+                    plugins: { legend: { position: 'bottom', labels: { font: { size: IS_MOBILE_CHART ? 9 : 10 }, padding: 8 } } },
+                    scales: {
+                        x: { stacked: true, grid: { display: false }, ticks: { font: { size: IS_MOBILE_CHART ? 8 : 10 }, maxRotation: 0, autoSkip: false } },
+                        y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1, precision: 0, font: { size: 9 } }, grid: { color: 'rgba(100,116,139,0.06)' } }
+                    }
+                }
+            });
         }
-    });
-})();
+    } catch (e) { console.error('[PANCA] labTrendChart:', e); }
 
-// ===== LAB TEST TREND (stacked bar) =====
-(function() {
-    const ctx = document.getElementById('labTrendChart');
-    if (!ctx) return;
-    const trend = @json($labTrend);
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: trend.map(function(t) { return t.label; }),
-            datasets: [
-                { label: 'MS (Memenuhi Syarat)', data: trend.map(function(t){return t.ms;}), backgroundColor: GREEN, borderRadius: 4, stack: 's', maxBarThickness: 32 },
-                { label: 'TMS (Tidak Memenuhi Syarat)', data: trend.map(function(t){return t.tms;}), backgroundColor: RED, borderRadius: 4, stack: 's', maxBarThickness: 32 }
-            ]
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', font: { size: 10 }, padding: 8 } } },
-            scales: {
-                x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 } } },
-                y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1, precision: 0, font: { size: 9 } }, grid: { color: 'rgba(0,0,0,0.04)' } }
-            }
+    // ===== 5. RINGKASAN HASIL (doughnut, rotate + scale + stagger arc) =====
+    try {
+        const el = document.getElementById('safetySummaryChart');
+        if (el) {
+            new Chart(el, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Rapid Aman ✅', 'Rapid Positif 🔴', 'Lab MS ✅', 'Lab TMS ❌'],
+                    datasets: [{
+                        data: [{{ (int) $rapidNegatif }}, {{ (int) $rapidPositif }}, {{ (int) $labMs }}, {{ (int) $labTms }}],
+                        backgroundColor: [GREEN, RED, BLUE, ORANGE],
+                        borderWidth: 3,
+                        borderColor: getComputedStyle(document.documentElement).getPropertyValue('--bg-card').trim() || '#fff',
+                        hoverOffset: 10,
+                        spacing: 2,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '60%',
+                    animation: {
+                        animateRotate: true,
+                        animateScale: true,
+                        duration: 1400,
+                        easing: 'easeOutQuart',
+                        delay: function (ctx) { return ctx.dataIndex * 160; }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { size: IS_MOBILE_CHART ? 9 : 10 }, padding: 10 } },
+                        tooltip: { callbacks: { label: function (ctx) { return ctx.label + ': ' + ctx.parsed + ' uji'; } } }
+                    }
+                }
+            });
         }
-    });
-})();
+    } catch (e) { console.error('[PANCA] safetySummaryChart:', e); }
+}
 
-// ===== SAFETY SUMMARY (doughnut) =====
-(function() {
-    const ctx = document.getElementById('safetySummaryChart');
-    if (!ctx) return;
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Rapid Aman ✅', 'Rapid Positif 🔴', 'Lab MS ✅', 'Lab TMS ❌'],
-            datasets: [{
-                data: [{{ $rapidNegatif }}, {{ $rapidPositif }}, {{ $labMs }}, {{ $labTms }}],
-                backgroundColor: [GREEN, RED, BLUE, '#f97316'],
-                borderWidth: 0, spacing: 3, borderRadius: 5
-            }]
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false, cutout: '58%',
-            plugins: {
-                legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', font: { size: 10 }, padding: 8 } }
-            }
-        }
-    });
-})();
+// Init setelah DOM siap (pastikan container sudah punya ukuran)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDashboardCharts);
+} else {
+    initDashboardCharts();
+}
 </script>
 @endpush

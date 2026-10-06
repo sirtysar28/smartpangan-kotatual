@@ -2,9 +2,14 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('logo.png') }}">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="PANCA Kota Tual">
     <title>@yield('title', 'Pangan Cerdas (Panca) Maryadat Kota Tual')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -13,7 +18,7 @@
     <style>
         :root { --primary: #6366f1; --secondary: #0ea5e9; }
         * { font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 40%, #312e81 70%, #4338ca 100%); background-size: 200% 200%; animation: gradient-shift 8s ease infinite; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin:0; }
+        body { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 40%, #312e81 70%, #4338ca 100%); background-size: 200% 200%; animation: gradient-shift 8s ease infinite; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; margin:0; padding: 2rem 1rem; }
         @keyframes gradient-shift { 0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%} }
         @keyframes fadeInUp { from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)} }
         @keyframes float { 0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)} }
@@ -30,6 +35,19 @@
         .input-icon-wrapper .icon-right:hover { background: #f1f5f9; color: #64748b; }
         .bg-particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 0; }
         .bg-particles span { position: absolute; width: 4px; height: 4px; background: rgba(255,255,255,0.15); border-radius: 50%; animation: float 4s ease-in-out infinite; }
+
+        /* ===== ANTI-MELEBAR + MOBILE ===== */
+        .min-w-0 { min-width: 0 !important; }
+        img, video, canvas, svg { max-width: 100%; }
+        @media (max-width: 767.98px) {
+            body { padding: 1.4rem 0.9rem calc(88px + env(safe-area-inset-bottom, 0px)); }
+            .auth-card { max-width: 100%; border-radius: 18px; }
+            .auth-body { padding: 1.5rem 1.15rem; }
+            h1, h2, h3, h4, h5, h6, p, small, div, span { overflow-wrap: break-word; }
+        }
+        @media (max-width: 360px) {
+            .auth-body { padding: 1.25rem 0.9rem; }
+        }
     </style>
 </head>
 <body>
@@ -48,6 +66,19 @@
             @yield('content')
         </div>
     </div>
+
+    {{-- Footer mini di bawah kartu login --}}
+    <div class="text-center mt-3" style="position:relative;z-index:1;padding:0 1rem">
+        <p class="mb-1" style="color:rgba(255,255,255,0.55);font-size:0.72rem">
+            &copy; {{ date('Y') }} Pangan Cerdas (Panca) Maryadat Kota Tual
+        </p>
+        <p class="mb-0" style="color:rgba(255,255,255,0.45);font-size:0.68rem">
+            Developed by <a href="https://ciptakaryadigital.id/new" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.7);text-decoration:none;font-weight:600">CV Cipta Karya Digital Indonesia</a>
+        </p>
+    </div>
+
+    {{-- 5 icon bottom nav khusus mobile (ala native) --}}
+    @include('frontend.partials.mobile-nav')
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -65,7 +65,7 @@
         <form action="{{ route('admin.commodities.update-price', $commodity) }}" method="POST" class="row g-2 align-items-end">@csrf
             <div class="col-md-4">
                 <label class="form-label small fw-bold mb-1">Harga Baru (Rp)</label>
-                <input type="number" name="price" class="form-control" placeholder="Masukkan harga terbaru" step="100" min="0" required>
+                <input type="text" name="price" class="form-control price-input" placeholder="cth. 60.983" inputmode="numeric" autocomplete="off" required>
             </div>
             <div class="col-md-4">
                 <label class="form-label small fw-bold mb-1">Tanggal Update Harga</label>
@@ -112,7 +112,7 @@
                 <label class="form-label"><i class="bi bi-tag me-1" style="color:#ef4444"></i>HET (Harga Eceran Tertinggi)</label>
                 <div class="input-icon-wrapper">
                     <span class="input-icon-left">Rp</span>
-                    <input type="number" name="het" class="form-control" step="100" value="{{ $commodity->het }}">
+                    <input type="text" name="het" class="form-control price-input" inputmode="numeric" autocomplete="off" value="{{ old('het', $commodity->het ? number_format($commodity->het, 0, '', '.') : '') }}">
                 </div>
             </div>
         </div>
@@ -121,7 +121,7 @@
                 <label class="form-label"><i class="bi bi-tag me-1" style="color:#0ea5e9"></i>HAP (Harga Acuan Pemerintah)</label>
                 <div class="input-icon-wrapper">
                     <span class="input-icon-left">Rp</span>
-                    <input type="number" name="hap" class="form-control" step="100" value="{{ $commodity->hap }}">
+                    <input type="text" name="hap" class="form-control price-input" inputmode="numeric" autocomplete="off" value="{{ old('hap', $commodity->hap ? number_format($commodity->hap, 0, '', '.') : '') }}">
                 </div>
             </div>
         </div>
@@ -130,7 +130,7 @@
                 <label class="form-label"><i class="bi bi-tag me-1" style="color:#f59e0b"></i>HPP (Harga Pokok Penjualan)</label>
                 <div class="input-icon-wrapper">
                     <span class="input-icon-left">Rp</span>
-                    <input type="number" name="hpp" class="form-control" step="100" value="{{ $commodity->hpp }}">
+                    <input type="text" name="hpp" class="form-control price-input" inputmode="numeric" autocomplete="off" value="{{ old('hpp', $commodity->hpp ? number_format($commodity->hpp, 0, '', '.') : '') }}">
                 </div>
             </div>
         </div>

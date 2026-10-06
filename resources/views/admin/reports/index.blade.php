@@ -1,94 +1,312 @@
 @extends('layouts.admin')
 @section('title', 'Laporan - Admin Pangan Cerdas (Panca) Maryadat Kota Tual')
 @section('content')
+
+<style>
+    /* ===== REPORT CARDS — seragam & rapi ===== */
+    .report-grid .report-card {
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(0,0,0,0.04);
+        background: var(--bg-card);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        transition: transform .35s cubic-bezier(.4,0,.2,1), box-shadow .35s cubic-bezier(.4,0,.2,1);
+        position: relative;
+        overflow: hidden;
+    }
+    .report-grid .report-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 4px;
+        background: var(--rc-accent, #6366f1);
+    }
+    .report-grid .report-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+    .report-grid .report-body {
+        padding: 1.15rem;
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+    }
+    .report-grid .report-head {
+        display: flex;
+        align-items: center;
+        gap: .85rem;
+        min-height: 60px;
+        margin-bottom: 1rem;
+    }
+    .report-grid .report-icon {
+        width: 50px; height: 50px;
+        border-radius: 14px;
+        flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.3rem;
+        background: var(--rc-soft, rgba(99,102,241,0.1));
+        color: var(--rc-accent, #6366f1);
+        transition: transform .35s cubic-bezier(.4,0,.2,1);
+    }
+    .report-grid .report-card:hover .report-icon { transform: scale(1.08) rotate(-4deg); }
+    .report-grid .report-title {
+        font-weight: 700;
+        font-size: .95rem;
+        margin: 0;
+        line-height: 1.3;
+        color: var(--text-main);
+    }
+    .report-grid .report-desc {
+        font-size: .74rem;
+        color: var(--text-muted);
+        margin: 0;
+        line-height: 1.4;
+    }
+    .report-grid .report-form {
+        margin-top: auto;          /* pin form ke bawah agar tombol sejajar antar card */
+        display: flex;
+        flex-direction: column;
+        gap: .8rem;
+    }
+    .report-grid .form-label {
+        font-size: .68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        color: var(--text-muted);
+        margin-bottom: .3rem;
+        white-space: nowrap;
+    }
+    .report-grid .form-control, .report-grid .form-select {
+        font-size: .83rem;
+        border-radius: 9px;
+        padding: .48rem .65rem;
+        min-height: 40px;
+    }
+    .report-btn {
+        border: none;
+        border-radius: 11px;
+        font-weight: 700;
+        font-size: .84rem;
+        padding: .68rem 1rem;
+        width: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .5rem;
+        cursor: pointer;
+        color: #fff;
+        background: var(--rc-accent, #6366f1);
+        box-shadow: 0 4px 14px var(--rc-shadow, rgba(99,102,241,0.35));
+        transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
+        white-space: nowrap;
+    }
+    .report-btn:hover { transform: translateY(-2px); filter: brightness(1.07); color: #fff; }
+    .report-btn:active { transform: translateY(0); }
+    .report-hint {
+        font-size: .7rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+        margin: 0;
+    }
+    /* Dark mode */
+    html.dark-mode .report-grid .report-card { border-color: #334155; }
+    /* Mobile */
+    @media (max-width: 767.98px) {
+        .report-grid .report-head { min-height: auto; }
+        .report-grid .report-body { padding: 1rem; }
+        .report-grid .report-icon { width: 44px; height: 44px; font-size: 1.1rem; border-radius: 12px; }
+        .report-grid .report-title { font-size: .88rem; }
+        .report-btn { font-size: .8rem; padding: .6rem .8rem; }
+    }
+    @media (max-width: 360px) {
+        .report-grid .report-body { padding: .85rem; }
+        .report-grid .report-head { gap: .6rem; }
+    }
+</style>
+
 <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4 animate-fade-up">
     <div>
         <h4 class="fw-bold mb-1" style="font-size:1.35rem"><i class="bi bi-file-earmark-bar-graph me-2"></i>Export Laporan 📄</h4>
-        <p class="text-muted mb-0 small">Download laporan dalam format PDF</p>
+        <p class="text-muted mb-0 small">Download laporan PDF — semua laporan dapat difilter berdasarkan rentang tanggal</p>
     </div>
+    <span class="badge-modern" style="background:rgba(99,102,241,0.1);color:#6366f1"><i class="bi bi-calendar3 me-1"></i>{{ now()->translatedFormat('d F Y') }}</span>
 </div>
-<div class="row g-4">
-    <div class="col-md-6 animate-fade-up delay-1">
-        <div class="card border-0 h-100" style="border-radius:var(--radius);box-shadow:var(--shadow)">
-            <div class="p-3">
-                <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="stat-icon" style="background:rgba(99,102,241,0.1)"><i class="bi bi-bag" style="color:#6366f1"></i></div>
-                    <div><h6 class="fw-bold mb-0">Laporan Penjualan</h6><small class="text-muted">Data transaksi per periode</small></div>
-                </div>
-                <form action="{{ route('admin.reports.sales') }}" method="POST">@csrf
-                    <div class="row g-2 mb-3">
-                        <div class="col-6"><label class="form-label small">Dari</label><input type="date" name="start_date" class="form-control" value="{{ now()->startOfMonth()->format('Y-m-d') }}" required></div>
-                        <div class="col-6"><label class="form-label small">Sampai</label><input type="date" name="end_date" class="form-control" value="{{ now()->format('Y-m-d') }}" required></div>
+
+<div class="row g-3 g-xl-4 report-grid">
+
+    {{-- ================= LAPORAN PENJUALAN ================= --}}
+    <div class="col-12 col-md-6 col-xl-4 animate-fade-up delay-1">
+        <div class="report-card" style="--rc-accent:#6366f1;--rc-soft:rgba(99,102,241,0.12);--rc-shadow:rgba(99,102,241,0.35)">
+            <div class="report-body">
+                <div class="report-head">
+                    <div class="report-icon"><i class="bi bi-bag"></i></div>
+                    <div>
+                        <h6 class="report-title">Laporan Penjualan</h6>
+                        <p class="report-desc">Data transaksi per periode</p>
                     </div>
-                    <button class="btn btn-primary-modern w-100"><i class="bi bi-download me-2"></i>Download PDF</button>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 animate-fade-up delay-2">
-        <div class="card border-0 h-100" style="border-radius:var(--radius);box-shadow:var(--shadow)">
-            <div class="p-3">
-                <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="stat-icon" style="background:rgba(16,185,129,0.1)"><i class="bi bi-shop" style="color:#10b981"></i></div>
-                    <div><h6 class="fw-bold mb-0">Laporan UMKM</h6><small class="text-muted">Data UMKM terverifikasi</small></div>
                 </div>
-                <form action="{{ route('admin.reports.umkm') }}" method="POST">@csrf
-                    <button class="btn w-100" style="background:rgba(16,185,129,0.1);color:#10b981;border:none;border-radius:10px;font-weight:600"><i class="bi bi-download me-2"></i>Download PDF</button>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 animate-fade-up delay-3">
-        <div class="card border-0 h-100" style="border-radius:var(--radius);box-shadow:var(--shadow)">
-            <div class="p-3">
-                <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="stat-icon" style="background:rgba(245,158,11,0.1)"><i class="bi bi-graph-up" style="color:#f59e0b"></i></div>
-                    <div><h6 class="fw-bold mb-0">Laporan Komoditas</h6><small class="text-muted">Harga kebutuhan pokok & tren</small></div>
-                </div>
-                <form action="{{ route('admin.reports.commodity') }}" method="POST">@csrf
-                    <button class="btn w-100" style="background:rgba(245,158,11,0.1);color:#f59e0b;border:none;border-radius:10px;font-weight:600"><i class="bi bi-download me-2"></i>Download PDF</button>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 animate-fade-up delay-4">
-        <div class="card border-0 h-100" style="border-radius:var(--radius);box-shadow:var(--shadow)">
-            <div class="p-3">
-                <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="stat-icon" style="background:rgba(14,165,233,0.1)"><i class="bi bi-trophy" style="color:#0ea5e9"></i></div>
-                    <div><h6 class="fw-bold mb-0">Produk Terlaris</h6><small class="text-muted">Top 50 produk terlaris</small></div>
-                </div>
-                <form action="{{ route('admin.reports.top-products') }}" method="POST">@csrf
-                    <button class="btn w-100" style="background:rgba(14,165,233,0.1);color:#0ea5e9;border:none;border-radius:10px;font-weight:600"><i class="bi bi-download me-2"></i>Download PDF</button>
+                <form action="{{ route('admin.reports.sales') }}" method="POST" class="report-form">@csrf
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="form-label">Dari Tanggal</label>
+                            <input type="date" name="start_date" class="form-control" value="{{ now()->startOfMonth()->format('Y-m-d') }}" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Sampai</label>
+                            <input type="date" name="end_date" class="form-control" value="{{ now()->format('Y-m-d') }}" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="report-btn"><i class="bi bi-download"></i>Download PDF</button>
                 </form>
             </div>
         </div>
     </div>
 
-    <div class="col-md-6 animate-fade-up delay-4">
-        <div class="card border-0 h-100" style="border-radius:var(--radius);box-shadow:var(--shadow);border-top:3px solid #a855f7">
-            <div class="p-3">
-                <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="stat-icon" style="background:rgba(168,85,247,0.1)"><i class="bi bi-shield-check" style="color:#a855f7"></i></div>
-                    <div><h6 class="fw-bold mb-0">Laporan Keamanan Pangan</h6><small class="text-muted">Hasil Uji Rapid Test &amp; Uji Laboratorium</small></div>
+    {{-- ================= LAPORAN UMKM ================= --}}
+    <div class="col-12 col-md-6 col-xl-4 animate-fade-up delay-2">
+        <div class="report-card" style="--rc-accent:#10b981;--rc-soft:rgba(16,185,129,0.12);--rc-shadow:rgba(16,185,129,0.3)">
+            <div class="report-body">
+                <div class="report-head">
+                    <div class="report-icon"><i class="bi bi-shop"></i></div>
+                    <div>
+                        <h6 class="report-title">Laporan UMKM</h6>
+                        <p class="report-desc">Data UMKM terverifikasi</p>
+                    </div>
                 </div>
-                <form action="{{ route('admin.reports.food-safety') }}" method="POST">@csrf
-                    <div class="row g-2 mb-2">
-                        <div class="col-6"><label class="form-label small">Dari (opsional)</label><input type="date" name="start_date" class="form-control form-control-sm"></div>
-                        <div class="col-6"><label class="form-label small">Sampai (opsional)</label><input type="date" name="end_date" class="form-control form-control-sm"></div>
+                <form action="{{ route('admin.reports.umkm') }}" method="POST" class="report-form">@csrf
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="form-label">Dari Tanggal <em class="fw-normal text-lowercase">(opsional)</em></label>
+                            <input type="date" name="start_date" class="form-control">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Sampai</label>
+                            <input type="date" name="end_date" class="form-control">
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label small">Jenis Laporan</label>
-                        <select name="report_type" class="form-select form-select-sm">
-                            <option value="all">Semua (Rapid Test + Uji Lab)</option>
-                            <option value="rapid">Hanya Uji Rapid Test</option>
-                            <option value="lab">Hanya Uji Laboratorium</option>
-                        </select>
-                    </div>
-                    <button class="btn w-100" style="background:rgba(168,85,247,0.1);color:#a855f7;border:none;border-radius:10px;font-weight:600"><i class="bi bi-file-earmark-pdf me-2"></i>Download Laporan PDF</button>
+                    <button type="submit" class="report-btn"><i class="bi bi-download"></i>Download PDF</button>
                 </form>
             </div>
         </div>
     </div>
+
+    {{-- ================= LAPORAN KOMODITAS ================= --}}
+    <div class="col-12 col-md-6 col-xl-4 animate-fade-up delay-3">
+        <div class="report-card" style="--rc-accent:#f59e0b;--rc-soft:rgba(245,158,11,0.12);--rc-shadow:rgba(245,158,11,0.3)">
+            <div class="report-body">
+                <div class="report-head">
+                    <div class="report-icon"><i class="bi bi-graph-up"></i></div>
+                    <div>
+                        <h6 class="report-title">Laporan Komoditas</h6>
+                        <p class="report-desc">Harga kebutuhan pokok &amp; tren</p>
+                    </div>
+                </div>
+                <form action="{{ route('admin.reports.commodity') }}" method="POST" class="report-form">@csrf
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="form-label">Dari Tanggal <em class="fw-normal text-lowercase">(opsional)</em></label>
+                            <input type="date" name="start_date" class="form-control">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Sampai</label>
+                            <input type="date" name="end_date" class="form-control">
+                        </div>
+                    </div>
+                    <button type="submit" class="report-btn"><i class="bi bi-download"></i>Download PDF</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- ================= PRODUK TERLARIS ================= --}}
+    <div class="col-12 col-md-6 col-xl-4 animate-fade-up delay-4">
+        <div class="report-card" style="--rc-accent:#0ea5e9;--rc-soft:rgba(14,165,233,0.12);--rc-shadow:rgba(14,165,233,0.3)">
+            <div class="report-body">
+                <div class="report-head">
+                    <div class="report-icon"><i class="bi bi-trophy"></i></div>
+                    <div>
+                        <h6 class="report-title">Produk Terlaris</h6>
+                        <p class="report-desc">Top 50 produk terlaris</p>
+                    </div>
+                </div>
+                <form action="{{ route('admin.reports.top-products') }}" method="POST" class="report-form">@csrf
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="form-label">Dari Tanggal <em class="fw-normal text-lowercase">(opsional)</em></label>
+                            <input type="date" name="start_date" class="form-control">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Sampai</label>
+                            <input type="date" name="end_date" class="form-control">
+                        </div>
+                    </div>
+                    <button type="submit" class="report-btn"><i class="bi bi-download"></i>Download PDF</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- ================= KEAMANAN PANGAN ================= --}}
+    <div class="col-12 col-md-6 col-xl-4 animate-fade-up delay-5">
+        <div class="report-card" style="--rc-accent:#a855f7;--rc-soft:rgba(168,85,247,0.12);--rc-shadow:rgba(168,85,247,0.3)">
+            <div class="report-body">
+                <div class="report-head">
+                    <div class="report-icon"><i class="bi bi-shield-check"></i></div>
+                    <div>
+                        <h6 class="report-title">Keamanan Pangan</h6>
+                        <p class="report-desc">Rapid Test &amp; Uji Laboratorium</p>
+                    </div>
+                </div>
+                <form action="{{ route('admin.reports.food-safety') }}" method="POST" class="report-form">@csrf
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="form-label">Dari Tanggal <em class="fw-normal text-lowercase">(opsional)</em></label>
+                            <input type="date" name="start_date" class="form-control">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Sampai</label>
+                            <input type="date" name="end_date" class="form-control">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label">Jenis Laporan</label>
+                        <select name="report_type" class="form-select">
+                            <option value="all">Semua (Rapid + Uji Lab)</option>
+                            <option value="rapid">Hanya Rapid Test</option>
+                            <option value="lab">Hanya Uji Laboratorium</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="report-btn"><i class="bi bi-file-earmark-pdf"></i>Download PDF</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- ================= PETUNJUK ================= --}}
+    <div class="col-12 col-md-6 col-xl-4 animate-fade-up delay-6">
+        <div class="report-card" style="--rc-accent:#64748b;--rc-soft:rgba(100,116,139,0.12);--rc-shadow:rgba(100,116,139,0.25)">
+            <div class="report-body">
+                <div class="report-head">
+                    <div class="report-icon"><i class="bi bi-info-circle"></i></div>
+                    <div>
+                        <h6 class="report-title">Petunjuk</h6>
+                        <p class="report-desc">Cara menggunakan filter tanggal</p>
+                    </div>
+                </div>
+                <div class="d-flex flex-column gap-2" style="font-size:.78rem;color:var(--text-muted)">
+                    <div class="d-flex gap-2"><i class="bi bi-check2-circle mt-1" style="color:#10b981"></i><span>Pilih rentang tanggal untuk memfilter data laporan sesuai kebutuhan.</span></div>
+                    <div class="d-flex gap-2"><i class="bi bi-check2-circle mt-1" style="color:#10b981"></i><span>Kosongkan tanggal untuk mengunduh <strong>semua periode</strong>.</span></div>
+                    <div class="d-flex gap-2"><i class="bi bi-check2-circle mt-1" style="color:#10b981"></i><span>Semua laporan diunduh dalam format <strong>PDF</strong> siap cetak.</span></div>
+                </div>
+                <p class="report-hint mt-3 mb-0"><i class="bi bi-clock-history"></i>Periode mengikuti tanggal pendataan pada sistem.</p>
+            </div>
+        </div>
+    </div>
+
 </div>
 @endsection

@@ -1,0 +1,51 @@
+{
+    "name": "Pangan Cerdas (PANCA) Maryadat Kota Tual",
+    "short_name": "PANCA Tual",
+    "description": "Layanan Pangan Cerdas — Sistem Monitoring Stabilisasi Harga, Pasokan, dan Keamanan Pangan Kota Tual, Maluku",
+    "lang": "id",
+    "dir": "ltr",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "background_color": "#0f172a",
+    "theme_color": "#0f172a",
+    "categories": ["government", "food", "utilities"],
+    "icons": [
+        {
+            "src": "/logo.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/favicon.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Panel Harga Pangan",
+            "short_name": "Harga",
+            "description": "Cek harga kebutuhan pokok terkini",
+            "url": "/kebutuhan-pokok",
+            "icons": [{ "src": "/favicon.png", "sizes": "512x512" }]
+        },
+        {
+            "name": "Ketersediaan Pangan",
+            "short_name": "Pasokan",
+            "description": "Monitoring ketersediaan & stok pangan",
+            "url": "/ketersediaan-pangan",
+            "icons": [{ "src": "/favicon.png", "sizes": "512x512" }]
+        },
+        {
+            "name": "Keamanan Pangan",
+            "short_name": "Keamanan",
+            "description": "Hasil rapid test & uji laboratorium",
+            "url": "/keamanan-pangan",
+            "icons": [{ "src": "/favicon.png", "sizes": "512x512" }]
+        }
+    ]
+}

@@ -69,6 +69,9 @@ class CommodityController extends Controller
 
     public function store(Request $request)
     {
+        // Normalisasi input angka format Indonesia (60.983 / 60.983,50 → angka murni)
+        \App\Support\IdNumber::merge($request, ['price', 'het', 'hap', 'hpp']);
+
         $data = $request->validate([
             'name' => 'required',
             'unit' => 'required',
@@ -112,6 +115,9 @@ class CommodityController extends Controller
 
     public function update(Request $request, Commodity $commodity)
     {
+        // Normalisasi input angka format Indonesia (60.983 / 60.983,50 → angka murni)
+        \App\Support\IdNumber::merge($request, ['het', 'hap', 'hpp']);
+
         $data = $request->validate([
             'name' => 'required',
             'unit' => 'required',
@@ -146,6 +152,9 @@ class CommodityController extends Controller
 
     public function updatePrice(Request $request, Commodity $commodity)
     {
+        // Normalisasi input angka format Indonesia (60.983 → 60983)
+        \App\Support\IdNumber::merge($request, ['price']);
+
         $request->validate([
             'price' => 'required|numeric|min:0',
             'price_date' => 'required|date',

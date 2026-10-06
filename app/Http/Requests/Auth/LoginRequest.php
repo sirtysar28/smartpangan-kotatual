@@ -30,7 +30,38 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
+            'captcha' => ['required', 'string', 'size:5'],
         ];
+    }
+
+    /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'captcha' => strtoupper(trim((string) $this->input('captcha', ''))),
+        ]);
+    }
+
+    /**
+     * Verifikasi jawaban captcha (5 karakter alphanumeric).
+     *
+     * @throws ValidationException
+     */
+    protected function ensureCaptchaIsValid(): void
+    {
+        $expected = strtoupper(trim((string) session('login_captcha_code')));
+
+        if ($expected === '' || strtoupper(trim((string) $this->input('captcha'))) !== $expected) {
+            // Regenerate captcha supaya user mencoba kode baru
+            $chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+            session(['login_captcha_code' => substr(str_shuffle(str_repeat($chars, 5)), 0, 5)]);
+
+            throw ValidationException::withMessages([
+                'captcha' => 'Kode captcha salah. Silakan coba lagi.',
+            ]);
+        }
     }
 
     /**
@@ -41,6 +72,7 @@ class LoginRequest extends FormRequest
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
+        $this->ensureCaptchaIsValid();
 
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());

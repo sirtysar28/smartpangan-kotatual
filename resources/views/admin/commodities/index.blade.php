@@ -172,7 +172,7 @@
                         </td>
                         <td>
                             <form action="{{ route('admin.commodities.update-price', $c) }}" method="POST" class="d-flex gap-1 flex-wrap">@csrf
-                                <input type="number" name="price" class="form-control form-control-sm" placeholder="Harga" step="100" style="font-size:0.72rem;border-radius:6px;min-width:80px" required>
+                                <input type="text" name="price" class="form-control form-control-sm price-input" placeholder="60.983" inputmode="numeric" autocomplete="off" style="font-size:0.72rem;border-radius:6px;min-width:80px" required>
                                 <input type="date" name="price_date" class="form-control form-control-sm" value="{{ date('Y-m-d') }}" style="font-size:0.68rem;border-radius:6px;min-width:110px" required title="Tanggal update harga">
                                 <button type="submit" class="btn btn-sm" style="background:rgba(16,185,129,0.1);color:#10b981;border-radius:6px;flex-shrink:0;font-size:0.7rem" title="Update"><i class="bi bi-arrow-up"></i></button>
                             </form>

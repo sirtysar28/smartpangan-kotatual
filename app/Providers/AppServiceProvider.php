@@ -19,6 +19,15 @@ class AppServiceProvider extends ServiceProvider
     {
         \Illuminate\Database\Eloquent\Model::preventLazyLoading(!$this->app->isProduction());
 
+        // ===== SMTP dari Pengaturan (override config mail runtime) =====
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
+                \App\Http\Controllers\Admin\SettingController::applyMailConfig();
+            }
+        } catch (\Throwable $e) {
+            // DB belum siap (mis. saat migrate pertama) — abaikan
+        }
+
         // Redirect default /dashboard based on role
         \Illuminate\Support\Facades\Route::get('/dashboard', function () {
             $user = auth()->user();

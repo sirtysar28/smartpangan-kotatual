@@ -16,6 +16,32 @@ class ReportController extends Controller
 {
     public function index() { return view('admin.reports.index'); }
 
+    /**
+     * Ambil & normalisasi rentang tanggal dari request (nullable).
+     */
+    private function dateRange(Request $request): array
+    {
+        $data = $request->validate([
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+        ]);
+
+        return [$data['start_date'] ?? null, $data['end_date'] ?? null];
+    }
+
+    /**
+     * Label periode untuk header PDF.
+     */
+    private function periodeLabel(?string $start, ?string $end): string
+    {
+        $fmt = fn($d) => \Illuminate\Support\Carbon::parse($d)->translatedFormat('d F Y');
+
+        if ($start && $end) return "Periode {$fmt($start)} s/d {$fmt($end)}";
+        if ($start) return "Periode {$fmt($start)} s/d Sekarang";
+        if ($end) return "Periode s/d {$fmt($end)}";
+        return 'Semua Periode';
+    }
+
     public function salesReport(Request $request)
     {
         $request->validate(['start_date' => 'required|date', 'end_date' => 'required|date']);
@@ -27,27 +53,56 @@ class ReportController extends Controller
         return $pdf->download('laporan-penjualan-'.$request->start_date.'.pdf');
     }
 
-    public function umkmReport()
+    public function umkmReport(Request $request)
     {
-        $umkms = Umkm::with(['user','products','orders'])->verified()->get();
-        ActivityLogService::log('export', 'report', "Download laporan UMKM ({$umkms->count()} UMKM)");
-        $pdf = Pdf::loadView('admin.reports.umkm-pdf', compact('umkms'));
+        [$start, $end] = $this->dateRange($request);
+
+        $umkms = Umkm::with(['user','products','orders'])->verified()
+            ->when($start, fn($q) => $q->whereDate('created_at', '>=', $start))
+            ->when($end, fn($q) => $q->whereDate('created_at', '<=', $end))
+            ->get();
+
+        $periode = $this->periodeLabel($start, $end);
+        ActivityLogService::log('export', 'report', "Download laporan UMKM ({$umkms->count()} UMKM) — {$periode}");
+        $pdf = Pdf::loadView('admin.reports.umkm-pdf', compact('umkms','periode'));
         return $pdf->download('laporan-umkm-'.now()->format('Y-m-d').'.pdf');
     }
 
-    public function commodityReport()
+    public function commodityReport(Request $request)
     {
-        $commodities = \App\Models\Commodity::with('latestPrice')->active()->pangan()->get();
-        ActivityLogService::log('export', 'report', "Download laporan komoditas ({$commodities->count()} item)");
-        $pdf = Pdf::loadView('admin.reports.commodity-pdf', compact('commodities'));
+        [$start, $end] = $this->dateRange($request);
+
+        $commodities = \App\Models\Commodity::with(['latestPrice', 'prices' => fn($q) => $q
+                ->when($start, fn($q) => $q->whereDate('price_date', '>=', $start))
+                ->when($end, fn($q) => $q->whereDate('price_date', '<=', $end))
+            ])
+            ->active()->pangan()
+            ->when($start, function ($q) use ($start, $end) {
+                $q->whereHas('prices', fn($p) => $p->whereDate('price_date', '>=', $start)
+                    ->when($end, fn($p) => $p->whereDate('price_date', '<=', $end)));
+            })
+            ->get();
+
+        $periode = $this->periodeLabel($start, $end);
+        ActivityLogService::log('export', 'report', "Download laporan komoditas ({$commodities->count()} item) — {$periode}");
+        $pdf = Pdf::loadView('admin.reports.commodity-pdf', compact('commodities','periode'));
         return $pdf->download('laporan-komoditas-'.now()->format('Y-m-d').'.pdf');
     }
 
-    public function topProductsReport()
+    public function topProductsReport(Request $request)
     {
-        $products = Product::with(['umkm','category'])->active()->popular()->take(50)->get();
-        ActivityLogService::log('export', 'report', "Download laporan produk terlaris ({$products->count()} produk)");
-        $pdf = Pdf::loadView('admin.reports.top-products-pdf', compact('products'));
+        [$start, $end] = $this->dateRange($request);
+
+        $products = Product::with(['umkm','category'])->active()->popular()
+            ->when($start, fn($q) => $q->whereHas('orderItems', fn($oi) => $oi->whereHas('order', fn($o) => $o
+                ->where('status', '!=', 'cancelled')
+                ->whereDate('created_at', '>=', $start)
+                ->when($end, fn($o) => $o->whereDate('created_at', '<=', $end)))))
+            ->take(50)->get();
+
+        $periode = $this->periodeLabel($start, $end);
+        ActivityLogService::log('export', 'report', "Download laporan produk terlaris ({$products->count()} produk) — {$periode}");
+        $pdf = Pdf::loadView('admin.reports.top-products-pdf', compact('products','periode'));
         return $pdf->download('laporan-produk-terlaris-'.now()->format('Y-m-d').'.pdf');
     }
 
@@ -92,10 +147,7 @@ class ReportController extends Controller
 
         ActivityLogService::log('export', 'report', "Download laporan keamanan pangan ({$summary['total_rapid']} rapid test, {$summary['total_lab']} uji lab)");
 
-        $fmt = fn($d) => \Illuminate\Support\Carbon::parse($d)->translatedFormat('d F Y');
-        $periode = $startDate || $endDate
-            ? 'Periode ' . ($startDate ? $fmt($startDate) : 'awal') . ' s/d ' . ($endDate ? $fmt($endDate) : 'sekarang')
-            : 'Semua Periode';
+        $periode = $this->periodeLabel($startDate, $endDate);
 
         $pdf = Pdf::loadView('admin.reports.food-safety-pdf', compact('rapidTests', 'labTests', 'summary', 'periode'))
             ->setPaper('a4', 'portrait');
