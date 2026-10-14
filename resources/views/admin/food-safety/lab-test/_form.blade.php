@@ -58,7 +58,36 @@
 
     <hr class="my-4">
     <h6 class="fw-bold mb-1"><i class="bi bi-clipboard2-data me-2" style="color:var(--primary)"></i>Data Hasil Uji</h6>
-    <p class="text-muted small mb-3">Isi parameter yang diuji. Kolom <strong>Nilai</strong> diisi melalui popup.</p>
+    <p class="text-muted small mb-3">Isi parameter yang diuji. Kolom <strong>Nilai</strong> diisi melalui popup. Parameter bersifat <strong>fleksibel</strong> — bisa dipilih dari data master, diisi manual, atau <strong>di kosongkan</strong> untuk jenis uji tanpa parameter (mis. boraks).</p>
+
+    {{-- Revisi 14 Okt 2026: Pemilih parameter dari Data Master (terhubung menu Master Parameter) --}}
+    @php $masterParams = \App\Models\TestParameterMaster::active()->ordered()->get(); @endphp
+    @if($masterParams->count() > 0)
+    <div class="card border-0 mb-3" style="border-radius:var(--radius);box-shadow:var(--shadow-sm);background:linear-gradient(135deg,rgba(99,102,241,0.04),rgba(14,165,233,0.03))">
+        <div class="p-3">
+            <label class="form-label small fw-semibold mb-2" style="color:var(--primary)"><i class="bi bi-database-fill-check me-1"></i>Pilih Cepat dari Data Master Parameter ({{ $masterParams->count() }} parameter aktif)</label>
+            <div class="row g-2">
+                <div class="col-md-9">
+                    <select id="masterParamSelect" class="form-select form-select-sm">
+                        <option value="">-- Pilih parameter dari data master --</option>
+                        @foreach($masterParams as $mp)
+                        <option value="{{ $mp->id }}"
+                                data-name="{{ $mp->name }}"
+                                data-category="{{ $mp->category ?? '' }}"
+                                data-unit="{{ $mp->unit }}"
+                                data-standard="{{ $mp->standard }}"
+                                data-method="{{ $mp->method }}">{{ $mp->name }}@if($mp->category) — {{ $mp->category_label }}@endif</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="button" id="masterParamAdd" class="btn btn-sm w-100" style="background:var(--primary);color:#fff;border-radius:8px;font-weight:600"><i class="bi bi-plus-lg me-1"></i>Tambah ke Form</button>
+                </div>
+            </div>
+            <small class="text-muted">Parameter terpilih otomatis masuk ke kelompok uji yang sesuai. Kelola daftar master di menu <strong>Master Parameter</strong>.</small>
+        </div>
+    </div>
+    @endif
 
     @foreach(\App\Models\LabTestParameter::CATEGORIES as $catKey => $cat)
     <div class="card border-0 mb-3" style="border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden">
@@ -91,6 +120,37 @@
         </div>
     </div>
     @endforeach
+
+    {{-- Revisi 14 Okt 2026: Grup parameter tanpa kelompok (kategori kosong — mis. boraks, formalin) --}}
+    <div class="card border-0 mb-3" style="border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden">
+        <div class="p-3 d-flex justify-content-between align-items-center" style="background:rgba(100,116,139,0.06);border-bottom:1px solid rgba(100,116,139,0.15)">
+            <h6 class="fw-bold mb-0" style="font-size:0.88rem;color:#64748b">
+                <i class="bi bi-clipboard2-plus me-2"></i>Parameter Lainnya / Tanpa Kelompok <span class="text-muted fw-normal" style="font-size:0.72rem">(opsional — mis. boraks, formalin)</span>
+            </h6>
+            <button type="button" class="btn btn-sm add-param-btn" data-cat="" style="background:rgba(100,116,139,0.12);color:#64748b;border-radius:8px;font-weight:600;font-size:0.72rem">
+                <i class="bi bi-plus-lg me-1"></i>Tambah Parameter
+            </button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-modern param-table mb-0" data-cat="" style="font-size:0.72rem">
+                <thead>
+                    <tr style="background:rgba(148,163,184,0.04)">
+                        <th style="min-width:170px">Parameter</th>
+                        <th style="min-width:130px">Hasil Uji</th>
+                        <th style="min-width:110px">Nilai</th>
+                        <th style="min-width:80px">Satuan</th>
+                        <th style="min-width:110px">Standar</th>
+                        <th style="min-width:90px">LOD</th>
+                        <th style="min-width:90px">LOQ</th>
+                        <th style="min-width:120px">Status</th>
+                        <th style="min-width:120px">Metode Uji</th>
+                        <th style="width:40px"></th>
+                    </tr>
+                </thead>
+                <tbody class="param-tbody" data-cat=""></tbody>
+            </table>
+        </div>
+    </div>
 
     <hr class="my-3">
     <button class="btn btn-primary rounded-pill"><i class="bi bi-save me-1"></i>{{ $editMode ? 'Simpan Perubahan' : 'Simpan Hasil Uji Lab' }}</button>
@@ -184,6 +244,27 @@
         btn.addEventListener('click', function() { addParamRow(this.dataset.cat); });
     });
 
+    // Revisi 14 Okt 2026: Pilih cepat dari data master parameter
+    var masterAddBtn = document.getElementById('masterParamAdd');
+    var masterSelect = document.getElementById('masterParamSelect');
+    if (masterAddBtn && masterSelect) {
+        masterAddBtn.addEventListener('click', function() {
+            var opt = masterSelect.options[masterSelect.selectedIndex];
+            if (!opt || !opt.value) { masterSelect.focus(); return; }
+            var tr = addParamRow(opt.dataset.category || '', {
+                parameter: opt.dataset.name,
+                unit: opt.dataset.unit,
+                standard: opt.dataset.standard,
+                method: opt.dataset.method
+            });
+            if (tr) {
+                tr.querySelector('input[name$="[parameter]"]').readOnly = true;
+                tr.style.background = 'rgba(99,102,241,0.04)';
+            }
+            masterSelect.selectedIndex = 0;
+        });
+    }
+
     // ==== POPUP NILAI ====
     var popupEl = document.getElementById('valuePopup');
     var popupInput = document.getElementById('valuePopupInput');
@@ -224,7 +305,7 @@
     var prefillData = {!! $oldParams ? json_encode($oldParams) : ($editMode ? json_encode($labTest->parameters->map(fn($p) => ['test_category' => $p->test_category, 'parameter' => $p->parameter, 'result' => $p->result, 'value' => $p->value, 'unit' => $p->unit, 'standard' => $p->standard, 'lod' => $p->lod, 'loq' => $p->loq, 'status' => $p->status, 'method' => $p->method])->values()->all()) : 'null') !!};
     if (prefillData) {
         prefillData.forEach(function(row) {
-            if (row && row.parameter) { addParamRow(row.test_category, row); }
+            if (row && row.parameter) { addParamRow(row.test_category || '', row); }
         });
     }
 })();

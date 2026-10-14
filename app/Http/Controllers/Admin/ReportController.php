@@ -17,16 +17,32 @@ class ReportController extends Controller
     public function index() { return view('admin.reports.index'); }
 
     /**
-     * Ambil & normalisasi rentang tanggal dari request (nullable).
+     * Revisi 14 Okt 2026:
+     * - Laporan Penjualan, UMKM & Produk Terlaris disembunyikan dari menu
+     *   (tidak relevan — fungsional tetap dipertahankan untuk kebutuhan lain).
+     * - Laporan Panel Harga & Ketersediaan Pangan dipisah, default periode 1 tahun.
      */
-    private function dateRange(Request $request): array
+
+    /**
+     * Ambil & normalisasi rentang tanggal dari request (nullable).
+     * Revisi 14 Okt 2026: jika kosong, default periode 1 tahun terakhir.
+     */
+    private function dateRange(Request $request, bool $defaultOneYear = false): array
     {
         $data = $request->validate([
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
         ]);
 
-        return [$data['start_date'] ?? null, $data['end_date'] ?? null];
+        $start = $data['start_date'] ?? null;
+        $end = $data['end_date'] ?? null;
+
+        if ($defaultOneYear && (!$start || !$end)) {
+            $end = $end ?? now()->toDateString();
+            $start = $start ?? now()->subYear()->toDateString();
+        }
+
+        return [$start, $end];
     }
 
     /**
@@ -70,7 +86,8 @@ class ReportController extends Controller
 
     public function commodityReport(Request $request)
     {
-        [$start, $end] = $this->dateRange($request);
+        // Revisi 14 Okt 2026: default periode 1 tahun (panel harga dibuat untuk 1 tahun)
+        [$start, $end] = $this->dateRange($request, defaultOneYear: true);
 
         $commodities = \App\Models\Commodity::with(['latestPrice', 'prices' => fn($q) => $q
                 ->when($start, fn($q) => $q->whereDate('price_date', '>=', $start))
@@ -83,10 +100,51 @@ class ReportController extends Controller
             })
             ->get();
 
+        // Perbandingan harga: minggu ke minggu, bulan lalu, tahun lalu (riwayat & tren kenaikan/penurunan)
+        $commodities->each(fn($c) => $c->price_comparison = $c->getPriceComparison());
+
         $periode = $this->periodeLabel($start, $end);
-        ActivityLogService::log('export', 'report', "Download laporan komoditas ({$commodities->count()} item) — {$periode}");
+        ActivityLogService::log('export', 'report', "Download laporan panel harga ({$commodities->count()} item) — {$periode}");
         $pdf = Pdf::loadView('admin.reports.commodity-pdf', compact('commodities','periode'));
-        return $pdf->download('laporan-komoditas-'.now()->format('Y-m-d').'.pdf');
+        return $pdf->download('laporan-panel-harga-'.now()->format('Y-m-d').'.pdf');
+    }
+
+    // ==================== LAPORAN KETERSEDIAAN PANGAN (STOK) — TERPISAH DARI PANEL HARGA (REVISI 14 OKT 2026) ====================
+
+    public function availabilityReport(Request $request)
+    {
+        // Laporan ketersediaan dipisah dari laporan harga; default periode 1 tahun
+        [$start, $end] = $this->dateRange($request, defaultOneYear: true);
+
+        $stocks = \App\Models\CommodityStock::with('commodity')
+            ->when($start, fn($q) => $q->whereDate('monitoring_date', '>=', $start))
+            ->when($end, fn($q) => $q->whereDate('monitoring_date', '<=', $end))
+            ->orderBy('monitoring_date')->get()->groupBy('commodity_id');
+
+        // Ringkasan per komoditas: stok terakhir + riwayat dalam periode
+        $summaries = \App\Models\Commodity::with(['latestStock'])
+            ->whereHas('stocks', fn($s) => $s
+                ->when($start, fn($s) => $s->whereDate('monitoring_date', '>=', $start))
+                ->when($end, fn($s) => $s->whereDate('monitoring_date', '<=', $end)))
+            ->active()->pangan()->get()
+            ->map(function ($c) use ($stocks) {
+                $history = $stocks->get($c->id, collect());
+                $withDuration = $history->whereNotNull('stock_duration_days');
+                return [
+                    'commodity' => $c,
+                    'latest' => $history->sortByDesc('monitoring_date')->first(),
+                    'avg_stock' => $history->count() ? round($history->avg('stock_quantity'), 2) : null,
+                    'avg_duration' => $withDuration->count() ? round($withDuration->avg('stock_duration_days')) : null,
+                    'records' => $history->count(),
+                    'history' => $history->sortByDesc('monitoring_date')->take(12)->values(),
+                ];
+            });
+
+        $periode = $this->periodeLabel($start, $end);
+        ActivityLogService::log('export', 'report', "Download laporan ketersediaan pangan ({$summaries->count()} komoditas) — {$periode}");
+        $pdf = Pdf::loadView('admin.reports.availability-pdf', compact('summaries','periode'))
+            ->setPaper('a4', 'landscape');
+        return $pdf->download('laporan-ketersediaan-pangan-'.now()->format('Y-m-d').'.pdf');
     }
 
     public function topProductsReport(Request $request)

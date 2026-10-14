@@ -40,11 +40,13 @@ class Commodity extends Model
     }
 
     /**
-     * Get price comparison: today, last month, last year
+     * Get price comparison: today, last week, last month, last year
+     * (Revisi 14 Okt 2026: tambah perbandingan minggu ke minggu)
      */
     public function getPriceComparison(): array
     {
         $today = now()->startOfDay();
+        $lastWeek = now()->subWeek()->startOfDay();
         $lastMonth = now()->subMonth()->startOfDay();
         $lastYear = now()->subYear()->startOfDay();
 
@@ -53,6 +55,16 @@ class Commodity extends Model
 
         // Today price float (used for HET evaluation)
         $todayPriceFloat = $todayPrice ? (float) $todayPrice : null;
+
+        // ===== Minggu lalu (week-to-week) =====
+        $lastWeekPrice = $this->prices()->where('price_date', $lastWeek)->value('price');
+        if (!$lastWeekPrice) {
+            $lastWeekPrice = $this->prices()
+                ->where('price_date', '>=', $lastWeek->copy()->subDays(3))
+                ->where('price_date', '<=', $lastWeek->copy()->addDays(3))
+                ->orderBy('price_date')
+                ->value('price');
+        }
 
         $lastMonthPrice = $this->prices()->where('price_date', $lastMonth)->value('price');
 
@@ -81,6 +93,12 @@ class Commodity extends Model
             $mtmPercent = round((($todayPrice - $lastMonthPrice) / $lastMonthPrice) * 100, 2);
         }
 
+        // WTW (week-to-week) percentage
+        $wtwPercent = null;
+        if ($todayPrice && $lastWeekPrice && $lastWeekPrice != 0) {
+            $wtwPercent = round((($todayPrice - $lastWeekPrice) / $lastWeekPrice) * 100, 2);
+        }
+
         // YOY percentage
         $yoyPercent = null;
         if ($todayPrice && $lastYearPrice && $lastYearPrice != 0) {
@@ -100,10 +118,13 @@ class Commodity extends Model
 
         return [
             'today_price' => $todayPriceFloat,
+            'last_week_price' => $lastWeekPrice ? (float) $lastWeekPrice : null,
             'last_month_price' => $lastMonthPrice ? (float) $lastMonthPrice : null,
             'last_year_price' => $lastYearPrice ? (float) $lastYearPrice : null,
+            'wtw_percent' => $wtwPercent,
             'mtm_percent' => $mtmPercent,
             'yoy_percent' => $yoyPercent,
+            'wtw_direction' => $wtwPercent > 0 ? 'up' : ($wtwPercent < 0 ? 'down' : 'stable'),
             'mtm_direction' => $mtmPercent > 0 ? 'up' : ($mtmPercent < 0 ? 'down' : 'stable'),
             'yoy_direction' => $yoyPercent > 0 ? 'up' : ($yoyPercent < 0 ? 'down' : 'stable'),
             'food_status' => $foodStatus,

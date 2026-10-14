@@ -17,7 +17,8 @@ class DashboardController extends Controller
         $aiInsights = AiInsight::active()->latest()->take(10)->get();
 
         // === MONITORING HARGA PANGAN ===
-        $commodities = Commodity::with('latestPrice')->active()->get();
+        // eager-load prices agar grafik tren tidak N+1 (revisi 14 Okt 2026)
+        $commodities = Commodity::with(['latestPrice', 'prices' => fn($q) => $q->latest('price_date')->take(14)])->active()->get();
         $priceIncreases = CommodityPrice::where('change_percent', '>', 0)->where('price_date', '>=', now()->subDays(7))->with('commodity')->orderBy('change_percent', 'desc')->take(10)->get();
         $totalCommodities = $commodities->count();
         $avgChange = $commodities->whereNotNull('latestPrice')->avg(fn($c) => (float) ($c->latestPrice->change_percent ?? 0));
@@ -29,7 +30,15 @@ class DashboardController extends Controller
         $commodityTrend = [];
         $topCommodities = $commodities->take(8);
         foreach ($topCommodities as $c) {
-            $prices = $c->prices()->orderBy('price_date', 'desc')->take(14)->get()->reverse();
+            // Revisi 14 Okt 2026: skip komoditas tanpa data harga agar dataset kosong
+            // tidak membuat grafik Tren Harga Komoditas tampil blank
+            if ($c->prices->isEmpty() && !$c->latestPrice) {
+                continue;
+            }
+            $prices = $c->prices->sortBy('price_date')->values();
+            if ($prices->isEmpty() && $c->latestPrice) {
+                $prices = collect([$c->latestPrice]);
+            }
 
             // If only 1 price exists, generate simulated historical data for chart
             if ($prices->count() <= 1 && $prices->first()) {
@@ -55,7 +64,7 @@ class DashboardController extends Controller
                 'name'   => $c->name,
                 'unit'   => $c->unit,
                 'image'  => $c->image_url,
-                'prices' => $prices->pluck('price')->map(fn($p) => (float) $p)->values()->toArray(),
+                'prices' => $prices->pluck('price')->map(fn($p) => is_array($p) ? (float) $p['price'] : (float) $p)->values()->toArray(),
                 'dates'  => $prices->map(fn($p) => is_array($p) ? \Carbon\Carbon::parse($p['price_date'])->format('d/m') : $p->price_date->format('d/m'))->toArray(),
             ];
         }

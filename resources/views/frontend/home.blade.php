@@ -416,6 +416,64 @@
     </div>
 </section>
 
+{{-- ==================== SECTION: STRUKTUR ORGANISASI (Revisi 14 Okt 2026) ====================
+     Gambar diupload dari Admin → Tampilan Beranda; section otomatis tersembunyi bila belum ada gambar --}}
+@if($strukturOrganisasi)
+<section class="py-5" id="struktur-organisasi" style="background:var(--bg-card)">
+    <div class="container">
+        <div class="text-center mb-4" data-animate>
+            <div class="section-title justify-content-center">
+                <span class="icon-circle" style="background:rgba(14,165,233,0.12);color:#0ea5e9"><i class="bi bi-diagram-3"></i></span>
+                Struktur Organisasi
+            </div>
+            <p class="text-muted mt-2 mb-0 mx-auto" style="font-size:0.85rem;max-width:640px">Struktur organisasi Dinas Ketahanan Pangan Kota Tual.</p>
+        </div>
+        <div class="row justify-content-center" data-animate>
+            <div class="col-12 col-lg-10">
+                <div style="border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,0.05);background:#f8fafc">
+                    <img src="{{ \Storage::url($strukturOrganisasi) }}" alt="Struktur Organisasi Dinas Ketahanan Pangan Kota Tual" style="width:100%;display:block;object-fit:contain" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@endif
+
+{{-- ==================== SECTION: GALERI KEGIATAN (Revisi 14 Okt 2026) ==================== --}}
+@if($galleries && $galleries->count() > 0)
+<section class="py-5" id="galeri-kegiatan" style="background:linear-gradient(180deg,rgba(99,102,241,0.03),rgba(245,158,11,0.02))">
+    <div class="container">
+        <div class="text-center mb-4" data-animate>
+            <div class="section-title justify-content-center">
+                <span class="icon-circle" style="background:rgba(245,158,11,0.12);color:var(--accent)"><i class="bi bi-images"></i></span>
+                Galeri Kegiatan
+            </div>
+            <p class="text-muted mt-2 mb-0 mx-auto" style="font-size:0.85rem;max-width:640px">Dokumentasi kegiatan pemantauan pangan di Kota Tual.</p>
+        </div>
+        <div class="row g-3 justify-content-center">
+            @foreach($galleries as $g)
+            <div class="col-6 col-md-4 col-lg-3" data-animate>
+                <div class="h-100" style="border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);background:var(--bg-card);border:1px solid rgba(0,0,0,0.04);transition:transform .35s ease,box-shadow .35s ease">
+                    <div style="position:relative;height:150px;overflow:hidden">
+                        <img src="{{ $g->image_url }}" alt="{{ $g->title }}" style="width:100%;height:100%;object-fit:cover;transition:transform .5s ease" loading="lazy" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        @if($g->activity_date)
+                        <span class="badge" style="position:absolute;top:10px;left:10px;background:rgba(15,23,42,0.7);color:#fff;font-size:0.62rem;border-radius:8px;backdrop-filter:blur(4px)"><i class="bi bi-calendar3 me-1"></i>{{ $g->activity_date->translatedFormat('d M Y') }}</span>
+                        @endif
+                    </div>
+                    <div class="p-2">
+                        <div class="fw-semibold text-truncate" style="font-size:0.78rem" title="{{ $g->title }}">{{ $g->title }}</div>
+                        @if($g->description)
+                        <small class="text-muted d-block text-truncate" style="font-size:0.66rem" title="{{ $g->description }}">{{ $g->description }}</small>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
 <!-- ALERT: Kenaikan Harga -->
 @if($priceIncreases->count() > 0)
 <section class="py-3" style="background:linear-gradient(135deg,rgba(239,68,68,0.08),rgba(245,158,11,0.05))">
@@ -452,9 +510,9 @@
 
         <div class="row g-4">
 
-            <!-- 1. Panel Harga Pangan (Large) -->
-            <div class="col-md-6 col-xl-4" data-animate>
-                <a href="{{ route('frontend.commodities') }}" class="menu-thumb-card thumb-lg text-decoration-none" style="color:#fff">
+            <!-- 1. Panel Harga Pangan — ukuran disamakan dengan card lain (revisi 14 Okt 2026) -->
+            <div class="col-sm-6 col-lg-4" data-animate>
+                <a href="{{ route('frontend.commodities') }}" class="menu-thumb-card text-decoration-none" style="color:#fff">
                     <div class="thumb-bg" style="background-image:url('{{ asset('BG_ketahanan_pangan.jpeg') }}')"></div>
                     <div class="thumb-overlay"></div>
                     <div class="thumb-badge" style="background:rgba(99,102,241,0.25);color:#a5b4fc">
@@ -472,7 +530,7 @@
             </div>
 
             <!-- 2. Ketersediaan Pangan -->
-            <div class="col-sm-6 col-xl-4" data-animate>
+            <div class="col-sm-6 col-lg-4" data-animate>
                 <a href="{{ route('frontend.availability') }}" class="menu-thumb-card text-decoration-none" style="color:#fff">
                     <div class="thumb-bg" style="background:linear-gradient(135deg,#064e3b,#10b981)"></div>
                     <div class="thumb-overlay"></div>
@@ -491,7 +549,7 @@
             </div>
 
             <!-- 3. Kerawanan Pangan -->
-            <div class="col-sm-6 col-xl-4" data-animate>
+            <div class="col-sm-6 col-lg-4" data-animate>
                 <a href="{{ route('frontend.food-vulnerability') }}" class="menu-thumb-card text-decoration-none" style="color:#fff">
                     <div class="thumb-bg" style="background:linear-gradient(135deg,#78350f,#f59e0b)"></div>
                     <div class="thumb-overlay"></div>
@@ -510,7 +568,7 @@
             </div>
 
             <!-- 4. Keamanan Pangan -->
-            <div class="col-sm-6 col-xl-3" data-animate>
+            <div class="col-sm-6 col-lg-4" data-animate>
                 <a href="{{ route('frontend.food-safety') }}" class="menu-thumb-card text-decoration-none" style="color:#fff">
                     <div class="thumb-bg" style="background:linear-gradient(135deg,#0c4a6e,#0ea5e9)"></div>
                     <div class="thumb-overlay"></div>
@@ -528,8 +586,8 @@
                 </a>
             </div>
 
-            <!-- 5. Perizinan Pangan -->
-            <div class="col-sm-6 col-xl-3" data-animate>
+            <!-- 5. Laporan Perizinan Pangan (revisi 14 Okt 2026: istilah laporan, bukan penerbitan izin) -->
+            <div class="col-sm-6 col-lg-4" data-animate>
                 <a href="{{ route('frontend.permits') }}" class="menu-thumb-card text-decoration-none" style="color:#fff">
                     <div class="thumb-bg" style="background:linear-gradient(135deg,#3b0764,#8b5cf6)"></div>
                     <div class="thumb-overlay"></div>
@@ -540,7 +598,7 @@
                         <div class="thumb-icon" style="background:rgba(139,92,246,0.3);color:#c4b5fd">
                             <i class="bi bi-file-earmark-text"></i>
                         </div>
-                        <div class="thumb-title">Perizinan Pangan</div>
+                        <div class="thumb-title">Laporan Perizinan Pangan</div>
                         <div class="thumb-desc">Data perizinan bagi pelaku usaha pangan di Kota Tual.</div>
                     </div>
                     <div class="thumb-arrow"><i class="bi bi-arrow-right"></i></div>
@@ -569,8 +627,8 @@
             </div>
             --}}
 
-            <!-- 7. Profil / Informasi Kota Tual (Large) -->
-            <div class="col-sm-6 col-xl-3" data-animate>
+            <!-- 7. Profil / Informasi Kota Tual -->
+            <div class="col-sm-6 col-lg-4" data-animate>
                 @if($sitePages && $sitePages->count() > 0)
                 <a href="{{ route('site.page', $sitePages->first()->slug) }}" class="menu-thumb-card text-decoration-none" style="color:#fff">
                 @else

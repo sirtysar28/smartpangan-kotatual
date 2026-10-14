@@ -15,7 +15,7 @@
         <div class="col-md-6">
             <div class="mb-3"><label class="form-label">Jumlah Stok *</label>
                 <div class="input-group">
-                    <input type="number" name="stock_quantity" class="form-control" step="0.01" min="0" required placeholder="Contoh: 500" value="{{ old('stock_quantity') }}">
+                    <input type="text" name="stock_quantity" class="form-control" inputmode="decimal" autocomplete="off" required placeholder="cth. 1.250,5" value="{{ old('stock_quantity') }}">
                     <input type="text" name="stock_unit" class="form-control" style="max-width:80px" required placeholder="kg" value="{{ old('stock_unit', 'kg') }}">
                 </div>
             </div>
@@ -23,7 +23,7 @@
         <div class="col-md-6">
             <div class="mb-3"><label class="form-label">Kebutuhan Per Minggu *</label>
                 <div class="input-group">
-                    <input type="number" name="weekly_need" class="form-control" step="0.01" min="0" required placeholder="Contoh: 150" value="{{ old('weekly_need') }}">
+                    <input type="text" name="weekly_need" class="form-control" inputmode="decimal" autocomplete="off" required placeholder="cth. 150" value="{{ old('weekly_need') }}">
                     <span class="input-group-text" style="font-size:0.78rem">otomatis satuan</span>
                 </div>
             </div>

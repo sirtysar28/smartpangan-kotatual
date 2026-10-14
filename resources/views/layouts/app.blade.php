@@ -577,10 +577,14 @@
         .commodity-card .price-down { color: #10b981; }
         .commodity-card .price-stable { color: #64748b; }
 
-        /* ===== BOTTOM NAV MOBILE (5 ICON) — naikkan tombol float di atasnya ===== */
+        /* ===== BOTTOM NAV MOBILE (5 ICON) — tombol float bertingkat di atasnya ===== */
         @media (max-width: 767.98px) {
-            .chat-btn { bottom: calc(86px + env(safe-area-inset-bottom, 0px)) !important; width: 50px; height: 50px; font-size: 1.3rem; }
-            .chat-widget { bottom: calc(150px + env(safe-area-inset-bottom, 0px)); right: 12px; left: 12px; width: auto; }
+            /* Tombol AI di ATAS tombol WhatsApp — tidak saling menimpa */
+            .chat-btn { bottom: calc(148px + env(safe-area-inset-bottom, 0px)) !important; width: 50px; height: 50px; font-size: 1.3rem; right: 16px; }
+            #waFloatBtn { bottom: calc(90px + env(safe-area-inset-bottom, 0px)) !important; width: 50px; height: 50px; }
+            .chat-btn svg { width: 1.3rem; height: 1.3rem; }
+            .chat-widget { bottom: calc(210px + env(safe-area-inset-bottom, 0px)); right: 12px; left: 12px; width: auto; max-height: 62vh; }
+            .chat-widget .chat-messages { max-height: 46vh; }
         }
 
         /* ===== PWA ===== */
@@ -591,6 +595,7 @@
     @yield('styles')
 </head>
 <body>
+    @include('partials.page-loader')
     @include('frontend.partials.navbar')
 
     @if(session('success'))

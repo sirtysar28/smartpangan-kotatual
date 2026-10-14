@@ -89,7 +89,7 @@
 
             <a href="{{ route('frontend.permits') }}" class="nav-link-item {{ request()->routeIs('frontend.permits') ? 'active' : '' }}">
                 <i class="bi bi-file-earmark-text"></i>
-                <span class="nav-link-text">Perizinan</span>
+                <span class="nav-link-text">Laporan Perizinan</span>
             </a>
         </div>
 
@@ -265,7 +265,7 @@
             <i class="bi bi-shield-check"></i><span>Keamanan Pangan</span><i class="bi bi-chevron-right"></i>
         </a>
         <a href="{{ route('frontend.permits') }}" class="mob-link {{ request()->routeIs('frontend.permits') ? 'active' : '' }}" onclick="toggleMobileMenu()">
-            <i class="bi bi-file-earmark-text"></i><span>Perizinan</span><i class="bi bi-chevron-right"></i>
+            <i class="bi bi-file-earmark-text"></i><span>Laporan Perizinan</span><i class="bi bi-chevron-right"></i>
         </a>
 
         {{-- Marketplace dinonaktifkan: menu Keranjang & Pesanan disembunyikan

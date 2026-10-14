@@ -400,6 +400,7 @@
     @yield('styles')
 </head>
 <body>
+    @include('partials.page-loader')
     <div class="d-flex">
         <!-- Backdrop sidebar mobile -->
         <div class="sidebar-backdrop" id="sidebarBackdrop"></div>

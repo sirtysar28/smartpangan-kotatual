@@ -85,7 +85,8 @@ class LabTestController extends Controller
             'certificate_file' => 'nullable|file|mimes:pdf|max:10240',
             'notes' => 'nullable|string',
             'parameters' => 'nullable|array',
-            'parameters.*.test_category' => 'required_with:parameters|in:mikotoksin,logam_berat,mikrobiologi,residu_pestisida',
+            // Revisi 14 Okt 2026: kategori parameter bisa kosong (mis. uji boraks tanpa parameter kelompok)
+            'parameters.*.test_category' => 'nullable|in:mikotoksin,logam_berat,mikrobiologi,residu_pestisida',
             'parameters.*.parameter' => 'required_with:parameters|string|max:255',
             'parameters.*.result' => 'nullable|in:terdeteksi,tidak_terdeteksi',
             'parameters.*.value' => 'nullable|string|max:100',
@@ -105,7 +106,7 @@ class LabTestController extends Controller
                 continue;
             }
             $labTest->parameters()->create([
-                'test_category' => $row['test_category'],
+                'test_category' => $row['test_category'] ?? null,
                 'parameter' => $row['parameter'],
                 'result' => $row['result'] ?? 'tidak_terdeteksi',
                 'value' => $row['value'] ?? null,

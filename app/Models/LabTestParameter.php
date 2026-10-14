@@ -17,6 +17,12 @@ class LabTestParameter extends Model
         'residu_pestisida' => ['label' => 'Uji Residu Pestisida', 'icon' => 'bi-droplet-half', 'color' => '#0ea5e9'],
     ];
 
+    /**
+     * Revisi 14 Okt 2026: parameter bersifat fleksibel — tidak semua jenis uji
+     * (mis. boraks) memerlukan kelompok parameter, sehingga kategori boleh kosong.
+     */
+    public const CATEGORY_OPTIONAL = true;
+
     /** Parameter umum per kelompok uji (saran input) */
     public const PRESETS = [
         'mikotoksin' => ['Aflatoksin B1', 'Aflatoksin Total (B1+B2+G1+G2)', 'Ochratoxin A', 'Deoxynivalenol (DON)', 'Fumonisin', 'Zearalenone'],
@@ -37,6 +43,9 @@ class LabTestParameter extends Model
 
     public function getCategoryLabelAttribute(): string
     {
+        if (empty($this->test_category)) {
+            return 'Tanpa Kelompok';
+        }
         return self::CATEGORIES[$this->test_category]['label'] ?? ucfirst(str_replace('_', ' ', $this->test_category));
     }
 

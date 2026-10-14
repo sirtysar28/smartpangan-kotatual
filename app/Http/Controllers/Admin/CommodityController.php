@@ -47,7 +47,8 @@ class CommodityController extends Controller
             $priceTrendData[] = [
                 'name' => $c->name,
                 'prices' => $priceList->pluck('price')->map(fn($p) => is_array($p) ? $p['price'] : (float) $p)->toArray(),
-                'dates' => $priceList->map(fn($p) => is_array($p) ? $p['date'] : $p['date'])->toArray(),
+                // Fix (revisi 14 Okt 2026): model CommodityPrice tidak punya atribut 'date' — gunakan price_date
+                'dates' => $priceList->map(fn($p) => is_array($p) ? $p['date'] : $p->price_date->format('d/m'))->toArray(),
             ];
         }
 
@@ -80,6 +81,7 @@ class CommodityController extends Controller
             'hpp' => 'nullable|numeric|min:0',
             'category' => 'required|in:pangan,sandang,perumahan,lainnya',
             'price' => 'required|numeric|min:0',
+            'price_date' => 'nullable|date', // Revisi 14 Okt 2026: tanggal berlaku harga bisa dipilih
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'sertifikasi_type' => 'nullable|string|max:255',
@@ -102,7 +104,7 @@ class CommodityController extends Controller
             'price_previous' => $request->price,
             'change_percent' => 0,
             'source' => 'admin',
-            'price_date' => today(),
+            'price_date' => $data['price_date'] ?? today(),
         ]);
         ActivityLogService::log('create', 'commodity', "Menambah komoditas: {$c->name} (Rp " . number_format($request->price, 0, ',', '.') . "/{$c->unit})", ['commodity_id' => $c->id]);
         return redirect()->route('admin.commodities.index')->with('success', 'Komoditas ditambahkan.');

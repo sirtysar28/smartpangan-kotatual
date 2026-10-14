@@ -20,16 +20,20 @@ class PermitController extends Controller
         if ($request->filled('type')) {
             $query->where('permit_type', $request->type);
         }
+        if ($request->filled('kecamatan')) {
+            $query->where('kecamatan', $request->kecamatan);
+        }
         if ($request->filled('search')) {
             $s = '%' . $request->search . '%';
             $query->where(function ($q) use ($s) {
                 $q->where('business_name', 'like', $s)
                   ->orWhere('applicant_name', 'like', $s)
+                  ->orWhere('nib', 'like', $s)
                   ->orWhere('permit_number', 'like', $s);
             });
         }
 
-        $permits = $query->latest()->paginate(15);
+        $permits = $query->latest()->paginate(15)->withQueryString();
 
         $stats = [
             'total' => Permit::count(),
@@ -55,17 +59,35 @@ class PermitController extends Controller
             'applicant_name' => 'required|string|max:255',
             'applicant_phone' => 'nullable|string|max:20',
             'business_address' => 'nullable|string',
+            'kecamatan' => 'nullable|string|max:100',
+            'desa' => 'nullable|string|max:100',
             'business_category' => 'nullable|string|max:255',
             'food_products' => 'nullable|string',
+            'nib' => 'nullable|string|max:100',
             'permit_type' => 'required|in:pduk,bpom,halal,sp_irt,lainnya',
             'issue_date' => 'nullable|date',
             'expiry_date' => 'nullable|date|after:issue_date',
             'notes' => 'nullable|string',
             'document_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'nib_document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
+
+        // Isi otomatis dari data UMKM terkait bila kolom dikosongkan (revisi 14 Okt 2026)
+        if (!empty($data['umkm_id'])) {
+            $umkm = Umkm::with('user')->find($data['umkm_id']);
+            if ($umkm) {
+                $data['business_name'] = $data['business_name'] ?: $umkm->business_name;
+                $data['applicant_name'] = $data['applicant_name'] ?: ($umkm->user?->name ?? '');
+                $data['business_address'] = $data['business_address'] ?: $umkm->address;
+                $data['nib'] = $data['nib'] ?: $umkm->nib;
+            }
+        }
 
         if ($request->hasFile('document_file')) {
             $data['document_file'] = $request->file('document_file')->store('permits', 'public');
+        }
+        if ($request->hasFile('nib_document')) {
+            $data['nib_document'] = $request->file('nib_document')->store('permits', 'public');
         }
 
         // Auto-generate permit number
@@ -100,21 +122,31 @@ class PermitController extends Controller
             'applicant_name' => 'required|string|max:255',
             'applicant_phone' => 'nullable|string|max:20',
             'business_address' => 'nullable|string',
+            'kecamatan' => 'nullable|string|max:100',
+            'desa' => 'nullable|string|max:100',
             'business_category' => 'nullable|string|max:255',
             'food_products' => 'nullable|string',
+            'nib' => 'nullable|string|max:100',
             'permit_type' => 'required|in:pduk,bpom,halal,sp_irt,lainnya',
             'permit_status' => 'nullable|in:pending,approved,rejected,expired',
             'issue_date' => 'nullable|date',
             'expiry_date' => 'nullable|date|after:issue_date',
             'notes' => 'nullable|string',
             'document_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'nib_document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
 
         if ($request->hasFile('document_file')) {
             if ($permit->document_file) {
-                \Storage::delete($permit->document_file);
+                \Storage::disk('public')->delete($permit->document_file);
             }
             $data['document_file'] = $request->file('document_file')->store('permits', 'public');
+        }
+        if ($request->hasFile('nib_document')) {
+            if ($permit->nib_document) {
+                \Storage::disk('public')->delete($permit->nib_document);
+            }
+            $data['nib_document'] = $request->file('nib_document')->store('permits', 'public');
         }
 
         $permit->update($data);
@@ -128,7 +160,10 @@ class PermitController extends Controller
     {
         $name = $permit->permit_number;
         if ($permit->document_file) {
-            \Storage::delete($permit->document_file);
+            \Storage::disk('public')->delete($permit->document_file);
+        }
+        if ($permit->nib_document) {
+            \Storage::disk('public')->delete($permit->nib_document);
         }
         $permit->delete();
 

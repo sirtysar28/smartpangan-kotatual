@@ -24,7 +24,7 @@
                     <li><a href="{{ route('home') }}#ketersediaan-pangan" class="text-decoration-none" style="color:rgba(255,255,255,0.65) !important">Ketersediaan Pangan</a></li>
                     <li><a href="{{ route('home') }}#kerawanan-pangan" class="text-decoration-none" style="color:rgba(255,255,255,0.65) !important">Kerawanan Pangan</a></li>
                     <li><a href="{{ route('home') }}#keamanan-pangan" class="text-decoration-none" style="color:rgba(255,255,255,0.65) !important">Keamanan Pangan</a></li>
-                    <li><a href="{{ route('home') }}#perizinan-informasi" class="text-decoration-none" style="color:rgba(255,255,255,0.65) !important">Perizinan</a></li>
+                    <li><a href="{{ route('home') }}#perizinan-informasi" class="text-decoration-none" style="color:rgba(255,255,255,0.65) !important">Laporan Perizinan</a></li>
                 </ul>
             </div>
             <div class="col-lg-3 col-6">

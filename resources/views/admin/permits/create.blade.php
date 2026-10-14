@@ -24,7 +24,22 @@
                 </div>
                 <div class="col-12">
                     <label class="form-label small fw-semibold">Alamat Usaha</label>
-                    <textarea name="business_address" class="form-control" rows="2" placeholder="Alamat lengkap usaha">{{ old('business_address') }}</textarea>
+                    <textarea name="business_address" class="form-control" rows="2" placeholder="Alamat lengkap usaha (jalan/kampung)">{{ old('business_address') }}</textarea>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Kecamatan <span class="text-danger">*</span></label>
+                    <select name="kecamatan" id="permitKecamatan" class="form-select">
+                        <option value="">-- Pilih Kecamatan --</option>
+                        @foreach(array_keys(\App\Support\TualWilayah::kecamatan()) as $kec)
+                            <option value="{{ $kec }}" {{ old('kecamatan') == $kec ? 'selected' : '' }}>Kec. {{ $kec }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Desa / Kelurahan <span class="text-danger">*</span></label>
+                    <select name="desa" id="permitDesa" class="form-select">
+                        <option value="">-- Pilih Kecamatan dahulu --</option>
+                    </select>
                 </div>
             </div>
 
@@ -62,6 +77,11 @@
                         @endforeach
                     </select>
                 </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Nomor Izin Berusaha (NIB)</label>
+                    <input type="text" name="nib" class="form-control" value="{{ old('nib') }}" placeholder="Contoh: 8272010012345">
+                    <small class="text-muted">Otomatis terisi dari data UMKM bila dikosongkan</small>
+                </div>
                 <div class="col-12">
                     <label class="form-label small fw-semibold">Produk Pangan</label>
                     <textarea name="food_products" class="form-control" rows="2" placeholder="Daftar produk pangan yang diizinkan">{{ old('food_products') }}</textarea>
@@ -78,10 +98,20 @@
 
             <h6 class="fw-bold mb-3" style="font-size:0.95rem"><i class="bi bi-paperclip me-2" style="color:var(--primary)"></i>Dokumen</h6>
             <div class="row g-3 mb-4">
-                <div class="col-md-8">
-                    <label class="form-label small fw-semibold">Upload Dokumen</label>
-                    <input type="file" name="document_file" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
-                    <small class="text-muted">PDF, JPG, PNG — Maks 5MB</small>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold"><i class="bi bi-card-checklist me-1"></i>Upload Dokumen NIB</label>
+                    <input type="file" name="nib_document" id="nibDocumentFile" class="d-none" accept=".pdf,.jpg,.jpeg,.png">
+                    <div class="d-flex align-items-center gap-2">
+                        <label for="nibDocumentFile" class="btn btn-sm m-0" style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;border-radius:10px;font-weight:600;padding:0.45rem 1rem">
+                            <i class="bi bi-upload me-1"></i>Pilih Dokumen NIB
+                        </label>
+                        <small class="text-muted" id="nibFileName">PDF, JPG, PNG — Maks 5MB</small>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold"><i class="bi bi-file-earmark-text me-1"></i>Upload Dokumen Perizinan</label>
+                    <input type="file" name="document_file" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png">
+                    <small class="text-muted">Sertifikat/izin terkait — PDF, JPG, PNG maks 5MB</small>
                 </div>
                 <div class="col-md-12">
                     <label class="form-label small fw-semibold">Catatan</label>
@@ -98,3 +128,42 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Dropdown Desa dependen Kecamatan (data wilayah Kota Tual)
+        const KEC_DESA = @json(\App\Support\TualWilayah::kecamatan());
+        const kec = document.getElementById('permitKecamatan');
+        const desa = document.getElementById('permitDesa');
+        const selectedDesa = {{ json_encode(old('desa')) }};
+
+        function renderDesa() {
+            if (!kec || !desa) return;
+            const list = KEC_DESA[kec.value] || [];
+            desa.innerHTML = '<option value="">-- Pilih Desa / Kelurahan --</option>';
+            list.forEach(function (d) {
+                const opt = document.createElement('option');
+                opt.value = d;
+                opt.textContent = d;
+                if (d === selectedDesa) opt.selected = true;
+                desa.appendChild(opt);
+            });
+        }
+        if (kec) {
+            renderDesa();
+            kec.addEventListener('change', renderDesa);
+        }
+
+        // Nama file terpilih pada tombol Upload Dokumen NIB
+        const nibFile = document.getElementById('nibDocumentFile');
+        const nibName = document.getElementById('nibFileName');
+        if (nibFile && nibName) {
+            nibFile.addEventListener('change', function () {
+                nibName.textContent = this.files.length ? this.files[0].name : 'PDF, JPG, PNG — Maks 5MB';
+                nibName.classList.add('fw-semibold');
+            });
+        }
+    });
+</script>
+@endpush

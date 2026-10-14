@@ -116,6 +116,13 @@ Route::middleware(['auth','admin'])->prefix('admin')->name('admin.')->group(func
     Route::put('/food-safety/rapid-test/{rapidTest}', [App\Http\Controllers\Admin\RapidTestController::class, 'update'])->name('food-safety.rapid.update');
     Route::delete('/food-safety/rapid-test/{rapidTest}', [App\Http\Controllers\Admin\RapidTestController::class, 'destroy'])->name('food-safety.rapid.destroy');
 
+    // === MASTER PARAMETER UJI (Revisi 14 Okt 2026) ===
+    Route::get('/master-parameters', [\App\Http\Controllers\Admin\MasterParameterController::class, 'index'])->name('master-parameters.index');
+    Route::post('/master-parameters', [\App\Http\Controllers\Admin\MasterParameterController::class, 'store'])->name('master-parameters.store');
+    Route::put('/master-parameters/{masterParameter}', [\App\Http\Controllers\Admin\MasterParameterController::class, 'update'])->name('master-parameters.update');
+    Route::post('/master-parameters/{masterParameter}/toggle', [\App\Http\Controllers\Admin\MasterParameterController::class, 'toggle'])->name('master-parameters.toggle');
+    Route::delete('/master-parameters/{masterParameter}', [\App\Http\Controllers\Admin\MasterParameterController::class, 'destroy'])->name('master-parameters.destroy');
+
     // === UJI LABORATORIUM (KEAMANAN PANGAN) ===
     Route::get('/food-safety/lab-test/create', [App\Http\Controllers\Admin\LabTestController::class, 'create'])->name('food-safety.lab.create');
     Route::post('/food-safety/lab-test', [App\Http\Controllers\Admin\LabTestController::class, 'store'])->name('food-safety.lab.store');
@@ -123,7 +130,7 @@ Route::middleware(['auth','admin'])->prefix('admin')->name('admin.')->group(func
     Route::put('/food-safety/lab-test/{labTest}', [App\Http\Controllers\Admin\LabTestController::class, 'update'])->name('food-safety.lab.update');
     Route::delete('/food-safety/lab-test/{labTest}', [App\Http\Controllers\Admin\LabTestController::class, 'destroy'])->name('food-safety.lab.destroy');
 
-    // === PERIZINAN PANGAN ===
+    // === PERIZINAN PANGAN (bersifat laporan/daftar — revisi 14 Okt 2026) ===
     Route::get('/permits', [App\Http\Controllers\Admin\PermitController::class, 'index'])->name('permits.index');
 
     // === FAQ PERIZINAN ===
@@ -162,13 +169,15 @@ Route::middleware(['auth','admin'])->prefix('admin')->name('admin.')->group(func
     Route::put('/settings', [App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
     Route::post('/settings/test-email', [App\Http\Controllers\Admin\SettingController::class, 'testEmail'])->name('settings.test-email');
 
-    // Reports
+    // Reports (Revisi 14 Okt 2026: hanya panel harga, ketersediaan & keamanan pangan yang aktif di menu)
     Route::get('/reports', [App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
-    Route::post('/reports/sales', [App\Http\Controllers\Admin\ReportController::class, 'salesReport'])->name('reports.sales');
-    Route::post('/reports/umkm', [App\Http\Controllers\Admin\ReportController::class, 'umkmReport'])->name('reports.umkm');
+    Route::post('/reports/availability', [App\Http\Controllers\Admin\ReportController::class, 'availabilityReport'])->name('reports.availability');
     Route::post('/reports/commodity', [App\Http\Controllers\Admin\ReportController::class, 'commodityReport'])->name('reports.commodity');
-    Route::post('/reports/top-products', [App\Http\Controllers\Admin\ReportController::class, 'topProductsReport'])->name('reports.top-products');
     Route::post('/reports/food-safety', [App\Http\Controllers\Admin\ReportController::class, 'foodSafetyReport'])->name('reports.food-safety');
+    // Laporan berikut disembunyikan dari menu (revisi 14 Okt 2026) — endpoint dipertahankan
+    // Route::post('/reports/sales', [App\Http\Controllers\Admin\ReportController::class, 'salesReport'])->name('reports.sales');
+    // Route::post('/reports/umkm', [App\Http\Controllers\Admin\ReportController::class, 'umkmReport'])->name('reports.umkm');
+    // Route::post('/reports/top-products', [App\Http\Controllers\Admin\ReportController::class, 'topProductsReport'])->name('reports.top-products');
 
     // Site Pages (Kelola Halaman Profil)
     Route::get('/site-pages', [App\Http\Controllers\Admin\SitePageController::class, 'index'])->name('site-pages.index');
@@ -176,6 +185,14 @@ Route::middleware(['auth','admin'])->prefix('admin')->name('admin.')->group(func
     Route::post('/site-pages', [App\Http\Controllers\Admin\SitePageController::class, 'store'])->name('site-pages.store');
     Route::get('/site-pages/{sitePage}/edit', [App\Http\Controllers\Admin\SitePageController::class, 'edit'])->name('site-pages.edit');
     Route::put('/site-pages/{sitePage}', [App\Http\Controllers\Admin\SitePageController::class, 'update'])->name('site-pages.update');
+
+    // Tampilan Beranda (struktur organisasi + galeri kegiatan — revisi 14 Okt 2026)
+    Route::get('/homepage', [App\Http\Controllers\Admin\HomepageController::class, 'index'])->name('homepage.index');
+    Route::post('/homepage/struktur', [App\Http\Controllers\Admin\HomepageController::class, 'updateStruktur'])->name('homepage.struktur.update');
+    Route::delete('/homepage/struktur', [App\Http\Controllers\Admin\HomepageController::class, 'destroyStruktur'])->name('homepage.struktur.destroy');
+    Route::post('/homepage/gallery', [App\Http\Controllers\Admin\HomepageController::class, 'storeGallery'])->name('homepage.gallery.store');
+    Route::post('/homepage/gallery/{gallery}', [App\Http\Controllers\Admin\HomepageController::class, 'toggleGallery'])->name('homepage.gallery.toggle');
+    Route::delete('/homepage/gallery/{gallery}', [App\Http\Controllers\Admin\HomepageController::class, 'destroyGallery'])->name('homepage.gallery.destroy');
     Route::delete('/site-pages/{sitePage}', [App\Http\Controllers\Admin\SitePageController::class, 'destroy'])->name('site-pages.destroy');
 
     // ==================== SUPER ADMIN ONLY ====================

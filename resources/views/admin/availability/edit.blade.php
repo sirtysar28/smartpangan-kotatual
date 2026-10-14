@@ -10,14 +10,14 @@
         <div class="col-md-6">
             <div class="mb-3"><label class="form-label">Jumlah Stok *</label>
                 <div class="input-group">
-                    <input type="number" name="stock_quantity" class="form-control" step="0.01" min="0" required value="{{ $stock->stock_quantity }}">
+                    <input type="text" name="stock_quantity" class="form-control" inputmode="decimal" autocomplete="off" required value="{{ $stock->stock_quantity }}">
                     <input type="text" name="stock_unit" class="form-control" style="max-width:80px" required value="{{ $stock->stock_unit }}">
                 </div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="mb-3"><label class="form-label">Kebutuhan Per Minggu *</label>
-                <input type="number" name="weekly_need" class="form-control" step="0.01" min="0" required value="{{ $stock->weekly_need }}">
+                <input type="text" name="weekly_need" class="form-control" inputmode="decimal" autocomplete="off" required value="{{ $stock->weekly_need }}">
             </div>
         </div>
     </div>

@@ -76,6 +76,36 @@
     </div>
 </div>
 
+<!-- GRAFIK PERGERAKAN HARGA — dipindah ke ATAS tabel (revisi 14 Okt 2026) -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-8 animate-fade-up">
+        <div class="chart-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h6 class="fw-bold mb-0">📈 Grafik Pergerakan Harga Komoditas</h6>
+                    <small class="text-muted">Tren harga 14 hari terakhir (per komoditas)</small>
+                </div>
+            </div>
+            <div style="position:relative;height:340px">
+                <canvas id="priceTrendChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 animate-fade-up">
+        <div class="chart-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h6 class="fw-bold mb-0">🎯 Distribusi Status Harga</h6>
+                    <small class="text-muted">Aman / Rawan / Lonjakan / Kritis</small>
+                </div>
+            </div>
+            <div style="position:relative;max-width:250px;margin:0 auto">
+                <canvas id="priceStatusChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- TABLE: Panel Harga Pangan Lengkap -->
 <div class="card border-0 mb-4 animate-fade-up" style="border-radius:var(--radius);box-shadow:var(--shadow)">
     <div class="p-3">
@@ -92,8 +122,10 @@
                         <th rowspan="2" style="vertical-align:middle">HAP</th>
                         <th rowspan="2" style="vertical-align:middle">HPP</th>
                         <th rowspan="2" style="vertical-align:middle">Harga Hari Ini</th>
+                        <th rowspan="2" style="vertical-align:middle">Minggu Lalu</th>
                         <th rowspan="2" style="vertical-align:middle">Bulan Lalu</th>
                         <th rowspan="2" style="vertical-align:middle">Tahun Lalu</th>
+                        <th colspan="2" class="text-center" style="border-bottom:2px solid #0ea5e9">WTW (Week to Week)</th>
                         <th colspan="2" class="text-center" style="border-bottom:2px solid var(--primary)">MTM (Month to Month)</th>
                         <th colspan="2" class="text-center" style="border-bottom:2px solid #f59e0b">YOY (Year to Year)</th>
                         <th rowspan="2" style="vertical-align:middle">Status Pangan</th>
@@ -103,6 +135,7 @@
                     <tr>
                         <th class="text-center" style="font-size:0.7rem">% / Arah</th>
                         <th class="text-center" style="font-size:0.7rem">% / Arah</th>
+                        <th class="text-center" style="font-size:0.7rem">% / Arah</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -110,14 +143,19 @@
                     @php
                         $pc = $c->price_comparison ?? [];
                         $todayPrice = $pc['today_price'] ?? ($c->latestPrice?->price ?? null);
+                        $lastWeek = $pc['last_week_price'] ?? null;
                         $lastMonth = $pc['last_month_price'] ?? null;
                         $lastYear = $pc['last_year_price'] ?? null;
+                        $wtwPct = $pc['wtw_percent'] ?? null;
                         $mtmPct = $pc['mtm_percent'] ?? null;
                         $yoyPct = $pc['yoy_percent'] ?? null;
+                        $wtwDir = $pc['wtw_direction'] ?? 'stable';
                         $mtmDir = $pc['mtm_direction'] ?? 'stable';
                         $yoyDir = $pc['yoy_direction'] ?? 'stable';
                         $fs = $pc['food_status'] ?? ['code'=>'aman','label'=>'Aman','color'=>'#10b981','icon'=>'shield-check'];
 
+                        $wtwIcon = $wtwDir === 'up' ? 'arrow-up' : ($wtwDir === 'down' ? 'arrow-down' : 'dash');
+                        $wtwColor = $wtwDir === 'up' ? '#ef4444' : ($wtwDir === 'down' ? '#10b981' : '#64748b');
                         $mtmIcon = $mtmDir === 'up' ? 'arrow-up' : ($mtmDir === 'down' ? 'arrow-down' : 'dash');
                         $mtmColor = $mtmDir === 'up' ? '#ef4444' : ($mtmDir === 'down' ? '#10b981' : '#64748b');
                         $yoyIcon = $yoyDir === 'up' ? 'arrow-up' : ($yoyDir === 'down' ? 'arrow-down' : 'dash');
@@ -143,8 +181,19 @@
                         <td class="fw-bold" style="color:{{ $mtmDir === 'up' ? '#ef4444' : ($mtmDir === 'down' ? '#10b981' : 'var(--text-main)') }}">
                             {{ $todayPrice ? 'Rp '.number_format($todayPrice, 0, ',', '.') : '-' }}
                         </td>
+                        <td>{{ $lastWeek ? 'Rp '.number_format($lastWeek, 0, ',', '.') : '-' }}</td>
                         <td>{{ $lastMonth ? 'Rp '.number_format($lastMonth, 0, ',', '.') : '-' }}</td>
                         <td>{{ $lastYear ? 'Rp '.number_format($lastYear, 0, ',', '.') : '-' }}</td>
+                        <td class="text-center">
+                            @if($wtwPct !== null)
+                                <span style="color:{{ $wtwColor }};font-weight:600">
+                                    <i class="bi bi-{{ $wtwIcon }}{{ $wtwDir !== 'stable' ? '-short' : '' }}"></i>
+                                    {{ $wtwPct > 0 ? '+' : '' }}{{ number_format($wtwPct, 1) }}%
+                                </span>
+                            @else
+                                <span class="text-muted">-</span>
+                            @endif
+                        </td>
                         <td class="text-center">
                             @if($mtmPct !== null)
                                 <span style="color:{{ $mtmColor }};font-weight:600">
@@ -187,40 +236,10 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="14" class="text-center py-4 text-muted">Belum ada data komoditas</td></tr>
+                    <tr><td colspan="16" class="text-center py-4 text-muted">Belum ada data komoditas</td></tr>
                     @endforelse
                 </tbody>
             </table>
-        </div>
-    </div>
-</div>
-
-<!-- GRAFIK PERGERAKAN HARGA (Poin 5) -->
-<div class="row g-4 mb-4">
-    <div class="col-lg-8 animate-fade-up">
-        <div class="chart-container">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <h6 class="fw-bold mb-0">📈 Grafik Pergerakan Harga Komoditas</h6>
-                    <small class="text-muted">Tren harga 14 hari terakhir (per komoditas)</small>
-                </div>
-            </div>
-            <div style="position:relative;height:340px">
-                <canvas id="priceTrendChart"></canvas>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-4 animate-fade-up">
-        <div class="chart-container">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <h6 class="fw-bold mb-0">🎯 Distribusi Status Harga</h6>
-                    <small class="text-muted">Aman / Rawan / Lonjakan / Kritis</small>
-                </div>
-            </div>
-            <div style="position:relative;max-width:250px;margin:0 auto">
-                <canvas id="priceStatusChart"></canvas>
-            </div>
         </div>
     </div>
 </div>

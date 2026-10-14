@@ -12,7 +12,7 @@
         ['url' => route('frontend.commodities'),     'match' => 'frontend.commodities',   'icon' => 'bi-tag',             'label' => 'Harga'],
         ['url' => route('frontend.availability'),    'match' => 'frontend.availability',  'icon' => 'bi-box-seam',        'label' => 'Pasokan'],
         ['url' => route('frontend.food-safety'),     'match' => 'frontend.food-safety',   'icon' => 'bi-shield-check',    'label' => 'Keamanan'],
-        ['url' => route('frontend.permits'),         'match' => 'frontend.permits',       'icon' => 'bi-file-earmark-text','label' => 'Perizinan'],
+        ['url' => route('frontend.permits'),         'match' => 'frontend.permits',       'icon' => 'bi-file-earmark-text','label' => 'Laporan Perizinan'],
     ];
 @endphp
 <nav class="mobile-bottom-nav d-md-none" aria-label="Navigasi mobile">

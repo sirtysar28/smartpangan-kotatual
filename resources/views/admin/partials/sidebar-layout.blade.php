@@ -33,8 +33,12 @@
                 <a class="nav-link {{ request()->routeIs('admin.food-safety.*')?'active':'' }}" href="{{ route('admin.food-safety.index') }}">
                     <i class="bi bi-shield-check"></i><span class="sidebar-text">Keamanan Pangan</span>
                 </a>
+                <a class="nav-link {{ request()->routeIs('admin.master-parameters.*')?'active':'' }}" href="{{ route('admin.master-parameters.index') }}">
+                    <i class="bi bi-list-check"></i><span class="sidebar-text">Master Parameter Uji</span>
+                </a>
+                {{-- Revisi 14 Okt 2026: modul ini bersifat LAPORAN/DAFTAR data — bukan penerbitan izin (izin tetap di sistem satu pintu). Terminologi "Perizinan" → "Laporan Perizinan" --}}
                 <a class="nav-link {{ request()->routeIs('admin.permits.*') || request()->routeIs('frontend.permits') ?'active':'' }}" href="{{ route('admin.permits.index') }}">
-                    <i class="bi bi-file-earmark-text"></i><span class="sidebar-text">Perizinan Pangan</span>
+                    <i class="bi bi-file-earmark-text"></i><span class="sidebar-text">Laporan Perizinan</span>
                 </a>
                 {{-- Marketplace UMKM dinonaktifkan (revisi 7 Juli 2026)
                 <a class="nav-link {{ request()->routeIs('admin.umkms.*')?'active':'' }}" href="{{ route('admin.umkms.index') }}">
@@ -48,6 +52,7 @@
                 </a>
                 --}}
 
+                {{-- AI & Analytics disembunyikan (revisi 14 Okt 2026 — menu dianggap tidak dipakai)
                 <div style="padding:0.5rem 1.25rem;margin-top:0.5rem" class="sidebar-section-label">
                     <small style="color:rgba(255,255,255,0.2);font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;font-weight:700">AI & Analytics</small>
                 </div>
@@ -60,12 +65,16 @@
                 <a class="nav-link {{ request()->routeIs('admin.ai-dashboard.economy')?'active':'' }}" href="{{ route('admin.ai-dashboard.economy') }}">
                     <i class="bi bi-cash-coin"></i><span class="sidebar-text">Ekonomi</span>
                 </a>
+                --}}
 
                 <div style="padding:0.5rem 1.25rem;margin-top:0.5rem" class="sidebar-section-label">
                     <small style="color:rgba(255,255,255,0.2);font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;font-weight:700">Lainnya</small>
                 </div>
                 <a class="nav-link {{ request()->routeIs('admin.reports.*')?'active':'' }}" href="{{ route('admin.reports.index') }}">
                     <i class="bi bi-file-earmark-bar-graph"></i><span class="sidebar-text">Laporan</span>
+                </a>
+                <a class="nav-link {{ request()->routeIs('admin.homepage.*')?'active':'' }}" href="{{ route('admin.homepage.index') }}">
+                    <i class="bi bi-window-desktop"></i><span class="sidebar-text">Tampilan Beranda</span>
                 </a>
                 {{-- Marketplace disembunyikan (revisi 7 Juli 2026)
                 <a class="nav-link" href="{{ route('home') }}" target="_blank">
@@ -81,6 +90,7 @@
                 <a class="nav-link {{ request()->routeIs('admin.faqs.*') ?'active':'' }}" href="{{ route('admin.faqs.index') }}">
                     <i class="bi bi-patch-question"></i><span class="sidebar-text">FAQ Perizinan</span>
                 </a>
+                {{-- Menu AI Dashboard disembunyikan (revisi 14 Okt 2026) --}}
 
                 {{-- Super Admin Only Menus --}}
                 @if(auth()->check() && auth()->user()->isSuperAdmin())

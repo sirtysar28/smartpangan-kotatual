@@ -8,6 +8,7 @@ use App\Models\Commodity;
 use App\Models\CommodityPrice;
 use App\Models\Product;
 use App\Models\Umkm;
+use App\Models\Permit;
 use App\Models\Faq;
 use App\Services\FoodSecurityService;
 use App\Models\CommodityStock;
@@ -17,6 +18,8 @@ use App\Models\FoodSafetyActivity;
 use App\Models\RapidTest;
 use App\Models\LabTest;
 use App\Models\SitePage;
+use App\Models\HomepageGallery;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -142,6 +145,10 @@ class HomeController extends Controller
         // Site Pages (Profil)
         $sitePages = SitePage::active()->ordered()->get();
 
+        // Revisi 14 Okt 2026: Struktur organisasi + galeri kegiatan untuk beranda
+        $strukturOrganisasi = Setting::get('homepage_struktur_organisasi');
+        $galleries = HomepageGallery::active()->ordered()->take(8)->get();
+
         return view('frontend.home', compact(
             'commodities', 'commodityCategories', 'totalUmkms', 'totalProducts',
             'featured', 'popular', 'categories', 'topUmkms',
@@ -151,7 +158,8 @@ class HomeController extends Controller
             'stocksSummary', 'stockStats',
             'fsvaLatest', 'fsvaStats',
             'safetyChecks', 'safetyStats',
-            'totalVerifiedUmkms'
+            'totalVerifiedUmkms',
+            'strukturOrganisasi', 'galleries'
         ));
     }
 
@@ -392,22 +400,69 @@ class HomeController extends Controller
     }
 
     // ==================== PERIZINAN ====================
-    public function permits()
+    // Revisi 14 Okt 2026: laporan data perizinan pangan (Nama Usaha, Pelaku Usaha,
+    // NIB, Jenis Perizinan) + filter per Kecamatan/Desa + grafik sebaran per Kecamatan.
+    public function permits(Request $request)
     {
-        $totalVerified = Umkm::verified()->count();
-        $totalPending = Umkm::where('status', 'pending')->count();
-        $totalRejected = Umkm::where('status', 'rejected')->count();
-        $totalUmkms = Umkm::count();
+        // ---------- Filter & Pencarian ----------
+        $query = Permit::query();
 
-        $umkms = Umkm::with(['user', 'products'])
-            ->withCount(['products' => fn($q) => $q->active()])
-            ->orderByDesc('created_at')
-            ->paginate(15);
+        if ($request->filled('q')) {
+            $s = '%' . $request->q . '%';
+            $query->where(function ($qq) use ($s) {
+                $qq->where('nib', 'like', $s)
+                    ->orWhere('business_name', 'like', $s)
+                    ->orWhere('applicant_name', 'like', $s)
+                    ->orWhere('permit_number', 'like', $s);
+            });
+        }
+        if ($request->filled('jenis')) {
+            $query->where('permit_type', $request->jenis);
+        }
+        if ($request->filled('kecamatan')) {
+            $query->where('kecamatan', $request->kecamatan);
+        }
+        if ($request->filled('desa')) {
+            $query->where('desa', $request->desa);
+        }
+
+        $permits = $query->orderByDesc('created_at')->paginate(15)->withQueryString();
+
+        // ---------- Statistik (keseluruhan, bukan hasil filter) ----------
+        $stats = [
+            'total'    => Permit::count(),
+            'approved' => Permit::where('permit_status', 'approved')->count(),
+            'pending'  => Permit::where('permit_status', 'pending')->count(),
+            'expired'  => Permit::where('permit_status', 'expired')
+                ->orWhere(fn ($q) => $q->whereNotNull('expiry_date')->where('expiry_date', '<', today()))
+                ->count(),
+        ];
+
+        // ---------- Grafik sebaran pelaku usaha per Kecamatan ----------
+        $kecamatanDesa = \App\Support\TualWilayah::kecamatan();
+        $perKecamatan = Permit::select('kecamatan', \DB::raw('COUNT(*) AS total'))
+            ->whereNotNull('kecamatan')
+            ->groupBy('kecamatan')
+            ->pluck('total', 'kecamatan');
+
+        $chartLabels = [];
+        $chartValues = [];
+        foreach (array_keys($kecamatanDesa) as $kec) {
+            $chartLabels[] = 'Kec. ' . $kec;
+            $chartValues[] = (int) ($perKecamatan[$kec] ?? 0);
+        }
+        // Data dengan kecamatan di luar daftar (jika ada)
+        $perKecamatan->each(function ($total, $kec) use (&$chartLabels, &$chartValues, $kecamatanDesa) {
+            if ($kec && !isset($kecamatanDesa[$kec])) {
+                $chartLabels[] = 'Kec. ' . $kec;
+                $chartValues[] = (int) $total;
+            }
+        });
 
         $faqs = Faq::active()->ordered()->get();
 
         return view('frontend.permits', compact(
-            'totalVerified', 'totalPending', 'totalRejected', 'totalUmkms', 'umkms', 'faqs'
+            'permits', 'stats', 'kecamatanDesa', 'chartLabels', 'chartValues', 'faqs'
         ));
     }
 }

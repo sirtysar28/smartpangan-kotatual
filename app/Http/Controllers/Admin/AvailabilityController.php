@@ -53,6 +53,9 @@ class AvailabilityController extends Controller
 
     public function store(Request $request)
     {
+        // Normalisasi angka desimal format Indonesia (12,5 → 12.5)
+        \App\Support\IdNumber::merge($request, ['stock_quantity', 'weekly_need']);
+
         $data = $request->validate([
             'commodity_id' => 'required|exists:commodities,id',
             'monitoring_date' => 'required|date',
@@ -107,6 +110,9 @@ class AvailabilityController extends Controller
 
     public function update(Request $request, CommodityStock $stock)
     {
+        // Normalisasi angka desimal format Indonesia (12,5 → 12.5)
+        \App\Support\IdNumber::merge($request, ['stock_quantity', 'weekly_need']);
+
         $data = $request->validate([
             'monitoring_date' => 'required|date',
             'stock_quantity' => 'required|numeric|min:0',

@@ -10,10 +10,10 @@ class Permit extends Model
     use HasFactory;
 
     protected $fillable = [
-        'permit_number', 'umkm_id', 'business_name', 'applicant_name', 'applicant_phone',
-        'business_address', 'business_category', 'food_products',
+        'permit_number', 'nib', 'umkm_id', 'business_name', 'applicant_name', 'applicant_phone',
+        'business_address', 'kecamatan', 'desa', 'business_category', 'food_products',
         'permit_type', 'permit_status', 'issue_date', 'expiry_date',
-        'notes', 'document_file', 'approved_by', 'approved_at',
+        'notes', 'document_file', 'nib_document', 'approved_by', 'approved_at',
         'rejection_reason',
     ];
 
@@ -77,6 +77,11 @@ class Permit extends Model
     public function getDocumentFileUrlAttribute()
     {
         return $this->document_file ? \Storage::url($this->document_file) : null;
+    }
+
+    public function getNibDocumentUrlAttribute()
+    {
+        return $this->nib_document ? \Storage::url($this->nib_document) : null;
     }
 
     public function scopePending($query) { return $query->where('permit_status', 'pending'); }

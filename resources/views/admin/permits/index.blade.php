@@ -1,13 +1,14 @@
 @extends('layouts.admin')
-@section('title', 'Perizinan Pangan - Admin Pangan Cerdas (Panca) Maryadat Kota Tual')
+@section('title', 'Laporan Perizinan Pangan - Admin Pangan Cerdas (Panca) Maryadat Kota Tual')
 @section('content')
 
 <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4 animate-fade-up">
     <div>
-        <h4 class="fw-bold mb-1" style="font-size:1.4rem"><i class="bi bi-file-earmark-text me-2" style="color:var(--primary)"></i>Perizinan Pangan</h4>
-        <p class="text-muted mb-0 small">Kelola data perizinan pangan, PDUK, BPOM, Halal, SP-IRT di Kota Tual</p>
+        <h4 class="fw-bold mb-1" style="font-size:1.4rem"><i class="bi bi-file-earmark-text me-2" style="color:var(--primary)"></i>Laporan Perizinan Pangan</h4>
+        <p class="text-muted mb-0 small">Daftar/Rekap data perizinan pangan (PDUK, BPOM, Halal, SP-IRT) — pemilik usaha, alamat &amp; dokumen perizinan</p>
+        <p class="mb-0 mt-1" style="font-size:0.72rem;color:#0ea5e9"><i class="bi bi-info-circle me-1"></i>Modul ini bersifat <strong>laporan data</strong>, bukan penerbitan izin — perizinan tetap dikelola melalui sistem satu pintu (revisi 14 Okt 2026)</p>
     </div>
-    <a href="{{ route('admin.permits.create') }}" class="btn btn-primary-modern"><i class="bi bi-plus-lg me-2"></i>Tambah Perizinan</a>
+    <a href="{{ route('admin.permits.create') }}" class="btn btn-primary-modern"><i class="bi bi-plus-lg me-2"></i>Tambah Data Perizinan</a>
 </div>
 
 <!-- Stats -->
@@ -54,14 +55,14 @@
 <div class="card border-0 mb-4 animate-fade-up" style="border-radius:var(--radius);box-shadow:var(--shadow)">
     <div class="p-3">
         <form method="GET" action="{{ route('admin.permits.index') }}" class="row g-2 align-items-end">
-            <div class="col-md-4">
-                <label class="form-label small fw-semibold text-muted">Cari</label>
-                <input type="text" name="search" class="form-control form-control-sm" placeholder="Nama usaha / pemohon / nomor..." value="{{ request('search') }}">
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold text-muted">Cari Nama Usaha / NIB</label>
+                <input type="text" name="search" class="form-control form-control-sm" placeholder="Nama usaha / NIB / no. perizinan..." value="{{ request('search') }}">
             </div>
             <div class="col-md-3">
                 <label class="form-label small fw-semibold text-muted">Jenis Perizinan</label>
                 <select name="type" class="form-select form-select-sm">
-                    <option value="">Semua</option>
+                    <option value="">Semua Jenis</option>
                     <option value="pduk" {{ request('type') == 'pduk' ? 'selected' : '' }}>PDUK</option>
                     <option value="bpom" {{ request('type') == 'bpom' ? 'selected' : '' }}>BPOM</option>
                     <option value="halal" {{ request('type') == 'halal' ? 'selected' : '' }}>Halal</option>
@@ -69,7 +70,16 @@
                     <option value="lainnya" {{ request('type') == 'lainnya' ? 'selected' : '' }}>Lainnya</option>
                 </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold text-muted">Kecamatan</label>
+                <select name="kecamatan" class="form-select form-select-sm">
+                    <option value="">Semua</option>
+                    @foreach(array_keys(\App\Support\TualWilayah::kecamatan()) as $kec)
+                        <option value="{{ $kec }}" {{ request('kecamatan') == $kec ? 'selected' : '' }}>Kec. {{ $kec }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-2">
                 <label class="form-label small fw-semibold text-muted">Status</label>
                 <select name="status" class="form-select form-select-sm">
                     <option value="">Semua</option>
@@ -97,60 +107,67 @@
                 <thead>
                     <tr>
                         <th style="width:40px">#</th>
-                        <th>Nomor Perizinan</th>
                         <th>Nama Usaha</th>
-                        <th>Pemohon</th>
-                        <th>Jenis</th>
-                        <th>Status</th>
-                        <th>Tgl Terbit</th>
-                        <th>Tgl Kadaluarsa</th>
-                        <th style="width:120px">Aksi</th>
+                        <th>Nama Pelaku Usaha</th>
+                        <th>Nomor Izin Berusaha (NIB)</th>
+                        <th>Jenis Perizinan</th>
+                        <th>Tanggal Terbit</th>
+                        <th>Tanggal Kadaluarsa</th>
+                        <th style="width:130px">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($permits as $i => $p)
                     @php
-                        $pClr = $p->permit_status_color;
-                        $pIcon = $p->permit_status_icon;
-                        $pLabel = $p->permit_status_label;
+                        $st = $p->permit_status;
+                        if ($st === 'approved' && $p->expiry_date && $p->expiry_date->lt(\Illuminate\Support\Carbon::today())) $st = 'expired';
+                        $pClr = match($st) { 'pending' => '#f59e0b', 'approved' => '#10b981', 'rejected' => '#ef4444', 'expired' => '#64748b', default => '#64748b' };
+                        $pIcon = match($st) { 'pending' => 'hourglass-split', 'approved' => 'patch-check-fill', 'rejected' => 'x-circle-fill', 'expired' => 'clock-history', default => 'dash-circle' };
+                        $pLabel = match($st) { 'pending' => 'Menunggu', 'approved' => 'Disetujui', 'rejected' => 'Ditolak', 'expired' => 'Kadaluarsa', default => ucfirst($st ?? '-') };
                     @endphp
                     <tr>
                         <td class="text-muted">{{ $permits->firstItem() + $i }}</td>
                         <td>
-                            <div class="fw-semibold" style="font-size:0.78rem">{{ $p->permit_number }}</div>
-                            @if($p->document_file_url)
-                                <a href="{{ $p->document_file_url }}" target="_blank" class="small" style="color:var(--primary);text-decoration:none"><i class="bi bi-paperclip me-1"></i>Dokumen</a>
+                            <div class="fw-semibold">{{ $p->business_name }}</div>
+                            @if($p->permit_number)
+                                <small class="text-muted" style="font-size:0.65rem"><i class="bi bi-tag me-1"></i>{{ $p->permit_number }}</small>
+                            @endif
+                            @if($p->kecamatan || $p->desa)
+                                <br><small class="text-muted" style="font-size:0.65rem"><i class="bi bi-geo-alt me-1"></i>{{ trim(($p->kecamatan ? 'Kec. '.$p->kecamatan : '').($p->desa ? ', '.$p->desa : ''), ', ') }}</small>
                             @endif
                         </td>
-                        <td class="fw-semibold">{{ $p->business_name }}</td>
                         <td>
-                            <small>{{ $p->applicant_name }}</small>
+                            <small class="fw-semibold">{{ $p->applicant_name }}</small>
                             @if($p->applicant_phone)
-                                <br><small class="text-muted">{{ $p->applicant_phone }}</small>
+                                <br><small class="text-muted" style="font-size:0.65rem">{{ $p->applicant_phone }}</small>
                             @endif
                         </td>
-                        <td><span class="badge" style="background:rgba(99,102,241,0.08);color:var(--primary);font-size:0.65rem">{{ $p->permit_type_label }}</span></td>
                         <td>
-                            <span class="badge" style="background:{{ $pClr }}18;color:{{ $pClr }};font-size:0.68rem;border-radius:8px;font-weight:600">
-                                <i class="bi bi-{{ $pIcon }} me-1"></i>{{ $pLabel }}
-                            </span>
-                            @if($p->rejection_reason)
-                                <br><small class="text-danger" style="font-size:0.62rem" title="{{ $p->rejection_reason }}">{{ Str::limit($p->rejection_reason, 30) }}</small>
+                            @if($p->nib)
+                                <span class="badge" style="background:rgba(99,102,241,0.08);color:var(--primary);font-size:0.68rem;font-family:monospace">{{ $p->nib }}</span>
+                            @else
+                                <small class="text-muted">-</small>
                             @endif
+                            @if($p->nib_document_url)
+                                <br><a href="{{ $p->nib_document_url }}" target="_blank" class="small" style="color:var(--primary);text-decoration:none;font-size:0.65rem"><i class="bi bi-file-earmark-arrow-up me-1"></i>Dok. NIB</a>
+                            @endif
+                        </td>
+                        <td>
+                            <span class="badge" style="background:rgba(99,102,241,0.08);color:var(--primary);font-size:0.65rem">{{ $p->permit_type_label }}</span>
+                            <br><span class="badge" style="background:{{ $pClr }}18;color:{{ $pClr }};font-size:0.62rem;border-radius:8px;font-weight:600"><i class="bi bi-{{ $pIcon }} me-1"></i>{{ $pLabel }}</span>
                         </td>
                         <td><small>{{ $p->issue_date ? $p->issue_date->format('d/m/Y') : '-' }}</small></td>
-                        <td><small>{{ $p->expiry_date ? $p->expiry_date->format('d/m/Y') : '-' }}</small></td>
+                        <td>
+                            @if($p->expiry_date)
+                                <small class="{{ $st === 'expired' ? 'text-danger fw-bold' : '' }}">{{ $p->expiry_date->format('d/m/Y') }}</small>
+                            @else
+                                <small class="text-muted">-</small>
+                            @endif
+                        </td>
                         <td>
                             <div class="d-flex gap-1 flex-wrap">
-                                @if($p->permit_status === 'pending')
-                                    <form action="{{ route('admin.permits.approve', $p) }}" method="POST" onsubmit="return confirm('Setujui perizinan ini?')">
-                                        @csrf
-                                        <button type="submit" class="btn btn-sm" style="background:rgba(16,185,129,0.1);color:#10b981;border-radius:6px;font-size:0.7rem" title="Setujui"><i class="bi bi-check-lg"></i></button>
-                                    </form>
-                                    <button type="button" class="btn btn-sm" style="background:rgba(239,68,68,0.1);color:#ef4444;border-radius:6px;font-size:0.7rem" title="Tolak" data-bs-toggle="modal" data-bs-target="#rejectModal{{ $p->id }}"><i class="bi bi-x-lg"></i></button>
-                                @endif
-                                <a href="{{ route('admin.permits.edit', $p) }}" class="btn btn-sm" style="background:rgba(99,102,241,0.1);color:var(--primary);border-radius:6px;font-size:0.7rem" title="Edit"><i class="bi bi-pencil"></i></a>
-                                <form action="{{ route('admin.permits.destroy', $p) }}" method="POST" onsubmit="return confirm('Hapus perizinan ini?')">
+                                <a href="{{ route('admin.permits.edit', $p) }}" class="btn btn-sm btn-primary-modern" style="border-radius:6px;font-size:0.7rem;padding:0.25rem 0.6rem" title="Edit"><i class="bi bi-pencil me-1"></i>Edit</a>
+                                <form action="{{ route('admin.permits.destroy', $p) }}" method="POST" onsubmit="return confirm('Hapus data perizinan ini?')">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="btn btn-sm" style="background:rgba(239,68,68,0.08);color:#ef4444;border-radius:6px;font-size:0.7rem" title="Hapus"><i class="bi bi-trash"></i></button>
                                 </form>
@@ -158,38 +175,12 @@
                         </td>
                     </tr>
 
-                    {{-- Reject Modal --}}
-                    @if($p->permit_status === 'pending')
-                    <div class="modal fade" id="rejectModal{{ $p->id }}" tabindex="-1">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content" style="border-radius:16px;border:none">
-                                <div class="modal-header border-0 pb-0">
-                                    <h6 class="fw-bold mb-0"><i class="bi bi-x-circle-fill me-2" style="color:#ef4444"></i>Tolak Perizinan</h6>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <p class="text-muted small mb-3">Perizinan <strong>{{ $p->permit_number }}</strong> — {{ $p->business_name }}</p>
-                                    <form action="{{ route('admin.permits.reject', $p) }}" method="POST">
-                                        @csrf
-                                        <label class="form-label small fw-semibold">Alasan Penolakan *</label>
-                                        <textarea name="rejection_reason" class="form-control" rows="3" required placeholder="Tulis alasan penolakan..."></textarea>
-                                        <div class="d-flex gap-2 mt-3">
-                                            <button type="submit" class="btn btn-sm" style="background:#ef4444;color:#fff;border-radius:8px;font-weight:600"><i class="bi bi-x-lg me-1"></i>Tolak</button>
-                                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:8px">Batal</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @endif
-
                     @empty
                     <tr>
-                        <td colspan="9" class="text-center py-5">
+                        <td colspan="8" class="text-center py-5">
                             <div style="font-size:2rem;opacity:0.3;margin-bottom:0.5rem"><i class="bi bi-file-earmark-text"></i></div>
                             <p class="text-muted mb-0">Belum ada data perizinan.</p>
-                            <a href="{{ route('admin.permits.create') }}" class="btn btn-sm btn-primary-modern mt-2"><i class="bi bi-plus-lg me-1"></i>Tambah Perizinan</a>
+                            <a href="{{ route('admin.permits.create') }}" class="btn btn-sm btn-primary-modern mt-2"><i class="bi bi-plus-lg me-1"></i>Tambah Data Perizinan</a>
                         </td>
                     </tr>
                     @endforelse

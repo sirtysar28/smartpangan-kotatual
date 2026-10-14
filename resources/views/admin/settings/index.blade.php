@@ -25,6 +25,9 @@
         'ai' => ['icon' => 'robot', 'color' => 'rgba(99,102,241,0.1);color:#6366f1', 'label' => 'AI & Chatbot'],
         'general' => ['icon' => 'sliders', 'color' => 'rgba(16,185,129,0.1);color:#10b981', 'label' => 'Umum'],
         'email' => ['icon' => 'envelope', 'color' => 'rgba(14,165,233,0.1);color:#0ea5e9', 'label' => 'SMTP / Email Notifikasi'],
+        // Revisi 14 Okt 2026
+        'beranda' => ['icon' => 'window-desktop', 'color' => 'rgba(245,158,11,0.1);color:#f59e0b', 'label' => 'Beranda'],
+        'sinkronisasi' => ['icon' => 'arrow-repeat', 'color' => 'rgba(168,85,247,0.1);color:#a855f7', 'label' => 'Sinkronisasi Data Eksternal (FPI/Bappenas)'],
     ];
 @endphp
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -67,7 +70,24 @@
                             <small class="text-muted fw-normal d-block mt-1">Kosongkan jika tidak ingin mengubah</small>
                         @endif
                     </label>
-                    @if($setting->type === 'textarea')
+                    @elseif($setting->type === 'boolean')
+                        <div class="form-check form-switch mt-1">
+                            <input
+                                type="hidden"
+                                name="settings[{{ $setting->key }}]"
+                                value="0"
+                            >
+                            <input
+                                type="checkbox"
+                                id="setting_{{ $setting->key }}"
+                                name="settings[{{ $setting->key }}]"
+                                value="1"
+                                class="form-check-input"
+                                {{ $setting->value ? 'checked' : '' }}
+                            >
+                            <label class="form-check-label small text-muted" for="setting_{{ $setting->key }}">{{ $setting->value ? 'Aktif' : 'Nonaktif' }}</label>
+                        </div>
+                    @elseif($setting->type === 'textarea')
                         <textarea
                             id="setting_{{ $setting->key }}"
                             name="settings[{{ $setting->key }}]"
@@ -125,6 +145,13 @@
                 </div>
                 @endforeach
             </div>
+
+            {{-- Info khusus group Sinkronisasi --}}
+            @if($group === 'sinkronisasi')
+            <div class="mt-3 pt-3" style="border-top:1px dashed #e2e8f0">
+                <small class="text-muted" style="font-size:0.72rem"><i class="bi bi-info-circle me-1"></i>Sinkronisasi berjalan otomatis via scheduler (cron) — pastikan cron server aktif (<code>* * * * * php artisan schedule:run</code>). Juga bisa dijalankan manual: <code>php artisan pangan:sync-external</code>. Format & endpoint API final menyusul dari Bappenas/FPI.</small>
+            </div>
+            @endif
 
             {{-- Tombol tes email khusus group SMTP --}}
             @if($group === 'email')

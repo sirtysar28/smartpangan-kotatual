@@ -72,7 +72,7 @@
         @endif
     </div>
 
-    <button type="submit" class="btn btn-primary-modern w-100 py-2-5 mb-3" style="padding:0.75rem;font-size:0.95rem">
+    <button type="submit" class="btn btn-primary-modern w-100 py-2-5 mb-3" id="loginSubmitBtn" style="padding:0.75rem;font-size:0.95rem">
         <i class="bi bi-box-arrow-in-right me-2"></i>Masuk
     </button>
 
@@ -92,6 +92,15 @@
 </div>
 
 <script>
+// ===== Spinner tombol saat proses login =====
+document.getElementById('loginForm').addEventListener('submit', function () {
+    var btn = document.getElementById('loginSubmitBtn');
+    if (!btn) return;
+    btn.disabled = true;
+    btn.style.opacity = '0.85';
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Sedang memverifikasi...';
+});
+
 function togglePassword(inputId, btn) {
     const input = document.getElementById(inputId);
     const icon = btn.querySelector('i');

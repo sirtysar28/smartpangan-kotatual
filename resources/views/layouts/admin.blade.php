@@ -286,6 +286,7 @@
     @yield('styles')
 </head>
 <body>
+    @include('partials.page-loader')
     <div class="d-flex">
         <!-- BACKDROP SIDEBAR MOBILE -->
         <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
@@ -450,6 +451,9 @@
             @endif
 
             @yield('content')
+
+            {{-- Footer dashboard admin (lengkap ala landing page) --}}
+            @include('admin.partials.footer')
         </div>
     </div>
 

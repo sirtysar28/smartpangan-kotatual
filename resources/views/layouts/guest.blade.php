@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('logo.png') }}">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="theme-color" content="#0f172a">
     <title>{{ config('app.name', 'Pangan Cerdas (Panca) Maryadat Kota Tual') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -32,6 +35,7 @@
     </style>
 </head>
 <body>
+    @include('partials.page-loader')
     <div class="bg-particles">
         <span style="top:10%;left:20%;animation-delay:0s"></span>
         <span style="top:30%;left:80%;animation-delay:1s"></span>
@@ -46,5 +50,12 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('{{ asset('sw.js') }}').catch(() => {});
+            });
+        }
+    </script>
 </body>
 </html>

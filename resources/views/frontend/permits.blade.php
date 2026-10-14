@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Perizinan Pangan - Pangan Cerdas (Panca) Maryadat Kota Tual')
+@section('title', 'Laporan Perizinan Pangan - Pangan Cerdas (Panca) Maryadat Kota Tual')
 @section('content')
 
 <!-- Header -->
@@ -10,14 +10,14 @@
                 <nav aria-label="breadcrumb" style="font-size:0.72rem">
                     <ol class="breadcrumb mb-1" style="background:none;padding:0;margin:0">
                         <li class="breadcrumb-item"><a href="{{ route('home') }}" style="color:rgba(255,255,255,0.5);text-decoration:none">Beranda</a></li>
-                        <li class="breadcrumb-item active" style="color:#8b5cf6">Perizinan Pangan</li>
+                        <li class="breadcrumb-item active" style="color:#8b5cf6">Laporan Perizinan Pangan</li>
                     </ol>
                 </nav>
-                <h4 class="fw-bold text-white mb-1"><i class="bi bi-file-earmark-text me-2"></i>Perizinan Pangan</h4>
-                <small class="text-white-50">Data perizinan dan legalitas pelaku usaha pangan di Kota Tual</small>
+                <h4 class="fw-bold text-white mb-1"><i class="bi bi-file-earmark-text me-2"></i>Laporan Perizinan Pangan</h4>
+                <small class="text-white-50">Daftar data perizinan pangan &amp; NIB pelaku usaha pangan di Kota Tual — informasi laporan, penerbitan izin tetap melalui sistem satu pintu</small>
             </div>
             <div class="d-flex gap-2">
-                <span class="badge-modern" style="background:rgba(139,92,246,0.15);color:#8b5cf6"><i class="bi bi-circle-fill me-1" style="font-size:0.4rem"></i>{{ $totalUmkms }} Total UMKM</span>
+                <span class="badge-modern" style="background:rgba(139,92,246,0.15);color:#8b5cf6"><i class="bi bi-circle-fill me-1" style="font-size:0.4rem"></i>{{ $stats['total'] }} Data Perizinan</span>
             </div>
         </div>
     </div>
@@ -28,11 +28,20 @@
     <div class="container">
         <div class="row g-3">
             <div class="col-6 col-md-3">
+                <div class="stat-card" style="border-left:4px solid #6366f1">
+                    <div class="stat-icon" style="background:rgba(99,102,241,0.1);color:#6366f1"><i class="bi bi-file-earmark-text"></i></div>
+                    <div>
+                        <div class="fw-bold" style="font-size:1.5rem;color:var(--primary)">{{ $stats['total'] }}</div>
+                        <small class="text-muted">Total Perizinan</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
                 <div class="stat-card" style="border-left:4px solid #10b981">
                     <div class="stat-icon" style="background:rgba(16,185,129,0.1);color:#10b981"><i class="bi bi-patch-check-fill"></i></div>
                     <div>
-                        <div class="fw-bold" style="font-size:1.5rem;color:#10b981">{{ $totalVerified }}</div>
-                        <small class="text-muted">Terverifikasi</small>
+                        <div class="fw-bold" style="font-size:1.5rem;color:#10b981">{{ $stats['approved'] }}</div>
+                        <small class="text-muted">Disetujui</small>
                     </div>
                 </div>
             </div>
@@ -40,26 +49,17 @@
                 <div class="stat-card" style="border-left:4px solid #f59e0b">
                     <div class="stat-icon" style="background:rgba(245,158,11,0.1);color:#f59e0b"><i class="bi bi-hourglass-split"></i></div>
                     <div>
-                        <div class="fw-bold" style="font-size:1.5rem;color:#f59e0b">{{ $totalPending }}</div>
-                        <small class="text-muted">Menunggu Verifikasi</small>
+                        <div class="fw-bold" style="font-size:1.5rem;color:#f59e0b">{{ $stats['pending'] }}</div>
+                        <small class="text-muted">Menunggu</small>
                     </div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="stat-card" style="border-left:4px solid #ef4444">
-                    <div class="stat-icon" style="background:rgba(239,68,68,0.1);color:#ef4444"><i class="bi bi-x-circle-fill"></i></div>
+                <div class="stat-card" style="border-left:4px solid #64748b">
+                    <div class="stat-icon" style="background:rgba(100,116,139,0.1);color:#64748b"><i class="bi bi-clock-history"></i></div>
                     <div>
-                        <div class="fw-bold" style="font-size:1.5rem;color:#ef4444">{{ $totalRejected }}</div>
-                        <small class="text-muted">Ditolak</small>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="stat-card" style="border-left:4px solid #6366f1">
-                    <div class="stat-icon" style="background:rgba(99,102,241,0.1);color:#6366f1"><i class="bi bi-shop"></i></div>
-                    <div>
-                        <div class="fw-bold" style="font-size:1.5rem;color:var(--primary)">{{ $totalUmkms }}</div>
-                        <small class="text-muted">Total UMKM Terdaftar</small>
+                        <div class="fw-bold" style="font-size:1.5rem;color:#64748b">{{ $stats['expired'] }}</div>
+                        <small class="text-muted">Kadaluarsa</small>
                     </div>
                 </div>
             </div>
@@ -67,34 +67,84 @@
     </div>
 </section>
 
-<!-- Progress Bar -->
-@if($totalUmkms > 0)
-<section class="py-3" style="background:var(--bg)">
+<!-- Filter + Grafik per Kecamatan -->
+<section class="py-4" style="background:var(--bg)">
     <div class="container">
-        <div class="p-3" style="border-radius:var(--radius);background:var(--bg-card);border:1px solid #e2e8f0">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <h6 class="fw-bold mb-0" style="font-size:0.85rem"><i class="bi bi-speedometer2 me-2" style="color:var(--primary)"></i>Progres Verifikasi UMKM</h6>
-                <span class="fw-bold" style="color:var(--primary)">{{ $totalUmkms > 0 ? round(($totalVerified / $totalUmkms) * 100, 1) : 0 }}%</span>
+        <div class="row g-4">
+            <!-- Filter Pencarian -->
+            <div class="col-lg-5">
+                <div class="p-3 p-md-4" style="border-radius:var(--radius);background:var(--bg-card);border:1px solid #e2e8f0;height:100%">
+                    <h6 class="fw-bold mb-3" style="font-size:0.88rem"><i class="bi bi-funnel me-2" style="color:var(--primary)"></i>Cari Data Perizinan / NIB</h6>
+                    <form method="GET" action="{{ route('frontend.permits') }}">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-muted">Pencarian</label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="background:rgba(99,102,241,0.06);border-radius:10px 0 0 10px"><i class="bi bi-search"></i></span>
+                                <input type="text" name="q" class="form-control" style="border-radius:0 10px 10px 0" placeholder="Nomor Izin Berusaha (NIB) / nama usaha / pelaku usaha..." value="{{ request('q') }}">
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-sm-6 mb-2">
+                                <label class="form-label small fw-semibold text-muted">Kecamatan</label>
+                                <select name="kecamatan" id="filterKecamatan" class="form-select">
+                                    <option value="">Semua Kecamatan</option>
+                                    @foreach(array_keys($kecamatanDesa) as $kec)
+                                        <option value="{{ $kec }}" {{ request('kecamatan') == $kec ? 'selected' : '' }}>Kec. {{ $kec }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-sm-6 mb-2">
+                                <label class="form-label small fw-semibold text-muted">Desa / Kelurahan</label>
+                                <select name="desa" id="filterDesa" class="form-select">
+                                    <option value="">Semua Desa</option>
+                                </select>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label small fw-semibold text-muted">Jenis Perizinan</label>
+                                <select name="jenis" class="form-select">
+                                    <option value="">Semua Jenis</option>
+                                    <option value="pduk" {{ request('jenis') == 'pduk' ? 'selected' : '' }}>PDUK</option>
+                                    <option value="bpom" {{ request('jenis') == 'bpom' ? 'selected' : '' }}>BPOM</option>
+                                    <option value="halal" {{ request('jenis') == 'halal' ? 'selected' : '' }}>Halal</option>
+                                    <option value="sp_irt" {{ request('jenis') == 'sp_irt' ? 'selected' : '' }}>SP-IRT</option>
+                                    <option value="lainnya" {{ request('jenis') == 'lainnya' ? 'selected' : '' }}>Lainnya</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary-modern flex-fill"><i class="bi bi-search me-1"></i>Cari</button>
+                            <a href="{{ route('frontend.permits') }}" class="btn btn-outline-secondary" style="border-radius:10px"><i class="bi bi-arrow-counterclockwise me-1"></i>Reset</a>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div style="height:10px;border-radius:10px;background:#e2e8f0;overflow:hidden">
-                <div style="height:100%;border-radius:10px;width:{{ $totalUmkms > 0 ? ($totalVerified / $totalUmkms) * 100 : 0 }}%;background:linear-gradient(90deg,#10b981,#34d399);transition:width 1s ease"></div>
-            </div>
-            <div class="d-flex gap-4 mt-2">
-                <small style="font-size:0.75rem;color:#10b981"><span style="width:8px;height:8px;border-radius:50%;background:#10b981;display:inline-block;margin-right:4px"></span>Terverifikasi: {{ $totalVerified }}</small>
-                <small style="font-size:0.75rem;color:#f59e0b"><span style="width:8px;height:8px;border-radius:50%;background:#f59e0b;display:inline-block;margin-right:4px"></span>Menunggu: {{ $totalPending }}</small>
-                <small style="font-size:0.75rem;color:#ef4444"><span style="width:8px;height:8px;border-radius:50%;background:#ef4444;display:inline-block;margin-right:4px"></span>Ditolak: {{ $totalRejected }}</small>
+
+            <!-- Grafik per Kecamatan -->
+            <div class="col-lg-7">
+                <div class="chart-container" style="height:100%;min-height:340px">
+                    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                        <h6 class="fw-bold mb-0" style="font-size:0.88rem"><i class="bi bi-bar-chart me-2" style="color:var(--primary)"></i>Sebaran Pelaku Usaha Pangan per Kecamatan</h6>
+                        <span class="badge" style="background:rgba(99,102,241,0.08);color:var(--primary);font-size:0.65rem">{{ array_sum($chartValues) }} Pelaku Usaha Terdata</span>
+                    </div>
+                    <div style="height:270px"><canvas id="chartKecamatan"></canvas></div>
+                    <small class="text-muted d-block mt-2" style="font-size:0.72rem"><i class="bi bi-info-circle me-1"></i>Grafik menampilkan jumlah pelaku usaha pangan berdasarkan wilayah kecamatan di Kota Tual.</small>
+                </div>
             </div>
         </div>
     </div>
 </section>
-@endif
 
-<!-- UMKM Table -->
+<!-- Tabel Laporan Perizinan -->
 <section class="py-4" style="background:var(--bg-card)">
     <div class="container">
         <div class="card border-0" style="border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden">
             <div class="card-header p-3" style="background:linear-gradient(135deg,rgba(139,92,246,0.06),rgba(99,102,241,0.04));border-bottom:1px solid rgba(139,92,246,0.08)">
-                <h6 class="fw-bold mb-0" style="font-size:0.88rem"><i class="bi bi-list-ul me-2" style="color:#8b5cf6"></i>Daftar Pelaku Usaha Pangan (UMKM)</h6>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h6 class="fw-bold mb-0" style="font-size:0.88rem"><i class="bi bi-list-ul me-2" style="color:#8b5cf6"></i>Daftar Perizinan Pangan &amp; NIB Pelaku Usaha</h6>
+                    @if(request()->filled(['q','kecamatan','desa','jenis']))
+                        <span class="badge" style="background:rgba(139,92,246,0.1);color:#8b5cf6;font-size:0.65rem"><i class="bi bi-funnel me-1"></i>Hasil Filter</span>
+                    @endif
+                </div>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -103,39 +153,53 @@
                             <tr>
                                 <th style="width:40px">#</th>
                                 <th>Nama Usaha</th>
-                                <th>Pemilik</th>
-                                <th>Kategori</th>
-                                <th>Produk</th>
+                                <th>Nama Pelaku Usaha</th>
+                                <th>Nomor Izin Berusaha (NIB)</th>
+                                <th>Jenis Perizinan</th>
+                                <th>Kecamatan</th>
+                                <th>Desa / Kelurahan</th>
                                 <th>Status</th>
-                                <th>Tanggal Daftar</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($umkms as $i => $umkm)
+                            @forelse($permits as $i => $p)
                             @php
-                                $uStatus = $umkm->status;
-                                $uClr = match($uStatus) { 'verified' => '#10b981', 'active' => '#10b981', 'pending' => '#f59e0b', 'rejected' => '#ef4444', 'suspended' => '#ef4444', default => '#64748b' };
-                                $uIcon = match($uStatus) { 'verified' => 'patch-check-fill', 'active' => 'check-circle-fill', 'pending' => 'hourglass-split', 'rejected' => 'x-circle-fill', 'suspended' => 'pause-circle-fill', default => 'dash-circle' };
-                                $uLabel = match($uStatus) { 'verified' => 'Terverifikasi', 'active' => 'Aktif', 'pending' => 'Menunggu', 'rejected' => 'Ditolak', 'suspended' => 'Ditangguhkan', default => ucfirst($uStatus ?? '-') };
+                                $st = $p->permit_status;
+                                if ($st === 'approved' && $p->expiry_date && $p->expiry_date->lt(\Illuminate\Support\Carbon::today())) $st = 'expired';
+                                $uClr = match($st) { 'approved' => '#10b981', 'pending' => '#f59e0b', 'rejected' => '#ef4444', 'expired' => '#64748b', default => '#64748b' };
+                                $uIcon = match($st) { 'approved' => 'patch-check-fill', 'pending' => 'hourglass-split', 'rejected' => 'x-circle-fill', 'expired' => 'clock-history', default => 'dash-circle' };
+                                $uLabel = match($st) { 'approved' => 'Disetujui', 'pending' => 'Menunggu', 'rejected' => 'Ditolak', 'expired' => 'Kadaluarsa', default => ucfirst($st ?? '-') };
                             @endphp
                             <tr>
-                                <td class="text-muted">{{ $umkms->firstItem() + $i }}</td>
-                                <td class="fw-semibold">{{ $umkm->business_name }}</td>
-                                <td>{{ $umkm->user?->name ?? '-' }}</td>
-                                <td>{{ $umkm->business_category ?? '-' }}</td>
+                                <td class="text-muted">{{ $permits->firstItem() + $i }}</td>
                                 <td>
-                                    <span class="badge" style="background:rgba(99,102,241,0.08);color:var(--primary);font-size:0.65rem">
-                                        {{ $umkm->products_count ?? 0 }} produk
-                                    </span>
+                                    <div class="fw-semibold">{{ $p->business_name }}</div>
+                                    @if($p->permit_number)
+                                        <small class="text-muted" style="font-size:0.68rem"><i class="bi bi-tag me-1"></i>{{ $p->permit_number }}</small>
+                                    @endif
                                 </td>
+                                <td>{{ $p->applicant_name ?? '-' }}</td>
+                                <td>
+                                    @if($p->nib)
+                                        <span class="badge" style="background:rgba(99,102,241,0.08);color:var(--primary);font-size:0.7rem;font-family:monospace">{{ $p->nib }}</span>
+                                    @else
+                                        <small class="text-muted">-</small>
+                                    @endif
+                                </td>
+                                <td><span class="badge" style="background:rgba(139,92,246,0.1);color:#8b5cf6;font-size:0.65rem">{{ $p->permit_type_label }}</span></td>
+                                <td><small>{{ $p->kecamatan ? 'Kec. '.$p->kecamatan : '-' }}</small></td>
+                                <td><small>{{ $p->desa ?? '-' }}</small></td>
                                 <td><span class="badge" style="background:{{ $uClr }}22;color:{{ $uClr }};font-size:0.7rem"><i class="bi bi-{{ $uIcon }} me-1"></i>{{ $uLabel }}</span></td>
-                                <td><small class="text-muted">{{ $umkm->created_at?->format('d/m/Y') }}</small></td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="7" class="text-center py-5">
-                                    <div style="font-size:2rem;opacity:0.3;margin-bottom:0.5rem"><i class="bi bi-shop"></i></div>
-                                    <p class="text-muted mb-0">Belum ada data pelaku usaha pangan.</p>
+                                <td colspan="8" class="text-center py-5">
+                                    <div style="font-size:2rem;opacity:0.3;margin-bottom:0.5rem"><i class="bi bi-file-earmark-text"></i></div>
+                                    @if(request()->filled(['q','kecamatan','desa','jenis']))
+                                        <p class="text-muted mb-0">Data perizinan tidak ditemukan. Coba ubah kata kunci atau filter wilayah.</p>
+                                    @else
+                                        <p class="text-muted mb-0">Belum ada data perizinan pangan yang dilaporkan.</p>
+                                    @endif
                                 </td>
                             </tr>
                             @endforelse
@@ -143,9 +207,9 @@
                     </table>
                 </div>
             </div>
-            @if($umkms->hasPages())
+            @if($permits->hasPages())
             <div class="card-footer p-3" style="background:var(--bg-card)">
-                {{ $umkms->links() }}
+                {{ $permits->links() }}
             </div>
             @endif
         </div>
@@ -337,4 +401,75 @@
     </div>
 </section>
 
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // ====== Dropdown Desa dinamis (dependen Kecamatan) ======
+        const KEC_DESA = @json($kecamatanDesa);
+        const kecSelect = document.getElementById('filterKecamatan');
+        const desaSelect = document.getElementById('filterDesa');
+        const selectedDesa = {{ json_encode(request('desa')) }};
+
+        function renderDesa() {
+            if (!kecSelect || !desaSelect) return;
+            const kec = kecSelect.value;
+            desaSelect.innerHTML = '<option value="">Semua Desa</option>';
+            (KEC_DESA[kec] || []).forEach(function (d) {
+                const opt = document.createElement('option');
+                opt.value = d;
+                opt.textContent = d;
+                if (d === selectedDesa) opt.selected = true;
+                desaSelect.appendChild(opt);
+            });
+        }
+        if (kecSelect) {
+            renderDesa();
+            kecSelect.addEventListener('change', renderDesa);
+        }
+
+        // ====== Grafik Sebaran Pelaku Usaha per Kecamatan ======
+        const ctx = document.getElementById('chartKecamatan');
+        if (ctx && window.Chart) {
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: @json($chartLabels),
+                    datasets: [{
+                        label: 'Jumlah Pelaku Usaha',
+                        data: @json($chartValues),
+                        backgroundColor: [
+                            'rgba(139,92,246,0.75)', 'rgba(99,102,241,0.75)',
+                            'rgba(16,185,129,0.75)', 'rgba(245,158,11,0.75)',
+                            'rgba(14,165,233,0.75)', 'rgba(239,68,68,0.75)'
+                        ],
+                        borderColor: [
+                            '#8b5cf6', '#6366f1', '#10b981', '#f59e0b', '#0ea5e9', '#ef4444'
+                        ],
+                        borderWidth: 1.5,
+                        borderRadius: 8,
+                        maxBarThickness: 46
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0, color: '#94a3b8' },
+                            grid: { color: 'rgba(148,163,184,0.15)' }
+                        },
+                        x: {
+                            ticks: { color: '#94a3b8', font: { size: 10 }, maxRotation: 35, minRotation: 0 },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
 @endsection

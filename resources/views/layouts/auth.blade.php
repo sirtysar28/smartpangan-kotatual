@@ -7,6 +7,7 @@
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('logo.png') }}">
     <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="theme-color" content="#0f172a">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="PANCA Kota Tual">
@@ -51,6 +52,7 @@
     </style>
 </head>
 <body>
+    @include('partials.page-loader')
     <div class="bg-particles">
         <span style="top:10%;left:20%;animation-delay:0s"></span>
         <span style="top:30%;left:80%;animation-delay:1s"></span>
@@ -80,5 +82,12 @@
     {{-- 5 icon bottom nav khusus mobile (ala native) --}}
     @include('frontend.partials.mobile-nav')
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('{{ asset('sw.js') }}').catch(() => {});
+            });
+        }
+    </script>
 </body>
 </html>

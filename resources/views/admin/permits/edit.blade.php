@@ -49,6 +49,21 @@
                     <label class="form-label small fw-semibold">Alamat Usaha</label>
                     <textarea name="business_address" class="form-control" rows="2">{{ $permit->business_address }}</textarea>
                 </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Kecamatan</label>
+                    <select name="kecamatan" id="permitKecamatan" class="form-select">
+                        <option value="">-- Pilih Kecamatan --</option>
+                        @foreach(array_keys(\App\Support\TualWilayah::kecamatan()) as $kec)
+                            <option value="{{ $kec }}" {{ old('kecamatan', $permit->kecamatan) == $kec ? 'selected' : '' }}>Kec. {{ $kec }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Desa / Kelurahan</label>
+                    <select name="desa" id="permitDesa" class="form-select">
+                        <option value="">-- Pilih Kecamatan dahulu --</option>
+                    </select>
+                </div>
             </div>
 
             <h6 class="fw-bold mb-3" style="font-size:0.95rem"><i class="bi bi-person me-2" style="color:var(--primary)"></i>Informasi Pemohon</h6>
@@ -60,6 +75,23 @@
                 <div class="col-md-6">
                     <label class="form-label small fw-semibold">No. Telepon</label>
                     <input type="text" name="applicant_phone" class="form-control" value="{{ $permit->applicant_phone }}">
+                </div>
+            </div>
+
+            <h6 class="fw-bold mb-3" style="font-size:0.95rem"><i class="bi bi-card-checklist me-2" style="color:var(--primary)"></i>NIB &amp; Detail Perizinan</h6>
+            <div class="row g-3 mb-2">
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Nomor Izin Berusaha (NIB)</label>
+                    <input type="text" name="nib" class="form-control" value="{{ old('nib', $permit->nib) }}" placeholder="Contoh: 8272010012345">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">UMKM Terdaftar</label>
+                    <select name="umkm_id" class="form-select">
+                        <option value="">-- Tidak terkait UMKM --</option>
+                        @foreach($umkms as $u)
+                            <option value="{{ $u->id }}" {{ old('umkm_id', $permit->umkm_id) == $u->id ? 'selected' : '' }}>{{ $u->business_name }}</option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
 
@@ -78,10 +110,24 @@
                 </div>
             </div>
 
+            <h6 class="fw-bold mb-3" style="font-size:0.95rem"><i class="bi bi-paperclip me-2" style="color:var(--primary)"></i>Dokumen</h6>
             <div class="row g-3 mb-4">
-                <div class="col-md-8">
-                    <label class="form-label small fw-semibold">Upload Dokumen Baru</label>
-                    <input type="file" name="document_file" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold"><i class="bi bi-card-checklist me-1"></i>Upload Dokumen NIB</label>
+                    <input type="file" name="nib_document" id="nibDocumentFile" class="d-none" accept=".pdf,.jpg,.jpeg,.png">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <label for="nibDocumentFile" class="btn btn-sm m-0" style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;border-radius:10px;font-weight:600;padding:0.45rem 1rem">
+                            <i class="bi bi-upload me-1"></i>Upload Dokumen NIB
+                        </label>
+                        <small class="text-muted" id="nibFileName">PDF, JPG, PNG — Maks 5MB</small>
+                    </div>
+                    @if($permit->nib_document_url)
+                        <div class="mt-2"><a href="{{ $permit->nib_document_url }}" target="_blank" class="btn btn-sm" style="background:rgba(16,185,129,0.08);color:#10b981;border-radius:8px"><i class="bi bi-eye me-1"></i>Lihat Dokumen NIB</a></div>
+                    @endif
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold"><i class="bi bi-file-earmark-text me-1"></i>Upload Dokumen Perizinan</label>
+                    <input type="file" name="document_file" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png">
                     <small class="text-muted">Kosongkan jika tidak ingin mengubah</small>
                     @if($permit->document_file_url)
                         <div class="mt-2"><a href="{{ $permit->document_file_url }}" target="_blank" class="btn btn-sm" style="background:rgba(99,102,241,0.08);color:var(--primary);border-radius:8px"><i class="bi bi-eye me-1"></i>Lihat Dokumen</a></div>
@@ -102,3 +148,42 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Dropdown Desa dependen Kecamatan (data wilayah Kota Tual)
+        const KEC_DESA = @json(\App\Support\TualWilayah::kecamatan());
+        const kec = document.getElementById('permitKecamatan');
+        const desa = document.getElementById('permitDesa');
+        const selectedDesa = {{ json_encode(old('desa', $permit->desa)) }};
+
+        function renderDesa() {
+            if (!kec || !desa) return;
+            const list = KEC_DESA[kec.value] || [];
+            desa.innerHTML = '<option value="">-- Pilih Desa / Kelurahan --</option>';
+            list.forEach(function (d) {
+                const opt = document.createElement('option');
+                opt.value = d;
+                opt.textContent = d;
+                if (d === selectedDesa) opt.selected = true;
+                desa.appendChild(opt);
+            });
+        }
+        if (kec) {
+            renderDesa();
+            kec.addEventListener('change', renderDesa);
+        }
+
+        // Nama file terpilih pada tombol Upload Dokumen NIB
+        const nibFile = document.getElementById('nibDocumentFile');
+        const nibName = document.getElementById('nibFileName');
+        if (nibFile && nibName) {
+            nibFile.addEventListener('change', function () {
+                nibName.textContent = this.files.length ? this.files[0].name : 'PDF, JPG, PNG — Maks 5MB';
+                nibName.classList.add('fw-semibold');
+            });
+        }
+    });
+</script>
+@endpush

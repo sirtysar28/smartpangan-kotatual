@@ -139,120 +139,66 @@
 
 <div class="row g-3 g-xl-4 report-grid">
 
-    {{-- ================= LAPORAN PENJUALAN ================= --}}
+    {{-- ============ LAPORAN PANEL HARGA (default 1 tahun) ============ --}}
     <div class="col-12 col-md-6 col-xl-4 animate-fade-up delay-1">
-        <div class="report-card" style="--rc-accent:#6366f1;--rc-soft:rgba(99,102,241,0.12);--rc-shadow:rgba(99,102,241,0.35)">
-            <div class="report-body">
-                <div class="report-head">
-                    <div class="report-icon"><i class="bi bi-bag"></i></div>
-                    <div>
-                        <h6 class="report-title">Laporan Penjualan</h6>
-                        <p class="report-desc">Data transaksi per periode</p>
-                    </div>
-                </div>
-                <form action="{{ route('admin.reports.sales') }}" method="POST" class="report-form">@csrf
-                    <div class="row g-2">
-                        <div class="col-6">
-                            <label class="form-label">Dari Tanggal</label>
-                            <input type="date" name="start_date" class="form-control" value="{{ now()->startOfMonth()->format('Y-m-d') }}" required>
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label">Sampai</label>
-                            <input type="date" name="end_date" class="form-control" value="{{ now()->format('Y-m-d') }}" required>
-                        </div>
-                    </div>
-                    <button type="submit" class="report-btn"><i class="bi bi-download"></i>Download PDF</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    {{-- ================= LAPORAN UMKM ================= --}}
-    <div class="col-12 col-md-6 col-xl-4 animate-fade-up delay-2">
-        <div class="report-card" style="--rc-accent:#10b981;--rc-soft:rgba(16,185,129,0.12);--rc-shadow:rgba(16,185,129,0.3)">
-            <div class="report-body">
-                <div class="report-head">
-                    <div class="report-icon"><i class="bi bi-shop"></i></div>
-                    <div>
-                        <h6 class="report-title">Laporan UMKM</h6>
-                        <p class="report-desc">Data UMKM terverifikasi</p>
-                    </div>
-                </div>
-                <form action="{{ route('admin.reports.umkm') }}" method="POST" class="report-form">@csrf
-                    <div class="row g-2">
-                        <div class="col-6">
-                            <label class="form-label">Dari Tanggal <em class="fw-normal text-lowercase">(opsional)</em></label>
-                            <input type="date" name="start_date" class="form-control">
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label">Sampai</label>
-                            <input type="date" name="end_date" class="form-control">
-                        </div>
-                    </div>
-                    <button type="submit" class="report-btn"><i class="bi bi-download"></i>Download PDF</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    {{-- ================= LAPORAN KOMODITAS ================= --}}
-    <div class="col-12 col-md-6 col-xl-4 animate-fade-up delay-3">
         <div class="report-card" style="--rc-accent:#f59e0b;--rc-soft:rgba(245,158,11,0.12);--rc-shadow:rgba(245,158,11,0.3)">
             <div class="report-body">
                 <div class="report-head">
                     <div class="report-icon"><i class="bi bi-graph-up"></i></div>
                     <div>
-                        <h6 class="report-title">Laporan Komoditas</h6>
-                        <p class="report-desc">Harga kebutuhan pokok &amp; tren</p>
+                        <h6 class="report-title">Laporan Panel Harga</h6>
+                        <p class="report-desc">Harga komoditas + perbandingan minggu/bulan/tahun lalu</p>
                     </div>
                 </div>
                 <form action="{{ route('admin.reports.commodity') }}" method="POST" class="report-form">@csrf
                     <div class="row g-2">
                         <div class="col-6">
-                            <label class="form-label">Dari Tanggal <em class="fw-normal text-lowercase">(opsional)</em></label>
-                            <input type="date" name="start_date" class="form-control">
+                            <label class="form-label">Dari Tanggal <em class="fw-normal text-lowercase">(default 1 thn)</em></label>
+                            <input type="date" name="start_date" class="form-control" value="{{ old('start_date', now()->subYear()->format('Y-m-d')) }}">
                         </div>
                         <div class="col-6">
                             <label class="form-label">Sampai</label>
-                            <input type="date" name="end_date" class="form-control">
+                            <input type="date" name="end_date" class="form-control" value="{{ old('end_date', now()->format('Y-m-d')) }}">
                         </div>
                     </div>
                     <button type="submit" class="report-btn"><i class="bi bi-download"></i>Download PDF</button>
+                    <p class="report-hint"><i class="bi bi-arrow-left-right"></i>Laporan terpisah dari ketersediaan pangan</p>
                 </form>
             </div>
         </div>
     </div>
 
-    {{-- ================= PRODUK TERLARIS ================= --}}
-    <div class="col-12 col-md-6 col-xl-4 animate-fade-up delay-4">
-        <div class="report-card" style="--rc-accent:#0ea5e9;--rc-soft:rgba(14,165,233,0.12);--rc-shadow:rgba(14,165,233,0.3)">
+    {{-- ============ LAPORAN KETERSEDIAAN PANGAN (TERPISAH — revisi 14 Okt 2026) ============ --}}
+    <div class="col-12 col-md-6 col-xl-4 animate-fade-up delay-2">
+        <div class="report-card" style="--rc-accent:#10b981;--rc-soft:rgba(16,185,129,0.12);--rc-shadow:rgba(16,185,129,0.3)">
             <div class="report-body">
                 <div class="report-head">
-                    <div class="report-icon"><i class="bi bi-trophy"></i></div>
+                    <div class="report-icon"><i class="bi bi-box-seam"></i></div>
                     <div>
-                        <h6 class="report-title">Produk Terlaris</h6>
-                        <p class="report-desc">Top 50 produk terlaris</p>
+                        <h6 class="report-title">Laporan Ketersediaan Pangan</h6>
+                        <p class="report-desc">Stok &amp; pasokan + riwayat pemantauan (data terpisah)</p>
                     </div>
                 </div>
-                <form action="{{ route('admin.reports.top-products') }}" method="POST" class="report-form">@csrf
+                <form action="{{ route('admin.reports.availability') }}" method="POST" class="report-form">@csrf
                     <div class="row g-2">
                         <div class="col-6">
-                            <label class="form-label">Dari Tanggal <em class="fw-normal text-lowercase">(opsional)</em></label>
-                            <input type="date" name="start_date" class="form-control">
+                            <label class="form-label">Dari Tanggal <em class="fw-normal text-lowercase">(default 1 thn)</em></label>
+                            <input type="date" name="start_date" class="form-control" value="{{ old('start_date', now()->subYear()->format('Y-m-d')) }}">
                         </div>
                         <div class="col-6">
                             <label class="form-label">Sampai</label>
-                            <input type="date" name="end_date" class="form-control">
+                            <input type="date" name="end_date" class="form-control" value="{{ old('end_date', now()->format('Y-m-d')) }}">
                         </div>
                     </div>
                     <button type="submit" class="report-btn"><i class="bi bi-download"></i>Download PDF</button>
+                    <p class="report-hint"><i class="bi bi-arrow-left-right"></i>Laporan terpisah dari panel harga</p>
                 </form>
             </div>
         </div>
     </div>
 
-    {{-- ================= KEAMANAN PANGAN ================= --}}
-    <div class="col-12 col-md-6 col-xl-4 animate-fade-up delay-5">
+    {{-- ============ LAPORAN KEAMANAN PANGAN ============ --}}
+    <div class="col-12 col-md-6 col-xl-4 animate-fade-up delay-3">
         <div class="report-card" style="--rc-accent:#a855f7;--rc-soft:rgba(168,85,247,0.12);--rc-shadow:rgba(168,85,247,0.3)">
             <div class="report-body">
                 <div class="report-head">
@@ -283,6 +229,26 @@
                     </div>
                     <button type="submit" class="report-btn"><i class="bi bi-file-earmark-pdf"></i>Download PDF</button>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- ============ LAPORAN PERIZINAN (REKAP DOKUMEN — revisi 14 Okt 2026) ============ --}}
+    <div class="col-12 col-md-6 col-xl-4 animate-fade-up delay-4">
+        <div class="report-card" style="--rc-accent:#0ea5e9;--rc-soft:rgba(14,165,233,0.12);--rc-shadow:rgba(14,165,233,0.3)">
+            <div class="report-body">
+                <div class="report-head">
+                    <div class="report-icon"><i class="bi bi-file-earmark-text"></i></div>
+                    <div>
+                        <h6 class="report-title">Laporan Perizinan Pangan</h6>
+                        <p class="report-desc">Rekap pemilik usaha, alamat &amp; dokumen perizinan</p>
+                    </div>
+                </div>
+                <div class="d-flex flex-column gap-2" style="font-size:0.78rem;color:var(--text-muted);margin-top:auto">
+                    <div class="d-flex gap-2"><i class="bi bi-check2-circle mt-1" style="color:#10b981"></i><span>Menampilkan <strong>pemilik usaha, alamat &amp; dokumen</strong> perizinan pangan.</span></div>
+                    <div class="d-flex gap-2"><i class="bi bi-info-circle mt-1" style="color:#0ea5e9"></i><span>Bersifat <strong>laporan data</strong> — penerbitan izin tetap di sistem satu pintu.</span></div>
+                </div>
+                <a href="{{ route('admin.permits.index') }}" class="report-btn mt-3"><i class="bi bi-eye"></i>Lihat Daftar Perizinan</a>
             </div>
         </div>
     </div>

@@ -50,7 +50,19 @@
         <option value="perumahan" {{ old('category') == 'perumahan' ? 'selected' : '' }}>Perumahan</option>
         <option value="lainnya" {{ old('category') == 'lainnya' ? 'selected' : '' }}>Lainnya</option>
     </select></div>
-    <div class="mb-3"><label class="form-label">Harga Awal (Hari Ini) *</label><input type="text" name="price" class="form-control price-input" placeholder="cth. 60.983" inputmode="numeric" autocomplete="off" required value="{{ old('price') }}"></div>
+    <div class="row g-3 mb-2">
+        <div class="col-md-6">
+            <div class="mb-3"><label class="form-label">Harga Awal *</label><input type="text" name="price" class="form-control price-input" placeholder="cth. 60.983" inputmode="numeric" autocomplete="off" required value="{{ old('price') }}"></div>
+        </div>
+        <div class="col-md-6">
+            {{-- Revisi 14 Okt 2026: tanggal berlaku harga bisa dipilih (tidak terpaku "hari ini") agar riwayat/perbandingan harga akurat --}}
+            <div class="mb-3">
+                <label class="form-label">Tanggal Berlaku Harga *</label>
+                <input type="date" name="price_date" class="form-control" required value="{{ old('price_date', today()->format('Y-m-d')) }}" max="{{ now()->addYears(2)->format('Y-m-d') }}">
+                <small class="text-muted">Tanggal harga mulai berlaku (bisa tanggal lampau untuk input riwayat)</small>
+            </div>
+        </div>
+    </div>
     <div class="mb-3"><label class="form-label">Deskripsi</label><textarea name="description" class="form-control" rows="2">{{ old('description') }}</textarea></div>
     <div class="mb-3"><label class="form-label">Gambar Komoditas</label><input type="file" name="image" class="form-control" accept="image/*"><small class="text-muted">JPG, PNG, WEBP (max 2MB)</small></div>
 

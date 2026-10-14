@@ -16,6 +16,9 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Master Parameter Uji (revisi 14 Okt 2026) — ±8 parameter utama
+        $this->call(TestParameterMasterSeeder::class);
+
         // Users — firstOrCreate agar aman di-run berulang
         $admin = User::firstOrCreate(
             ['email' => 'admin@tualmart.id'],

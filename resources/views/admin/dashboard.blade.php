@@ -120,6 +120,14 @@
             <div class="chart-box chart-box-lg">
                 <canvas id="priceTrendChart"></canvas>
             </div>
+
+            @if(empty($commodityTrend) || !count($commodityTrend))
+            <div class="text-center py-5 text-muted" style="font-size:0.85rem">
+                <i class="bi bi-graph-up" style="font-size:2rem;opacity:0.3"></i>
+                <p class="mt-2 mb-2">Belum ada data harga untuk grafik tren.<br><small>Tambahkan komoditas &amp; input harga (Panel Harga) agar grafik tampil.</small></p>
+                <a href="{{ route('admin.commodities.create') }}" class="btn btn-sm btn-primary-modern rounded-pill px-3"><i class="bi bi-plus-lg me-1"></i>Tambah Komoditas</a>
+            </div>
+            @endif
         </div>
     </div>
     <div class="col-lg-4 animate-fade-up delay-4">
@@ -163,7 +171,7 @@
                     @endforeach
                 </div>
             </div>
-            <a href="{{ route('admin.ai-dashboard.inflation') }}" class="btn btn-sm" style="color:var(--primary);font-size:0.75rem">Detail <i class="bi bi-arrow-right"></i></a>
+            <a href="{{ route('admin.commodities.index') }}" class="btn btn-sm" style="color:var(--primary);font-size:0.75rem">Detail <i class="bi bi-arrow-right"></i></a>
         </div>
     </div>
 </div>
@@ -401,6 +409,28 @@
             </div>
         </div>
 
+        <!-- Charts Row (di bagian atas section — revisi 14 Okt 2026) -->
+        <div class="row g-3 mb-3">
+            <div class="col-lg-4">
+                <small class="fw-bold text-muted d-block mb-2" style="font-size:0.72rem">TREN RAPID TEST (6 BULAN)</small>
+                <div class="chart-box chart-box-sm">
+                    <canvas id="rapidTrendChart"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <small class="fw-bold text-muted d-block mb-2" style="font-size:0.72rem">TREN UJI LAB (6 BULAN)</small>
+                <div class="chart-box chart-box-sm">
+                    <canvas id="labTrendChart"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <small class="fw-bold text-muted d-block mb-2" style="font-size:0.72rem">RINGKASAN HASIL</small>
+                <div class="chart-box chart-box-sm">
+                    <canvas id="safetySummaryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
         <!-- Stats Row -->
         <div class="row g-2 mb-3">
             <div class="col-6 col-md-2">
@@ -437,28 +467,6 @@
                 <div class="p-2 text-center" style="border-radius:10px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.12)">
                     <div class="fw-bold" style="font-size:1.2rem;color:#ef4444">{{ $labTms }}</div>
                     <small class="text-muted" style="font-size:0.65rem">Lab TMS ❌</small>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charts Row -->
-        <div class="row g-3 mb-3">
-            <div class="col-lg-4">
-                <small class="fw-bold text-muted d-block mb-2" style="font-size:0.72rem">TREN RAPID TEST (6 BULAN)</small>
-                <div class="chart-box chart-box-sm">
-                    <canvas id="rapidTrendChart"></canvas>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <small class="fw-bold text-muted d-block mb-2" style="font-size:0.72rem">TREN UJI LAB (6 BULAN)</small>
-                <div class="chart-box chart-box-sm">
-                    <canvas id="labTrendChart"></canvas>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <small class="fw-bold text-muted d-block mb-2" style="font-size:0.72rem">RINGKASAN HASIL</small>
-                <div class="chart-box chart-box-sm">
-                    <canvas id="safetySummaryChart"></canvas>
                 </div>
             </div>
         </div>
@@ -574,6 +582,7 @@
 </div>
 @endif
 
+{{-- ===== SECTION PERIZINAN / UMKM DI-TAKEOUT (revisi 14 Okt 2026 - menu tidak dipakai di dashboard) =====
 <!-- ===== PERIZINAN / UMKM ===== -->
 <div class="card border-0 mb-4 animate-fade-up" style="border-radius:var(--radius);box-shadow:var(--shadow)">
     <div class="p-3">
@@ -705,6 +714,7 @@
         </div>
     </div>
 </div>
+END SECTION PERIZINAN/UMKM (di-takeout) --}}
 
 @endsection
 
