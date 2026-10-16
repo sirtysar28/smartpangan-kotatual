@@ -130,7 +130,7 @@
             <td>{{ $r->commodity_name }}</td>
             <td>{{ $r->commodity_type ?? '-' }}</td>
             <td>{{ $r->sample_location }}</td>
-            <td>{{ $r->type_label }}</td>
+            <td>{{ $r->type_label }}@if($r->parameter) <span style="font-size:7.5px;color:#64748b"> &middot; {{ $r->parameter_label }}</span>@endif</td>
             <td class="center"><span class="badge {{ $r->result === 'positif' ? 'bg-merah' : 'bg-hijau' }}">{{ strtoupper($r->result) }}</span></td>
             <td>{{ $r->notes ? \Illuminate\Support\Str::limit($r->notes, 60) : '-' }}</td>
         </tr>

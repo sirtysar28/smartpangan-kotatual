@@ -25,9 +25,11 @@ class ReportController extends Controller
 
     /**
      * Ambil & normalisasi rentang tanggal dari request (nullable).
-     * Revisi 14 Okt 2026: jika kosong, default periode 1 tahun terakhir.
+     * Revisi 16 Okt 2026: jika tanggal kosong (tombol download langsung diklik),
+     * default HANYA bulan berjalan (1 s/d hari ini) — data bulan-bulan
+     * sebelumnya tidak ikut teritarik. Berlaku di semua laporan PDF.
      */
-    private function dateRange(Request $request, bool $defaultOneYear = false): array
+    private function dateRange(Request $request): array
     {
         $data = $request->validate([
             'start_date' => 'nullable|date',
@@ -37,9 +39,10 @@ class ReportController extends Controller
         $start = $data['start_date'] ?? null;
         $end = $data['end_date'] ?? null;
 
-        if ($defaultOneYear && (!$start || !$end)) {
+        // Langsung klik tanpa isi tanggal → bulan berjalan saja
+        if (!$start || !$end) {
             $end = $end ?? now()->toDateString();
-            $start = $start ?? now()->subYear()->toDateString();
+            $start = $start ?? now()->startOfMonth()->toDateString();
         }
 
         return [$start, $end];
@@ -86,8 +89,8 @@ class ReportController extends Controller
 
     public function commodityReport(Request $request)
     {
-        // Revisi 14 Okt 2026: default periode 1 tahun (panel harga dibuat untuk 1 tahun)
-        [$start, $end] = $this->dateRange($request, defaultOneYear: true);
+        // Revisi 16 Okt 2026: default periode bulan berjalan saat langsung klik download
+        [$start, $end] = $this->dateRange($request);
 
         $commodities = \App\Models\Commodity::with(['latestPrice', 'prices' => fn($q) => $q
                 ->when($start, fn($q) => $q->whereDate('price_date', '>=', $start))
@@ -113,8 +116,8 @@ class ReportController extends Controller
 
     public function availabilityReport(Request $request)
     {
-        // Laporan ketersediaan dipisah dari laporan harga; default periode 1 tahun
-        [$start, $end] = $this->dateRange($request, defaultOneYear: true);
+        // Revisi 16 Okt 2026: default periode bulan berjalan saat langsung klik download
+        [$start, $end] = $this->dateRange($request);
 
         $stocks = \App\Models\CommodityStock::with('commodity')
             ->when($start, fn($q) => $q->whereDate('monitoring_date', '>=', $start))
@@ -177,6 +180,13 @@ class ReportController extends Controller
         $type = $data['report_type'] ?? 'all';
         $startDate = $data['start_date'] ?? null;
         $endDate = $data['end_date'] ?? null;
+
+        // Revisi 16 Okt 2026: langsung klik tanpa isi tanggal → hanya bulan berjalan
+        // (sebelumnya kosong = semua periode, sehingga bulan lalu ikut teritarik)
+        if (!$startDate || !$endDate) {
+            $endDate = $endDate ?? now()->toDateString();
+            $startDate = $startDate ?? now()->startOfMonth()->toDateString();
+        }
 
         $dateRange = fn($q) => $q
             ->when($startDate, fn($q) => $q->whereDate('test_date', '>=', $startDate))

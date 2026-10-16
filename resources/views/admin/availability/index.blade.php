@@ -62,6 +62,36 @@
     </div>
 </div>
 
+<!-- GRAFIK KETERSEDIAAN (dipindah ke bawah stat cards — revisi 15 Okt 2026) -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-8 animate-fade-up">
+        <div class="chart-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h6 class="fw-bold mb-0">📊 Grafik Stok vs Kebutuhan Mingguan</h6>
+                    <small class="text-muted">Perbandingan stok tersedia vs kebutuhan per minggu</small>
+                </div>
+            </div>
+            <div style="position:relative;height:320px">
+                <canvas id="stockChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 animate-fade-up">
+        <div class="chart-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h6 class="fw-bold mb-0">🎯 Distribusi Status Stok</h6>
+                    <small class="text-muted">Aman / Rawan / Kritis</small>
+                </div>
+            </div>
+            <div style="position:relative;max-width:250px;margin:0 auto">
+                <canvas id="stockStatusChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- TABEL KETERSEDIAAN PANGAN -->
 <div class="card border-0 mb-4 animate-fade-up" style="border-radius:var(--radius);box-shadow:var(--shadow)">
     <div class="p-3">
@@ -133,36 +163,6 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
-    </div>
-</div>
-
-<!-- GRAFIK KETERSEDIAAN -->
-<div class="row g-4 mb-4">
-    <div class="col-lg-8 animate-fade-up">
-        <div class="chart-container">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <h6 class="fw-bold mb-0">📊 Grafik Stok vs Kebutuhan Mingguan</h6>
-                    <small class="text-muted">Perbandingan stok tersedia vs kebutuhan per minggu</small>
-                </div>
-            </div>
-            <div style="position:relative;height:320px">
-                <canvas id="stockChart"></canvas>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-4 animate-fade-up">
-        <div class="chart-container">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <h6 class="fw-bold mb-0">🎯 Distribusi Status Stok</h6>
-                    <small class="text-muted">Aman / Rawan / Kritis</small>
-                </div>
-            </div>
-            <div style="position:relative;max-width:250px;margin:0 auto">
-                <canvas id="stockStatusChart"></canvas>
-            </div>
         </div>
     </div>
 </div>

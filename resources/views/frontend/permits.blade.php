@@ -154,46 +154,22 @@
                                 <th style="width:40px">#</th>
                                 <th>Nama Usaha</th>
                                 <th>Nama Pelaku Usaha</th>
-                                <th>Nomor Izin Berusaha (NIB)</th>
-                                <th>Jenis Perizinan</th>
-                                <th>Kecamatan</th>
-                                <th>Desa / Kelurahan</th>
-                                <th>Status</th>
+                                <th>Jenis Usaha</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($permits as $i => $p)
-                            @php
-                                $st = $p->permit_status;
-                                if ($st === 'approved' && $p->expiry_date && $p->expiry_date->lt(\Illuminate\Support\Carbon::today())) $st = 'expired';
-                                $uClr = match($st) { 'approved' => '#10b981', 'pending' => '#f59e0b', 'rejected' => '#ef4444', 'expired' => '#64748b', default => '#64748b' };
-                                $uIcon = match($st) { 'approved' => 'patch-check-fill', 'pending' => 'hourglass-split', 'rejected' => 'x-circle-fill', 'expired' => 'clock-history', default => 'dash-circle' };
-                                $uLabel = match($st) { 'approved' => 'Disetujui', 'pending' => 'Menunggu', 'rejected' => 'Ditolak', 'expired' => 'Kadaluarsa', default => ucfirst($st ?? '-') };
-                            @endphp
                             <tr>
                                 <td class="text-muted">{{ $permits->firstItem() + $i }}</td>
                                 <td>
                                     <div class="fw-semibold">{{ $p->business_name }}</div>
-                                    @if($p->permit_number)
-                                        <small class="text-muted" style="font-size:0.68rem"><i class="bi bi-tag me-1"></i>{{ $p->permit_number }}</small>
-                                    @endif
                                 </td>
                                 <td>{{ $p->applicant_name ?? '-' }}</td>
-                                <td>
-                                    @if($p->nib)
-                                        <span class="badge" style="background:rgba(99,102,241,0.08);color:var(--primary);font-size:0.7rem;font-family:monospace">{{ $p->nib }}</span>
-                                    @else
-                                        <small class="text-muted">-</small>
-                                    @endif
-                                </td>
-                                <td><span class="badge" style="background:rgba(139,92,246,0.1);color:#8b5cf6;font-size:0.65rem">{{ $p->permit_type_label }}</span></td>
-                                <td><small>{{ $p->kecamatan ? 'Kec. '.$p->kecamatan : '-' }}</small></td>
-                                <td><small>{{ $p->desa ?? '-' }}</small></td>
-                                <td><span class="badge" style="background:{{ $uClr }}22;color:{{ $uClr }};font-size:0.7rem"><i class="bi bi-{{ $uIcon }} me-1"></i>{{ $uLabel }}</span></td>
+                                <td>{{ $p->business_category ?? '-' }}</td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="8" class="text-center py-5">
+                                <td colspan="4" class="text-center py-5">
                                     <div style="font-size:2rem;opacity:0.3;margin-bottom:0.5rem"><i class="bi bi-file-earmark-text"></i></div>
                                     @if(request()->filled(['q','kecamatan','desa','jenis']))
                                         <p class="text-muted mb-0">Data perizinan tidak ditemukan. Coba ubah kata kunci atau filter wilayah.</p>

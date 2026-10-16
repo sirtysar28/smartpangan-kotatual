@@ -202,7 +202,7 @@
                                         <td class="fw-semibold">{{ $rapid->commodity_name }}</td>
                                         <td>{{ $rapid->commodity_type ?? '-' }}</td>
                                         <td>{{ $rapid->sample_location }}</td>
-                                        <td><span class="badge" style="background:rgba(168,85,247,0.08);color:#a855f7;font-size:0.65rem"><i class="bi bi-lightning-charge me-1"></i>{{ $rapid->type_label }}</span></td>
+                                        <td><span class="badge" style="background:rgba(168,85,247,0.08);color:#a855f7;font-size:0.65rem"><i class="bi bi-lightning-charge me-1"></i>{{ $rapid->type_label }}</span>@if($rapid->parameter)<div class="small text-muted mt-1"><i class="bi bi-sliders me-1"></i>{{ $rapid->parameter_label }}</div>@endif</td>
                                         <td>
                                             <span class="badge" style="background:{{ $rapid->result_color }}22;color:{{ $rapid->result_color }};font-size:0.7rem">
                                                 <i class="bi bi-{{ $rapid->result === 'positif' ? 'x-circle-fill' : 'check-circle-fill' }} me-1"></i>{{ $rapid->result_label }}
@@ -390,6 +390,7 @@
             'commodityName' => $r->commodity_name ?? '',
             'commodityType' => $r->commodity_type ?? '-',
             'type' => $r->type_label ?? '-',
+            'parameter' => $r->parameter_label,
             'result' => $r->result_label ?? '-',
             'resultColor' => $r->result_color ?? '#64748b',
             'notes' => $r->notes,
@@ -446,6 +447,9 @@
             html += infoItem('Jenis Komoditas', esc(d.commodityType));
             html += infoItem('Lokasi Sampel', esc(d.location));
             html += infoItem('Jenis Rapid Test', '<i class="bi bi-lightning-charge me-1"></i>' + esc(d.type));
+            if (d.parameter) {
+                html += infoItem('Parameter Uji', '<i class="bi bi-sliders me-1"></i>' + esc(d.parameter));
+            }
             html += infoItem('Hasil Uji', '<strong style="color:' + d.resultColor + '">' + esc(d.result) + '</strong>');
             html += '</div>';
 

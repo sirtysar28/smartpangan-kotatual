@@ -353,9 +353,7 @@
                 <a class="nav-link {{ request()->routeIs('admin.ai-dashboard.inflation')?'active':'' }}" href="{{ route('admin.ai-dashboard.inflation') }}">
                     <i class="bi bi-bar-chart-line"></i><span class="sidebar-text">Inflasi</span>
                 </a>
-                <a class="nav-link {{ request()->routeIs('admin.ai-dashboard.economy')?'active':'' }}" href="{{ route('admin.ai-dashboard.economy') }}">
-                    <i class="bi bi-cash-coin"></i><span class="sidebar-text">Ekonomi</span>
-                </a>
+                {{-- Menu Ekonomi dihapus (revisi 15 Okt 2026) --}}
 
                 <div class="sidebar-section-label">
                     <small>Lainnya</small>

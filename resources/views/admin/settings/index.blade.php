@@ -70,7 +70,7 @@
                             <small class="text-muted fw-normal d-block mt-1">Kosongkan jika tidak ingin mengubah</small>
                         @endif
                     </label>
-                    @elseif($setting->type === 'boolean')
+                    @if($setting->type === 'boolean')
                         <div class="form-check form-switch mt-1">
                             <input
                                 type="hidden"

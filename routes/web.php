@@ -139,6 +139,7 @@ Route::middleware(['auth','admin'])->prefix('admin')->name('admin.')->group(func
     Route::post('/permits', [App\Http\Controllers\Admin\PermitController::class, 'store'])->name('permits.store');
     Route::get('/permits/{permit}/edit', [App\Http\Controllers\Admin\PermitController::class, 'edit'])->name('permits.edit');
     Route::put('/permits/{permit}', [App\Http\Controllers\Admin\PermitController::class, 'update'])->name('permits.update');
+    Route::post('/permits/{permit}/upload-nib', [App\Http\Controllers\Admin\PermitController::class, 'uploadNib'])->name('permits.uploadNib');
     Route::delete('/permits/{permit}', [App\Http\Controllers\Admin\PermitController::class, 'destroy'])->name('permits.destroy');
     Route::post('/permits/{permit}/approve', [App\Http\Controllers\Admin\PermitController::class, 'approve'])->name('permits.approve');
     Route::post('/permits/{permit}/reject', [App\Http\Controllers\Admin\PermitController::class, 'reject'])->name('permits.reject');
@@ -161,7 +162,8 @@ Route::middleware(['auth','admin'])->prefix('admin')->name('admin.')->group(func
     // AI Dashboard
     Route::get('/ai-dashboard', [App\Http\Controllers\Admin\AiDashboardController::class, 'index'])->name('ai-dashboard.index');
     Route::get('/ai-dashboard/inflation', [App\Http\Controllers\Admin\AiDashboardController::class, 'inflation'])->name('ai-dashboard.inflation');
-    Route::get('/ai-dashboard/economy', [App\Http\Controllers\Admin\AiDashboardController::class, 'economy'])->name('ai-dashboard.economy');
+    // Dashboard Pertumbuhan Ekonomi dihapus (revisi 15 Okt 2026)
+    // Route::get('/ai-dashboard/economy', [App\Http\Controllers\Admin\AiDashboardController::class, 'economy'])->name('ai-dashboard.economy');
     Route::post('/ai-dashboard/generate', [App\Http\Controllers\Admin\AiDashboardController::class, 'generateInsights'])->name('ai-dashboard.generate');
 
     // Settings

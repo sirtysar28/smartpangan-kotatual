@@ -121,6 +121,9 @@
                                 <td>{{ $r->commodity_type ?? '-' }}</td>
                                 <td>
                                     <span class="badge" style="background:rgba(168,85,247,0.1);color:#a855f7;font-size:0.62rem;border-radius:6px"><i class="bi bi-lightning-charge me-1"></i>{{ $r->type_label }}</span>
+                                    @if($r->parameter)
+                                    <div class="small text-muted mt-1"><i class="bi bi-sliders me-1"></i>{{ $r->parameter_label }}</div>
+                                    @endif
                                 </td>
                                 <td>
                                     <span class="badge" style="background:{{ $r->result_color }}15;color:{{ $r->result_color }};font-size:0.65rem;border-radius:6px;font-weight:600">

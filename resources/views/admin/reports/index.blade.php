@@ -153,8 +153,8 @@
                 <form action="{{ route('admin.reports.commodity') }}" method="POST" class="report-form">@csrf
                     <div class="row g-2">
                         <div class="col-6">
-                            <label class="form-label">Dari Tanggal <em class="fw-normal text-lowercase">(default 1 thn)</em></label>
-                            <input type="date" name="start_date" class="form-control" value="{{ old('start_date', now()->subYear()->format('Y-m-d')) }}">
+                            <label class="form-label">Dari Tanggal <em class="fw-normal text-lowercase">(default bulan ini)</em></label>
+                            <input type="date" name="start_date" class="form-control" value="{{ old('start_date', now()->startOfMonth()->format('Y-m-d')) }}">
                         </div>
                         <div class="col-6">
                             <label class="form-label">Sampai</label>
@@ -182,8 +182,8 @@
                 <form action="{{ route('admin.reports.availability') }}" method="POST" class="report-form">@csrf
                     <div class="row g-2">
                         <div class="col-6">
-                            <label class="form-label">Dari Tanggal <em class="fw-normal text-lowercase">(default 1 thn)</em></label>
-                            <input type="date" name="start_date" class="form-control" value="{{ old('start_date', now()->subYear()->format('Y-m-d')) }}">
+                            <label class="form-label">Dari Tanggal <em class="fw-normal text-lowercase">(default bulan ini)</em></label>
+                            <input type="date" name="start_date" class="form-control" value="{{ old('start_date', now()->startOfMonth()->format('Y-m-d')) }}">
                         </div>
                         <div class="col-6">
                             <label class="form-label">Sampai</label>
@@ -211,12 +211,12 @@
                 <form action="{{ route('admin.reports.food-safety') }}" method="POST" class="report-form">@csrf
                     <div class="row g-2">
                         <div class="col-6">
-                            <label class="form-label">Dari Tanggal <em class="fw-normal text-lowercase">(opsional)</em></label>
-                            <input type="date" name="start_date" class="form-control">
+                            <label class="form-label">Dari Tanggal <em class="fw-normal text-lowercase">(default bulan ini)</em></label>
+                            <input type="date" name="start_date" class="form-control" value="{{ old('start_date', now()->startOfMonth()->format('Y-m-d')) }}">
                         </div>
                         <div class="col-6">
                             <label class="form-label">Sampai</label>
-                            <input type="date" name="end_date" class="form-control">
+                            <input type="date" name="end_date" class="form-control" value="{{ old('end_date', now()->format('Y-m-d')) }}">
                         </div>
                     </div>
                     <div>
@@ -265,8 +265,8 @@
                     </div>
                 </div>
                 <div class="d-flex flex-column gap-2" style="font-size:.78rem;color:var(--text-muted)">
-                    <div class="d-flex gap-2"><i class="bi bi-check2-circle mt-1" style="color:#10b981"></i><span>Pilih rentang tanggal untuk memfilter data laporan sesuai kebutuhan.</span></div>
-                    <div class="d-flex gap-2"><i class="bi bi-check2-circle mt-1" style="color:#10b981"></i><span>Kosongkan tanggal untuk mengunduh <strong>semua periode</strong>.</span></div>
+                    <div class="d-flex gap-2"><i class="bi bi-check2-circle mt-1" style="color:#10b981"></i><span>Langsung klik <strong>Download PDF</strong> → laporan hanya <strong>bulan berjalan</strong>.</span></div>
+                    <div class="d-flex gap-2"><i class="bi bi-check2-circle mt-1" style="color:#10b981"></i><span>Ubah rentang tanggal secara manual jika ingin periode lain (mis. bulan/tahun sebelumnya).</span></div>
                     <div class="d-flex gap-2"><i class="bi bi-check2-circle mt-1" style="color:#10b981"></i><span>Semua laporan diunduh dalam format <strong>PDF</strong> siap cetak.</span></div>
                 </div>
                 <p class="report-hint mt-3 mb-0"><i class="bi bi-clock-history"></i>Periode mengikuti tanggal pendataan pada sistem.</p>

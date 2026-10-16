@@ -9,9 +9,28 @@ use Illuminate\Http\Request;
 
 class RapidTestController extends Controller
 {
+    /**
+     * Daftar parameter yang pernah diinput admin (Revisi 15 Okt 2026)
+     * — dipakai sebagai saran pilihan di form; admin juga bisa ketik parameter baru.
+     */
+    private function usedParameters(): array
+    {
+        return RapidTest::query()
+            ->whereNotNull('parameter')
+            ->where('parameter', '!=', 'manual')
+            ->distinct()
+            ->orderBy('parameter')
+            ->pluck('parameter')
+            ->map(fn ($p) => RapidTest::parameterLabel($p))
+            ->unique()
+            ->values()
+            ->all();
+    }
+
     public function create()
     {
-        return view('admin.food-safety.rapid-test.create');
+        $usedParameters = $this->usedParameters();
+        return view('admin.food-safety.rapid-test.create', compact('usedParameters'));
     }
 
     public function store(Request $request)
@@ -28,7 +47,8 @@ class RapidTestController extends Controller
 
     public function edit(RapidTest $rapidTest)
     {
-        return view('admin.food-safety.rapid-test.edit', compact('rapidTest'));
+        $usedParameters = $this->usedParameters();
+        return view('admin.food-safety.rapid-test.edit', compact('rapidTest', 'usedParameters'));
     }
 
     public function update(Request $request, RapidTest $rapidTest)
@@ -57,6 +77,7 @@ class RapidTestController extends Controller
             'commodity_name' => 'required|string|max:255',
             'commodity_type' => 'nullable|string|max:255',
             'rapid_test_type' => 'required|string|max:255',
+            'parameter' => 'nullable|string|max:255',
             'result' => 'required|in:positif,negatif',
             'notes' => 'nullable|string',
         ]);
