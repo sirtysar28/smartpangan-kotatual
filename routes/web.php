@@ -171,6 +171,10 @@ Route::middleware(['auth','admin'])->prefix('admin')->name('admin.')->group(func
     Route::put('/settings', [App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
     Route::post('/settings/test-email', [App\Http\Controllers\Admin\SettingController::class, 'testEmail'])->name('settings.test-email');
 
+    // === TERMINAL APLIKASI (khusus admin — whitelist perintah aman) ===
+    Route::get('/terminal', [App\Http\Controllers\Admin\TerminalController::class, 'index'])->name('terminal.index');
+    Route::post('/terminal/run', [App\Http\Controllers\Admin\TerminalController::class, 'run'])->name('terminal.run')->middleware('throttle:60,1');
+
     // Reports (Revisi 14 Okt 2026: hanya panel harga, ketersediaan & keamanan pangan yang aktif di menu)
     Route::get('/reports', [App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
     Route::post('/reports/availability', [App\Http\Controllers\Admin\ReportController::class, 'availabilityReport'])->name('reports.availability');

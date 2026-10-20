@@ -369,6 +369,12 @@
                 <a class="nav-link {{ request()->routeIs('admin.settings.*')?'active':'' }}" href="{{ route('admin.settings.index') }}">
                     <i class="bi bi-gear"></i><span class="sidebar-text">Pengaturan</span>
                 </a>
+                {{-- Terminal: hanya untuk role admin (super_admin & opd) --}}
+                @if(auth()->check() && auth()->user()->isAdminLevel())
+                <a class="nav-link {{ request()->routeIs('admin.terminal.*')?'active':'' }}" href="{{ route('admin.terminal.index') }}">
+                    <i class="bi bi-terminal"></i><span class="sidebar-text">Terminal</span>
+                </a>
+                @endif
                 <a class="nav-link {{ request()->routeIs('admin.site-pages.*')?'active':'' }}" href="{{ route('admin.site-pages.index') }}">
                     <i class="bi bi-file-earmark-text"></i><span class="sidebar-text">Kelola Halaman</span>
                 </a>
